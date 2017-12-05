@@ -1,21 +1,19 @@
 allprojects {
 	apply plugin: 'maven-publish'
-//	apply plugin: 'eclipse'
 	group = 'org.brailleblaster.libembosser'
 	version = '1.0-SNAPSHOT'
 	repositories {
 		// No need for maven central as jcenter is a superset.
 		jcenter()
+		mavenLocal()
 		maven { url 'https://nexus.aphtech.org/repository/aphtech-mrepo' }
 	}
 	publishing {
 		repositories {
+			mavenLocal()
 			maven { url "${rootProject.projectDir}/repo" }
 		}
 	}
-//	eclipse.project {
-//		natures 'org.eclipse.buildship.core.gradleprojectnature'
-//	}
 }
 
 task wrapper(type: Wrapper) {
