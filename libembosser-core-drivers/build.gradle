@@ -1,0 +1,14 @@
+apply plugin: 'java-library'
+
+dependencies {
+	implementation 'com.google.guava:guava:23.5-jre'
+	api project(':libembosser-api')
+}
+
+publishing {
+	publications {
+		coreDrivers(MavenPublication) {
+			from components.java
+		}
+	}
+}

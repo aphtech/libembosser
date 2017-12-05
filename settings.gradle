@@ -1,0 +1,2 @@
+include 'libembosser-api','libembosser-core-drivers'
+rootProject.name = 'libembosser'
