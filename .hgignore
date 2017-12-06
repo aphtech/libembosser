@@ -2,6 +2,8 @@
 syntax: regexp
 ^repo$
 syntax: glob
+.classpath
 .project
 .settings
 .gradle
+build

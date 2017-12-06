@@ -19,24 +19,29 @@ import com.google.common.io.ByteStreams;
 
 public class EnablingTechnologiesEmbosser extends GenericTextEmbosser implements IEmbosser {
 	private static final byte ESC = 0x1B;
+	private static final byte DOTS_CMD = 'K';
+	private static final byte WRAP_CMD = 'W';
+	private static final byte IP_CMD = 'i';
+	private static final byte CELL_CMD = 's';
+	private static final byte RESTART_CMD = '@';
 	// When a number is needed as a argument, rather than sending the number in ASCII encoding select the value at the index of the number value from the below array.
 	private static final byte[] NUMBER_ARG = new byte[] {'@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '[', '\\', ']', '^', '_', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{'};
-	private static final byte[] DOTS_MODE_6 = createCommand('K', 0);
-	private static final byte[] DOTS_MODE_8 = createCommand('K', 1);
-	private static final byte[] LINE_WRAP_OFF = createCommand('W', 0);
-	private static final byte[] LINE_WRAP_ON = createCommand('W', 1);
-	private static final byte[] INTERPOINT_ON = createCommand('i', 0);
-	private static final byte[] INTERPOINT_P1 = createCommand('i', 1);
-	private byte[] INTERPOINT_P2 = createCommand('i', 2);
-	private static final byte[] CELL_LIBRARY_OF_CONGRESS = createCommand('s', 0);
-	private static final byte[] CELL_CALIFORNIA_SIGN = createCommand('s', 1);
-	private static final byte[] CELL_JUMBO = createCommand('s', 2);
-	private static final byte[] CELL_ENHANCED_LINE_SPACING = createCommand('s', 3);
-	private static final byte[] CELL_PETITE = createCommand('s', 4);
-	private static final byte[] CELL_PETITE_INTERLINE = createCommand('s', 5);
-	private static final byte[] CELL_MOON = createCommand('s', 6);
-	private static final byte[] CELL_MARBURG = createCommand('s', 8);
-	private static final byte[] RESTART_EMBOSSER = createCommand('@');
+	private static final byte[] DOTS_MODE_6 = createCommand(DOTS_CMD, 0);
+	private static final byte[] DOTS_MODE_8 = createCommand(DOTS_CMD, 1);
+	private static final byte[] LINE_WRAP_OFF = createCommand(WRAP_CMD, 0);
+	private static final byte[] LINE_WRAP_ON = createCommand(WRAP_CMD, 1);
+	private static final byte[] INTERPOINT_ON = createCommand(IP_CMD, 0);
+	private static final byte[] INTERPOINT_P1 = createCommand(IP_CMD, 1);
+	private byte[] INTERPOINT_P2 = createCommand(IP_CMD, 2);
+	private static final byte[] CELL_LIBRARY_OF_CONGRESS = createCommand(CELL_CMD, 0);
+	private static final byte[] CELL_CALIFORNIA_SIGN = createCommand(CELL_CMD, 1);
+	private static final byte[] CELL_JUMBO = createCommand(CELL_CMD, 2);
+	private static final byte[] CELL_ENHANCED_LINE_SPACING = createCommand(CELL_CMD, 3);
+	private static final byte[] CELL_PETITE = createCommand(CELL_CMD, 4);
+	private static final byte[] CELL_PETITE_INTERLINE = createCommand(CELL_CMD, 5);
+	private static final byte[] CELL_MOON = createCommand(CELL_CMD, 6);
+	private static final byte[] CELL_MARBURG = createCommand(CELL_CMD, 8);
+	private static final byte[] RESTART_EMBOSSER = createCommand(RESTART_CMD);
 	
 	private static byte[] createCommand(byte cmd) {
 		return new byte[] {ESC, cmd};
