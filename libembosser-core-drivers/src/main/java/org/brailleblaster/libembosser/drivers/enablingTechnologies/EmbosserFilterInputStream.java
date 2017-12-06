@@ -39,7 +39,7 @@ public class EmbosserFilterInputStream extends FilterInputStream {
 			i += length;
 		}
 		int res = super.read(b, i, len - length);
-		return res < 0? i : i + res;
+		return res < 0 && length > 0? length : length + res;
 	}
 
 }
