@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.EnumSet;
+import java.util.Map;
 
 import javax.print.PrintException;
 import javax.print.PrintService;
@@ -15,6 +16,7 @@ import org.brailleblaster.libembosser.spi.EmbossProperties;
 import org.brailleblaster.libembosser.spi.IEmbosser;
 import org.brailleblaster.libembosser.spi.Version;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 
@@ -95,9 +97,32 @@ public class EnablingTechnologiesEmbosser extends GenericTextEmbosser implements
 		}
 	}
 
-		private final static Version API_VERSION = new Version(1, 0);
-		private final String manufacturer = "Enabling Technologies";
-		private final String model;
+	private final static Version API_VERSION = new Version(1, 0);
+	private final String manufacturer = "Enabling Technologies";
+	private final String model;
+	private static Command getCellCommand(BrlCell cell) {
+		Command cmd;
+		switch (cell) {
+		case UK:
+		case AUSTRALIAN:
+		case MARBURG_MEDIUM:
+			cmd = Command.CELL_MARBURG_MEDIUM;
+			break;
+		case CALIFORNIA_SIGN:
+			cmd = Command.CELL_CALIFORNIA_SIGN;
+			break;
+		case JUMBO:
+			cmd = Command.CELL_JUMBO;
+			break;
+		case SMALL_ENGLISH:
+			cmd = Command.CELL_PETITE;
+			break;
+		default:
+			cmd = Command.CELL_LIBRARY_OF_CONGRESS;
+			break;
+		}
+		return cmd;
+	}
 
 	public EnablingTechnologiesEmbosser(String model) {
 		this.model = model;
@@ -130,8 +155,12 @@ public class EnablingTechnologiesEmbosser extends GenericTextEmbosser implements
 			buf.write(Command.DOTS_MODE_6.getBytes());
 			buf.write(Command.LINE_WRAP_OFF.getBytes());
 			BrlCell cell = embossProperties.getCellType();
-			int leftMargin = cell.getCellsForWidth(embossProperties.getLeftMargin());
-			buf.write(Command.LEFT_MARGIN.getBytes(leftMargin));
+			if (cell == null) cell = BrlCell.NLS;
+			buf.write(getCellCommand(cell).getBytes());
+			if (embossProperties.getLeftMargin() != null) {
+				int leftMargin = cell.getCellsForWidth(embossProperties.getLeftMargin());
+				buf.write(Command.LEFT_MARGIN.getBytes(leftMargin));
+			}
 			EmbosserFilterInputStream embosserStream = new EmbosserFilterInputStream(is, buf.toByteArray());
 			return super.emboss(embosserDevice, embosserStream, format, embossProperties);
 		}

@@ -10,9 +10,13 @@ import java.math.BigDecimal;
  */
 public enum BrlCell {
 	NLS(new BigDecimal("6.20"), new BigDecimal("10.00"), 6),
+	CALIFORNIA_SIGN(new BigDecimal("7.60"), new BigDecimal("10.00"), 6),
+	JUMBO(new BigDecimal("8.76"), new BigDecimal("12.70"), 6),
+	ENHANCED_LINE_SPACING(new BigDecimal("6.10"), new BigDecimal("15.24"), 6),
 	SMALL_ENGLISH(new BigDecimal("5.38"), new BigDecimal("8.46"), 6),
+	MARBURG_MEDIUM(new BigDecimal("6.00"), new BigDecimal("10.00"), 6),
 	UK(new BigDecimal("6.00"), new BigDecimal("10.00"), 6),
-	AUSTRALIAN(new BigDecimal("6.50"), new BigDecimal("10.50"), 6);
+	AUSTRALIAN(new BigDecimal("6.00"), new BigDecimal("10.00"), 6);
 	private BigDecimal width, height;
 	private int dots;
 	private BrlCell(BigDecimal width, BigDecimal height, int dots) {
