@@ -1,6 +1,7 @@
 package org.brailleblaster.libembosser.spi;
 
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.util.EnumSet;
 
 import javax.print.PrintException;
@@ -77,4 +78,6 @@ public interface IEmbosser {
 	 */
 	public boolean emboss(PrintService embosserDevice, InputStream is, DocumentFormat format,
 			EmbossProperties embossProperties) throws PrintException;
+
+	BigDecimal getMaximumPaperWidth();
 }

@@ -1,1 +1,2 @@
 org.brailleblaster.libembosser.drivers.generic.CoreEmbosserFactory
+org.brailleblaster.libembosser.drivers.enablingTechnologies.ETFactory

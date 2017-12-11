@@ -10,7 +10,7 @@ import com.google.common.collect.ImmutableList;
 public class ETFactory implements IEmbosserFactory {
 	List<IEmbosser> embossers;
 	public ETFactory() {
-		embossers = ImmutableList.of();
+		embossers = ImmutableList.of(new EnablingTechnologiesEmbosser("Phoenix"));
 	}
 
 	@Override
