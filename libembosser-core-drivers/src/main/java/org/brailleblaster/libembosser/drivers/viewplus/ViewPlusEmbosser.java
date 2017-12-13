@@ -1,7 +1,6 @@
 package org.brailleblaster.libembosser.drivers.viewplus;
 
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.util.EnumSet;
 
 import javax.print.PrintService;
@@ -9,6 +8,7 @@ import javax.print.PrintService;
 import org.brailleblaster.libembosser.spi.DocumentFormat;
 import org.brailleblaster.libembosser.spi.EmbossProperties;
 import org.brailleblaster.libembosser.spi.IGraphicsEmbosser;
+import org.brailleblaster.libembosser.spi.Rectangle;
 import org.brailleblaster.libembosser.spi.Version;
 
 public class ViewPlusEmbosser implements IGraphicsEmbosser {
@@ -56,7 +56,7 @@ public class ViewPlusEmbosser implements IGraphicsEmbosser {
 		return resolution;
 	}
 	@Override
-	public BigDecimal getMaximumPaperWidth() {
+	public Rectangle getMaximumPaper() {
 		// TODO Auto-generated method stub
 		return null;
 	}

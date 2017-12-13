@@ -2,39 +2,70 @@ package org.brailleblaster.libembosser.spi;
 
 import java.math.BigDecimal;
 
-public class EmbossProperties {
-	private int copies = 1;
-	private BrlCell cellType = BrlCell.NLS;
-	private BigDecimal leftMargin, rightMargin;
-	private BigDecimal paperWidth;
+/**
+ * Properties for emboss jobs.
+ * 
+ * This class contains a number of properties useful for when embossing a Braille document which may not be contained in the Braille file. For example a BRF does not contain information about margins and whether it should be embossed using interpoint. These properties should be seen as hints to the embosser driver rather than a guarantee as some embossers may not have the capability to respect all properties.
+ * 
+ * @author Michael Whapples
+ *
+ */
+public final class EmbossProperties {
+	private final int copies;
+	private final MultiSides sides;
+	private final BrlCell cellType;
+	private final Margins margins;
+	private final Rectangle paper;
+	public EmbossProperties() {
+		this(null, null, BrlCell.NLS, 1);
+	}
+	public EmbossProperties(Rectangle paper, Margins margins, BrlCell cellType, int copies) {
+		this(paper, margins, cellType, copies, MultiSides.P1ONLY);
+	}
+	public EmbossProperties(Rectangle paper, Margins margins, BrlCell cellType, int copies, MultiSides sides) {
+		this.paper = paper;
+		this.margins = margins;
+		this.cellType = cellType;
+		this.copies = copies;
+		this.sides = sides;
+	}
+	/**
+	 * Get the paper size to be used when embossing.
+	 * 
+	 * @return The paper size.
+	 */
+	public Rectangle getPaper() {
+		return paper;
+	}
+	/**
+	 * Get the margins to be used when embossing.
+	 * 
+	 * @return The margins to be applied.
+	 */
+	public Margins getMargins() {
+		return margins;
+	}
+	/**
+	 * Get the number of copies to emboss.
+	 * @return Number of copies to emboss.
+	 */
 	public int getCopies() {
 		return copies;
 	}
-	public void setCopies(int copies) {
-		this.copies = copies;
-	}
+	/**
+	 * Get the Braille cell type to use.
+	 * 
+	 * @return The Braille cell type.
+	 */
 	public BrlCell getCellType() {
 		return cellType;
 	}
-	public void setCellType(BrlCell cellType) {
-		this.cellType = cellType;
-	}
-	public BigDecimal getPaperWidth() {
-		return paperWidth;
-	}
-	public void setPaperWidth(BigDecimal paperWidth) {
-		this.paperWidth = paperWidth;
-	}
-	public BigDecimal getLeftMargin() {
-		return leftMargin;
-	}
-	public void setLeftMargin(BigDecimal leftMargin) {
-		this.leftMargin = leftMargin;
-	}
-	public BigDecimal getRightMargin() {
-		return rightMargin;
-	}
-	public void setRightMargin(BigDecimal rightMargin) {
-		this.rightMargin = rightMargin;
+	/**
+	 * Get the sides to emboss on when the embosser supports embossing on multiple sides.
+	 * 
+	 * @return The sides to emboss on.
+	 */
+	public MultiSides getSides() {
+		return sides;
 	}
 }
