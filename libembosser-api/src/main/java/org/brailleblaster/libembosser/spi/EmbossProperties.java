@@ -68,4 +68,42 @@ public final class EmbossProperties {
 	public MultiSides getSides() {
 		return sides;
 	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((cellType == null) ? 0 : cellType.hashCode());
+		result = prime * result + copies;
+		result = prime * result + ((margins == null) ? 0 : margins.hashCode());
+		result = prime * result + ((paper == null) ? 0 : paper.hashCode());
+		result = prime * result + ((sides == null) ? 0 : sides.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		EmbossProperties other = (EmbossProperties) obj;
+		if (cellType != other.cellType)
+			return false;
+		if (copies != other.copies)
+			return false;
+		if (margins == null) {
+			if (other.margins != null)
+				return false;
+		} else if (!margins.equals(other.margins))
+			return false;
+		if (paper == null) {
+			if (other.paper != null)
+				return false;
+		} else if (!paper.equals(other.paper))
+			return false;
+		if (sides != other.sides)
+			return false;
+		return true;
+	}
 }

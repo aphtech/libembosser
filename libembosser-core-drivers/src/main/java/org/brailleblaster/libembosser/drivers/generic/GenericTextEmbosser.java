@@ -70,4 +70,10 @@ public class GenericTextEmbosser extends BaseTextEmbosser {
 	public EnumSet<DocumentFormat> getSupportedDocumentFormats() {
 		return EnumSet.of(DocumentFormat.BRF);
 	}
+	@Override
+	public boolean supportsInterpoint() {
+		// For now just say all generic embossers do not support interpoint.
+		// In the future should we want a interpoint generic embosser then we are still reliant on the embosser being configured and cannot actually set it from software in a generic way.
+		return false;
+	}
 }

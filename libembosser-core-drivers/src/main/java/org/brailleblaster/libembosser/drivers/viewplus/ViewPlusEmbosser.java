@@ -65,5 +65,10 @@ public class ViewPlusEmbosser implements IGraphicsEmbosser {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	@Override
+	public boolean supportsInterpoint() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 
 }

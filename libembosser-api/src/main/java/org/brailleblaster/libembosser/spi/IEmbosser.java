@@ -90,4 +90,10 @@ public interface IEmbosser {
 	 * @return The minimum paper size.
 	 */
 	public Rectangle getMinimumPaper();
+	/**
+	 * Whether the embosser supports interpoint embossing.
+	 * 
+	 * @return If the embosser can emboss interpoint then true, otherwise false.
+	 */
+	public boolean supportsInterpoint();
 }

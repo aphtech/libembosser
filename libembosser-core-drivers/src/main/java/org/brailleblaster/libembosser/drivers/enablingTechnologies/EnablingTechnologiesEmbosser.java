@@ -18,6 +18,7 @@ import org.brailleblaster.libembosser.spi.EmbossException;
 import org.brailleblaster.libembosser.spi.EmbossProperties;
 import org.brailleblaster.libembosser.spi.IEmbosser;
 import org.brailleblaster.libembosser.spi.Margins;
+import org.brailleblaster.libembosser.spi.MultiSides;
 import org.brailleblaster.libembosser.spi.Rectangle;
 import org.brailleblaster.libembosser.spi.Version;
 
@@ -99,6 +100,7 @@ public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 	}
 
 	private final static Version API_VERSION = new Version(1, 0);
+	private boolean interpoint;
 
 	private static Command getCellCommand(BrlCell cell) {
 		Command cmd;
@@ -124,8 +126,9 @@ public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 		return cmd;
 	}
 
-	public EnablingTechnologiesEmbosser(String model, Rectangle maxPaper, Rectangle minPaper) {
+	public EnablingTechnologiesEmbosser(String model, Rectangle maxPaper, Rectangle minPaper, boolean interpoint) {
 		super("Enabling Technologies", model, maxPaper, minPaper);
+		this.interpoint = interpoint;
 	}
 
 	@Override
@@ -160,12 +163,29 @@ public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 		if (BigDecimal.ZERO.compareTo(margins.getTop()) < 0) {
 			topMargin = cell.getLinesForHeight(margins.getTop());
 		}
+		MultiSides sides = props.getSides();
+		Command interpointCmd;
+		switch(sides) {
+		case INTERPOINT:
+			interpointCmd = Command.INTERPOINT_ON;
+			break;
+		case P1ONLY:
+			interpointCmd = Command.INTERPOINT_P1;
+			break;
+		case P2ONLY:
+			interpointCmd = Command.INTERPOINT_P2;
+			break;
+			default:
+				// Question what should really the default be when we do not recognise the value
+				interpointCmd = Command.INTERPOINT_ON;
+		}
 		// Max memory buffer of 10MB, otherwise fallback to file.
 		try(FileBackedOutputStream os = new FileBackedOutputStream(10485760)) {
 			os.write(Command.RESTART_EMBOSSER.getBytes());
 			os.write(Command.CHARSET.getBytes(0, 0));
 			os.write(Command.DOTS_MODE_6.getBytes());
 			os.write(Command.LINE_WRAP_OFF.getBytes());
+			os.write(interpointCmd.getBytes());
 			os.write(getCellCommand(cell).getBytes());
 			os.write(Command.LEFT_MARGIN.getBytes(leftMargin));
 			os.write(Command.RIGHT_MARGIN.getBytes(rightMargin));
@@ -177,6 +197,11 @@ public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 			e.printStackTrace();
 			return false;
 		}
+	}
+
+	@Override
+	public boolean supportsInterpoint() {
+		return interpoint;
 	}
 	
 }
