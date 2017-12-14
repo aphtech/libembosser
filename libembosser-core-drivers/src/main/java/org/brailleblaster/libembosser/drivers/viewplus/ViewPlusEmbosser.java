@@ -60,5 +60,10 @@ public class ViewPlusEmbosser implements IGraphicsEmbosser {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	@Override
+	public Rectangle getMinimumPaper() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

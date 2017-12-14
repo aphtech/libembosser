@@ -9,10 +9,12 @@ import java.util.EnumSet;
 import javax.print.PrintException;
 import javax.print.PrintService;
 
-import org.brailleblaster.libembosser.drivers.generic.CopyInputStream;
 import org.brailleblaster.libembosser.drivers.generic.GenericTextEmbosser;
+import org.brailleblaster.libembosser.drivers.utils.BaseTextEmbosser;
+import org.brailleblaster.libembosser.drivers.utils.CopyInputStream;
 import org.brailleblaster.libembosser.spi.BrlCell;
 import org.brailleblaster.libembosser.spi.DocumentFormat;
+import org.brailleblaster.libembosser.spi.EmbossException;
 import org.brailleblaster.libembosser.spi.EmbossProperties;
 import org.brailleblaster.libembosser.spi.IEmbosser;
 import org.brailleblaster.libembosser.spi.Margins;
@@ -22,7 +24,7 @@ import org.brailleblaster.libembosser.spi.Version;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.FileBackedOutputStream;
 
-public class EnablingTechnologiesEmbosser extends GenericTextEmbosser implements IEmbosser {
+public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 	private static final byte ESC = 0x1B;
 	// When a number is needed as a argument, rather than sending the number in
 	// ASCII encoding select the value at the index of the number value from the
@@ -122,8 +124,8 @@ public class EnablingTechnologiesEmbosser extends GenericTextEmbosser implements
 		return cmd;
 	}
 
-	public EnablingTechnologiesEmbosser(String model, Rectangle maxPaper) {
-		super("Enabling Technologies", model, maxPaper);
+	public EnablingTechnologiesEmbosser(String model, Rectangle maxPaper, Rectangle minPaper) {
+		super("Enabling Technologies", model, maxPaper, minPaper);
 	}
 
 	@Override
@@ -138,7 +140,7 @@ public class EnablingTechnologiesEmbosser extends GenericTextEmbosser implements
 
 	@Override
 	public boolean emboss(PrintService embosserDevice, InputStream is, DocumentFormat format,
-			EmbossProperties props) throws PrintException {
+			EmbossProperties props) throws EmbossException {
 		// Prepare from embossProperties
 		BrlCell cell = props.getCellType();
 		Rectangle paper = props.getPaper();

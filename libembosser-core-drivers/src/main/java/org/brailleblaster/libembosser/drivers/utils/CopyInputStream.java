@@ -1,4 +1,4 @@
-package org.brailleblaster.libembosser.drivers.generic;
+package org.brailleblaster.libembosser.drivers.utils;
 
 import java.io.IOException;
 import java.io.InputStream;

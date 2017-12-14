@@ -76,7 +76,7 @@ public interface IEmbosser {
 	 * @throws PrintException 
 	 */
 	public boolean emboss(PrintService embosserDevice, InputStream is, DocumentFormat format,
-			EmbossProperties embossProperties) throws PrintException;
+			EmbossProperties embossProperties) throws EmbossException;
 
 	/**
 	 * Get the maximum paper which can be handled by the embosser.
@@ -84,4 +84,10 @@ public interface IEmbosser {
 	 * @return The maximum paper which can be handled by the embosser.
 	 */
 	public Rectangle getMaximumPaper();
+	/**
+	 * The minimum paper size which can be handled by the embosser.
+	 * 
+	 * @return The minimum paper size.
+	 */
+	public Rectangle getMinimumPaper();
 }
