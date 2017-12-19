@@ -32,4 +32,13 @@ public class EmbosserService {
 	public IEmbosser getEmbosser(String manufacturer, String model) {
 		return getEmbosserStream().filter(e -> e.getManufacturer().equals(manufacturer) && e.getModel().equals(model)).findAny().orElseThrow(() -> new NoSuchElementException());
 	}
+	/**
+	 * Find an embosser matching the ID.
+	 * 
+	 * @param id The id of the embosser to find.
+	 * @return An embosser matching the id.
+	 */
+	public IEmbosser getEmbosser(String id) {
+		return getEmbosserStream().filter(e -> e.getId().equals(id)).findAny().orElseThrow(() -> new NoSuchElementException());
+	}
 }
