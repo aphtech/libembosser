@@ -2,6 +2,7 @@ package org.brailleblaster.libembosser.drivers.generic;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Locale;
 
 import org.brailleblaster.libembosser.drivers.generic.GenericTextEmbosser;
 import org.brailleblaster.libembosser.drivers.viewplus.ViewPlusLegacyEmbosser;
@@ -24,5 +25,9 @@ public class GenericEmbosserFactory implements IEmbosserFactory {
 	@Override
 	public List<IEmbosser> getEmbossers() {
 		return embossers;
+	}
+	@Override
+	public List<IEmbosser> getEmbossers(Locale locale) {
+		return getEmbossers();
 	}
 }

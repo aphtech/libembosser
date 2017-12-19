@@ -2,6 +2,7 @@ package org.brailleblaster.libembosser.drivers.enablingTechnologies;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Locale;
 
 import org.brailleblaster.libembosser.spi.IEmbosser;
 import org.brailleblaster.libembosser.spi.IEmbosserFactory;
@@ -27,6 +28,11 @@ public class ETFactory implements IEmbosserFactory {
 	@Override
 	public List<IEmbosser> getEmbossers() {
 		return embossers;
+	}
+	@Override
+	public List<IEmbosser> getEmbossers(Locale locale) {
+		// For now ignore the locale.
+		return getEmbossers();
 	}
 
 }
