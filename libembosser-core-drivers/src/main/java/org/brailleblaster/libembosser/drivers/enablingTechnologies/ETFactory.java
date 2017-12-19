@@ -15,12 +15,12 @@ public class ETFactory implements IEmbosserFactory {
 	private final List<IEmbosser> embossers;
 	public ETFactory() {
 		embossers = ImmutableList.<IEmbosser>builder()
-				.add(new EnablingTechnologiesEmbosser("Phoenix Gold", TWELVE_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, false))
-				.add(new EnablingTechnologiesEmbosser("Phoenix  silver", TWELVE_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, false))
-				.add(new EnablingTechnologiesEmbosser("Cyclone", TWELVE_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, false))
-				.add(new EnablingTechnologiesEmbosser("Trident", TWELVE_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, true))
-				.add(new EnablingTechnologiesEmbosser("BookMaker", TWELVE_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, true))
-				.add(new EnablingTechnologiesEmbosser("Braille Express", TWELVE_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, true))
+				.add(new EnablingTechnologiesEmbosser("libembosser.et.phoenix_gold", "Phoenix Gold", TWELVE_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, false))
+				.add(new EnablingTechnologiesEmbosser("libembosser.et.phoenix_silver", "Phoenix  silver", TWELVE_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, false))
+				.add(new EnablingTechnologiesEmbosser("libembosser.et.cyclone", "Cyclone", TWELVE_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, false))
+				.add(new EnablingTechnologiesEmbosser("libembosser.et.trident", "Trident", TWELVE_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, true))
+				.add(new EnablingTechnologiesEmbosser("libembosser.et.bookmaker", "BookMaker", TWELVE_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, true))
+				.add(new EnablingTechnologiesEmbosser("libembosser.et.braille_express", "Braille Express", TWELVE_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, true))
 				.build();
 	}
 

@@ -22,6 +22,7 @@ import org.brailleblaster.libembosser.spi.IEmbosser;
 import org.brailleblaster.libembosser.spi.Rectangle;
 
 public abstract class BaseTextEmbosser implements IEmbosser {
+	private final String id;
 	private String manufacturer;
 	private String model;
 	private Rectangle maximumPaper;
@@ -30,7 +31,8 @@ public abstract class BaseTextEmbosser implements IEmbosser {
 	// Doing it as this for now as this is how it worked previously in BrailleBlaster and so want too not break things.
 	private boolean jobFinished;
 	
-	public BaseTextEmbosser(String manufacturer, String model, Rectangle maxPaper, Rectangle minPaper) {
+	public BaseTextEmbosser(String id, String manufacturer, String model, Rectangle maxPaper, Rectangle minPaper) {
+		this.id = id;
 		this.manufacturer = manufacturer;
 		this.model = model;
 		this.maximumPaper = maxPaper;
@@ -134,5 +136,9 @@ public abstract class BaseTextEmbosser implements IEmbosser {
 			}
 		});
 		return jobFinished;
+	}
+	@Override
+	public String getId() {
+		return id;
 	}
 }

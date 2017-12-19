@@ -10,10 +10,7 @@ import javax.print.PrintService;
  * Interface for embosser drivers.
  * 
  * This interface should be implemented by embosser driver classes where the
- * instance of a driver will represent a specific model of embosser. The
- * manufacturer and model properties will be used as a primary key to locate
- * instances of the driver so implementations should attempt to make it so that
- * their instances will not clash with other implementations.
+ * instance of a driver will represent a specific model of embosser.
  * 
  * @author Michael Whapples
  *
@@ -29,6 +26,16 @@ public interface IEmbosser {
 	 */
 	public Version getApiVersion();
 
+	/**
+	 * Get the ID of the embosser.
+	 * 
+	 * The ID is used to uniquely identify each embosser model. In many instances the manufacturer and model may uniquely identify each model of embosser, however in contrast to manufacturer and model strings, the ID should never be localised or change and so will remain the same regardless of the locale being used. Therefore if your client software stores details of model in something such as an embosser configuration, it can rely on the ID remaining constant.
+	 * 
+	 * As the ID should be unique, driver implementations should choose something which will be unique to their specific implementation and will not clash with any other implementation. Whilst no enforcement of the form of ID is done, one possible recommendation might be to use reverse domains similar to java packages.
+	 * 
+	 * @return The ID of the embosser.
+	 */
+	public String getId();
 	/**
 	 * Get the name of the embosser manufacturer.
 	 * 

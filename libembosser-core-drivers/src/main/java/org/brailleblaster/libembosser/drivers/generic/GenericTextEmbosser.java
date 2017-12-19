@@ -32,8 +32,8 @@ public class GenericTextEmbosser extends BaseTextEmbosser {
 	public GenericTextEmbosser(String manufacturer, String model, Rectangle maxPaper, Rectangle minPaper) {
 		this(manufacturer, model, maxPaper, minPaper, false);
 	}
-	public GenericTextEmbosser(String manufacturer, String model, Rectangle maxPaper, Rectangle minPaper, boolean addMargins) {
-		super(manufacturer, model, maxPaper, minPaper);
+	public GenericTextEmbosser(String id, String model, Rectangle maxPaper, Rectangle minPaper, boolean addMargins) {
+		super(id, "Generic", model, maxPaper, minPaper);
 		this.addMargins = addMargins;
 	}
 	@Override

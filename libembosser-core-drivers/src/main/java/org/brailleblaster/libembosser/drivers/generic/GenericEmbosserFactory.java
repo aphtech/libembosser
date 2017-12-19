@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import org.brailleblaster.libembosser.drivers.generic.GenericTextEmbosser;
-import org.brailleblaster.libembosser.drivers.viewplus.ViewPlusEmbosser;
+import org.brailleblaster.libembosser.drivers.viewplus.ViewPlusLegacyEmbosser;
 import org.brailleblaster.libembosser.spi.IEmbosser;
 import org.brailleblaster.libembosser.spi.IEmbosserFactory;
 import org.brailleblaster.libembosser.spi.Rectangle;
@@ -17,8 +17,8 @@ public class GenericEmbosserFactory implements IEmbosserFactory {
 	private List<IEmbosser> embossers;
 	public GenericEmbosserFactory() {
 		embossers = ImmutableList.<IEmbosser>builder()
-				.add(new GenericTextEmbosser("Generic", "Text only", LARGE_GENERIC_PAPER, SMALL_GENERIC_PAPER))
-				.add(new GenericTextEmbosser("Generic", "Text with margins", LARGE_GENERIC_PAPER, SMALL_GENERIC_PAPER, true))
+				.add(new GenericTextEmbosser("libembosser.generic.text", "Text only", LARGE_GENERIC_PAPER, SMALL_GENERIC_PAPER))
+				.add(new GenericTextEmbosser("libembosser.generic.text_with_margins", "Text with margins", LARGE_GENERIC_PAPER, SMALL_GENERIC_PAPER, true))
 				.build();
 	}
 	@Override

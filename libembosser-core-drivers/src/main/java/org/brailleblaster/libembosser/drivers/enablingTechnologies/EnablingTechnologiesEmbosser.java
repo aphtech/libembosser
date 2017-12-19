@@ -126,8 +126,8 @@ public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 		return cmd;
 	}
 
-	public EnablingTechnologiesEmbosser(String model, Rectangle maxPaper, Rectangle minPaper, boolean interpoint) {
-		super("Enabling Technologies", model, maxPaper, minPaper);
+	public EnablingTechnologiesEmbosser(String id, String model, Rectangle maxPaper, Rectangle minPaper, boolean interpoint) {
+		super(id, "Enabling Technologies", model, maxPaper, minPaper);
 		this.interpoint = interpoint;
 	}
 
