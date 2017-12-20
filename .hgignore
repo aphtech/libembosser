@@ -7,3 +7,7 @@ syntax: glob
 .settings
 .gradle
 build
+syntax: regexp
+^libembosser-api/bin$
+syntax: regexp
+^libembosser-core-drivers/bin$
