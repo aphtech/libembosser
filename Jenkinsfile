@@ -8,14 +8,14 @@ Sets version to the branch name for downstream BrailleBlaster job on the same br
 pipeline {
 	agent any
 
+/*
 	triggers {
-		/*
 		Disabled, 
 		triggered with http://test.brailleblaster.org/jenkins.php 
 		due to https://issues.jenkins-ci.org/browse/JENKINS-48656 
 		bitbucketPush()
-		*/
 	}
+*/
 
 	stages {
 		stage("Build Data") {
@@ -29,7 +29,7 @@ pipeline {
 			steps {
 				// Run gradle
 				sh '''
-                    export BUILD=$(if [ "$( hg branch )" = "default" ]; then echo publish; else echo build; fi)
+					export BUILD=$(if [ "$( hg branch )" = "default" ]; then echo publish; else echo build; fi)
 					./gradlew clean $BUILD -PignoreTestFailures=true -PfindbugsXML=true
 				'''
 			}
