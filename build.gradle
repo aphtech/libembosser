@@ -1,5 +1,11 @@
+plugins {
+	id "net.linguica.maven-settings" version "0.5"
+}
+
 allprojects {
 	apply plugin: 'maven-publish'
+	apply plugin: 'net.linguica.maven-settings'
+
 	group = 'org.brailleblaster.libembosser'
 	version = '1.0-SNAPSHOT'
 	repositories {
@@ -10,7 +16,11 @@ allprojects {
 	}
 	publishing {
 		repositories {
-			maven { url "${rootProject.projectDir}/repo" }
+			maven {
+				// Get server credentials from maven-settings
+				name = "aphtech-mrepo"
+				url "https://nexus.aphtech.org/repository/aphtech-mrepo/"
+			}
 		}
 	}
 }
