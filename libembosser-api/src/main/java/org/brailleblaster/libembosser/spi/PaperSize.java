@@ -31,14 +31,14 @@ public enum PaperSize {
 	JUNIOR_LEGAL("Junior legal", "127", "203"),
 	LEDGER("Ledger", "279", "432"),
 	BRAILLE_11X11_5("11x11.5", "292", "279");
-	private String name;
+	private String displayName;
 	private Rectangle size;
 	private PaperSize(String name, String width, String height) {
-		this.name = name;
+		this.displayName = name;
 		size = new Rectangle(new BigDecimal(width), new BigDecimal(height));
 	}
-	public String getName() {
-		return name;
+	public String getDisplayName() {
+		return displayName;
 	}
 	public Rectangle getSize() {
 		return size;
