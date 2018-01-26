@@ -25,12 +25,12 @@ public enum PaperSize {
 	B8("B8", "62", "88"),
 	B9("B9", "44", "62"),
 	B10("B10", "31", "44"),
-	HALF_LETTER("Half letter", "140", "216"),
-	LETTER("Letter", "216", "279"),
-	LEGAL("Legal", "216", "356"),
-	JUNIOR_LEGAL("Junior legal", "127", "203"),
-	LEDGER("Ledger", "279", "432"),
-	BRAILLE_11X11_5("11x11.5", "292", "279");
+	HALF_LETTER("Half letter", "139.7", "216"),
+	LETTER("Letter", "216", "279.4"),
+	LEGAL("Legal", "216", "355.6"),
+	JUNIOR_LEGAL("Junior legal", "127", "203.2"),
+	LEDGER("Ledger", "279.4", "431.8"),
+	BRAILLE_11X11_5("11x11.5", "292.1", "279.4");
 	private String displayName;
 	private Rectangle size;
 	private PaperSize(String name, String width, String height) {
