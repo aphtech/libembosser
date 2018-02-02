@@ -26,7 +26,6 @@ import com.google.common.io.ByteStreams;
 import com.google.common.io.FileBackedOutputStream;
 
 public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
-	private static final byte ESC = 0x1B;
 	// When a number is needed as a argument, rather than sending the number in
 	// ASCII encoding select the value at the index of the number value from the
 	// below array.
@@ -57,7 +56,7 @@ public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 		}
 
 		private Command(byte cmd, int numOfArgs) {
-			this.cmd = new byte[] { ESC, cmd };
+			this.cmd = new byte[] { BaseTextEmbosser.ESC, cmd };
 			this.numOfArgs = numOfArgs;
 		}
 
@@ -67,7 +66,7 @@ public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 
 		private Command(byte cmd, int numOfArgs, int... data) {
 			this.cmd = new byte[data.length + 2];
-			this.cmd[0] = ESC;
+			this.cmd[0] = BaseTextEmbosser.ESC;
 			this.cmd[1] = cmd;
 			int cmdI = 2;
 			for (int i = 0; i < data.length; i++) {
@@ -144,6 +143,9 @@ public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 	@Override
 	public boolean emboss(PrintService embosserDevice, InputStream is, DocumentFormat format,
 			EmbossProperties props) throws EmbossException {
+		if (!getSupportedDocumentFormats().contains(format)) {
+			throw new EmbossException("Unsupported document format.");
+		}
 		// Prepare from embossProperties
 		BrlCell cell = props.getCellType();
 		Rectangle paper = props.getPaper();
@@ -154,10 +156,7 @@ public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 		if (margins == null) {
 			margins = Margins.NO_MARGINS;
 		}
-		int leftMargin = 0;
-		if (BigDecimal.ZERO.compareTo(margins.getLeft()) < 0) {
-			leftMargin = cell.getCellsForWidth(margins.getLeft());
-		}
+		int leftMargin = cell.getCellsForWidth(margins.getLeft());
 		int rightMargin = cell.getCellsForWidth(paper.getWidth().subtract(margins.getRight()));
 		int topMargin = 0;
 		if (BigDecimal.ZERO.compareTo(margins.getTop()) < 0) {

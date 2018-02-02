@@ -53,12 +53,15 @@ public enum BrlCell {
 		return dots;
 	}
 	/**
-	 * Get the number of whole cells which fit within a certain width.
+	 * Get the number of whole cells which fit within a certain width. If this method is passed a negative value it will return 0.
 	 * 
 	 * @param width The width in mm.
 	 * @return The number of whole cells which fit within the width.
 	 */
 	public int getCellsForWidth(BigDecimal width) {
+		if (BigDecimal.ZERO.compareTo(width) > 0) {
+			return 0;
+		}
 		return width.divideToIntegralValue(this.getWidth()).intValue();
 	}
 	/**

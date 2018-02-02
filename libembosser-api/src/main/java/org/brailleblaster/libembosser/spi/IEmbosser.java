@@ -80,7 +80,8 @@ public interface IEmbosser {
 	 *            The format of the document data.
 	 * @param embossProperties
 	 *            Details of how the BRF should be embossed.
-	 * @throws PrintException 
+	 * @return Whether the document was successfully embossed.
+	 * @throws EmbossException when there is a problem embossing.
 	 */
 	public boolean emboss(PrintService embosserDevice, InputStream is, DocumentFormat format,
 			EmbossProperties embossProperties) throws EmbossException;

@@ -30,6 +30,7 @@ public abstract class BaseTextEmbosser implements IEmbosser {
 	// Not really sure whether this is the best way to monitor for print job finishing.
 	// Doing it as this for now as this is how it worked previously in BrailleBlaster and so want too not break things.
 	private boolean jobFinished;
+	public static final byte ESC = 0x1B;
 	
 	public BaseTextEmbosser(String id, String manufacturer, String model, Rectangle maxPaper, Rectangle minPaper) {
 		this.id = id;
