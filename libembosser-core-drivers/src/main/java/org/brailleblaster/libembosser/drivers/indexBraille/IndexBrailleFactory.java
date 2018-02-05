@@ -19,6 +19,8 @@ public class IndexBrailleFactory implements IEmbosserFactory {
 				// The Enabling Technologies Romeo60 and Juliet120 are based on Index Basic D V5
 				.add(new IndexBrailleEmbosser("libembosser.ib.Romeo60", "Enabling Technologies", "Romeo 60", TWELVE_AND_HALF_BY_TWENTY_FOUR_PAPER, FOUR_BY_THREE_PAPER))
 				.add(new IndexBrailleEmbosser("libembosser.ib.Juliet120", "Enabling Technologies", "Juliet 120", TWELVE_AND_HALF_BY_TWENTY_FOUR_PAPER, FOUR_BY_THREE_PAPER))
+				.add(new IndexBrailleEmbosser("libembosser.ib.BasicDV5", "Index Braille", "Basic-D V5", new Rectangle(new BigDecimal("325"), new BigDecimal("431")), new Rectangle(new BigDecimal("100"), new BigDecimal("25"))))
+				.add(new IndexBrailleEmbosser("libembosser.ib.EverestDV5", "Index Braille", "Everest-D V5", new Rectangle(new BigDecimal("297"), new BigDecimal("590")), new Rectangle(new BigDecimal("130"), new BigDecimal("100"))))
 				.build();
 	}
 	@Override
