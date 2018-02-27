@@ -50,12 +50,15 @@ public class GenericTextEmbosser extends BaseTextEmbosser {
 		Margins margins = embossProperties.getMargins();
 		if (margins == null) margins = Margins.NO_MARGINS;
 		int topMargin = 0;
-		if (BigDecimal.ZERO.compareTo(margins.getTop()) < 0) {
-			topMargin = cell.getLinesForHeight(margins.getTop());
-		}
 		int leftMargin = 0;
-		if (BigDecimal.ZERO.compareTo(margins.getLeft()) < 0) {
-			leftMargin = cell.getCellsForWidth(margins.getLeft());
+		// Only set margins if addMargins is true.
+		if (addMargins) {
+			if (BigDecimal.ZERO.compareTo(margins.getTop()) < 0) {
+				topMargin = cell.getLinesForHeight(margins.getTop());
+			}
+			if (BigDecimal.ZERO.compareTo(margins.getLeft()) < 0) {
+				leftMargin = cell.getCellsForWidth(margins.getLeft());
+			} 
 		}
 		try (FileBackedOutputStream os = new FileBackedOutputStream(10485760)) {
 			copyContent(is, os, topMargin, leftMargin);
