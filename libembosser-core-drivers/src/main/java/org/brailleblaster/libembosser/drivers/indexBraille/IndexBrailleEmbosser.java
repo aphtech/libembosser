@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
+import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,16 +17,27 @@ import org.brailleblaster.libembosser.spi.DocumentFormat;
 import org.brailleblaster.libembosser.spi.EmbossException;
 import org.brailleblaster.libembosser.spi.EmbossProperties;
 import org.brailleblaster.libembosser.spi.Margins;
+import org.brailleblaster.libembosser.spi.MultiSides;
 import org.brailleblaster.libembosser.spi.Rectangle;
 import org.brailleblaster.libembosser.spi.Version;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Enums;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import com.google.common.io.FileBackedOutputStream;
 
 public class IndexBrailleEmbosser extends BaseTextEmbosser {
+	private final EnumSet<MultiSides> supportedSides;
+	/**
+	 * @deprecated Use {@link #IndexBrailleEmbosser(String,String,String,Rectangle,Rectangle,EnumSet)} instead
+	 */
 	public IndexBrailleEmbosser(String id, String manufacturer, String model, Rectangle maxPaper, Rectangle minPaper) {
+		this(id, manufacturer, model, maxPaper, minPaper, EnumSet.of(MultiSides.P1ONLY, MultiSides.INTERPOINT));
+	}
+	public IndexBrailleEmbosser(String id, String manufacturer, String model, Rectangle maxPaper, Rectangle minPaper, EnumSet<MultiSides> sides) {
 		super(id, manufacturer, model, maxPaper, minPaper);
-		// TODO Auto-generated constructor stub
+		supportedSides = sides;
 	}
 	private static final Version API_VERSION = new Version(1, 0);
 	@Override
@@ -106,5 +118,47 @@ public class IndexBrailleEmbosser extends BaseTextEmbosser {
 		} catch (IOException e) {
 			throw new EmbossException("There was a problem when embossing", e);
 		}
+	}
+	/**
+	 * Get the numeric value of the sides mode.
+	 * 
+	 * @param sides The enum value of how to emboss.
+	 * @return The numeric value to pass to the embosser in the dp escape sequence.
+	 */
+	private int getDuplexValue(MultiSides sides) {
+		switch(findNearestSupportedSides(sides)) {
+		case INTERPOINT:
+			return 2;
+		case P1ONLY:
+		case P2ONLY:
+			return 1;
+		case Z_FOLDING_DOUBLE_HORIZONTAL:
+			return 3;
+		case Z_FOLDING_SINGLE_HORIZONTAL:
+			return 5;
+		case Z_FOLDING_DOUBLE_VERTICAL:
+			return 6;
+		case Z_FOLDING_SINGLE_VERTICAL:
+			return 7;
+		case SADDLE_STITCH_DOUBLE_SIDED:
+			return 4;
+		case SADDLE_STITCH_SINGLE_SIDED:
+			return 8;
+			default:
+				return 1;
+		}
+	}
+	/**
+	 * Find the nearest supported page sides.
+	 * 
+	 * Not all embossers support all the possible side modes, so this method will find the closest match which this embosser can support.
+	 * @param sides The requested sides.
+	 * @return The nearest match supported by the embosser.
+	 */
+	private MultiSides findNearestSupportedSides(MultiSides sides) {
+		if (supportedSides.contains(sides)) {
+			return sides;
+		}
+		return MultiSides.P1ONLY;
 	}
 }
