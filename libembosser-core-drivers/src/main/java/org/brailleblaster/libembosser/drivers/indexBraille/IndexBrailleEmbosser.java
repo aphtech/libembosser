@@ -50,8 +50,7 @@ public class IndexBrailleEmbosser extends BaseTextEmbosser {
 	}
 	@Override
 	public boolean supportsInterpoint() {
-		// TODO Auto-generated method stub
-		return false;
+		return supportedSides.stream().anyMatch(e -> e.isDoubleSide());
 	}
 	@Override
 	public boolean emboss(PrintService embosserDevice, InputStream is, DocumentFormat format,
