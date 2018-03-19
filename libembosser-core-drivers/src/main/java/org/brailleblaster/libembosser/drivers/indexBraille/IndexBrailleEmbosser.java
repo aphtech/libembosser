@@ -93,6 +93,8 @@ public class IndexBrailleEmbosser extends BaseTextEmbosser {
 		int topLines = BrlCell.NLS.getLinesForHeight(topMargin);
 		// Index protocol requires lines per page to be specified if giving top margin
 		int linesPerPage = BrlCell.NLS.getLinesForHeight(paper.getHeight().subtract(topMargin).subtract(bottomMargin));
+		// Find the int value used for the page layout.
+		int embossPageFormat = getDuplexValue(embossProperties.getSides());
 		try (FileBackedOutputStream	os = new FileBackedOutputStream(10485760)) {
 			os.write(new byte[] {0x1B, 0x44});
 			List<String> params = new LinkedList<>();
@@ -100,6 +102,8 @@ public class IndexBrailleEmbosser extends BaseTextEmbosser {
 			params.add("BT0");
 			// Set multiple copies
 			params.add("MC" + Integer.toString(embossProperties.getCopies()));
+			// Set the page format
+			params.add("DP" + Integer.toString(embossPageFormat));
 			// Left margin and cells per line
 			// The Index protocol requires both or none to be given.
 			params.add("BI" + Integer.toString(bindingMargin));
@@ -144,8 +148,8 @@ public class IndexBrailleEmbosser extends BaseTextEmbosser {
 			return 4;
 		case SADDLE_STITCH_SINGLE_SIDED:
 			return 8;
-			default:
-				return 1;
+		default:
+			return 1;
 		}
 	}
 	/**
