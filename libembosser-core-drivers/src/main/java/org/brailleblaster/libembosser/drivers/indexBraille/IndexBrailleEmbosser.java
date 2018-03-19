@@ -162,6 +162,10 @@ public class IndexBrailleEmbosser extends BaseTextEmbosser {
 		if (supportedSides.contains(sides)) {
 			return sides;
 		}
+		if (sides.isDoubleSide() && supportedSides.contains(MultiSides.INTERPOINT)) {
+			return MultiSides.INTERPOINT;
+		}
+		// All Index Braille embossers should support P1ONLY, single side
 		return MultiSides.P1ONLY;
 	}
 }
