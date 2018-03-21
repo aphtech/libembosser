@@ -3,8 +3,6 @@ package org.brailleblaster.libembosser.drivers.indexBraille;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
-import java.nio.charset.Charset;
-import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,9 +20,6 @@ import org.brailleblaster.libembosser.spi.Rectangle;
 import org.brailleblaster.libembosser.spi.Version;
 
 import com.google.common.base.Charsets;
-import com.google.common.base.Enums;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import com.google.common.io.FileBackedOutputStream;
 
 public class IndexBrailleEmbosser extends BaseTextEmbosser {

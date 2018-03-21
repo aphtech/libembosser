@@ -29,6 +29,34 @@ public final class EmbossProperties {
 		this.copies = copies;
 		this.sides = sides;
 	}
+	public EmbossProperties copy() {
+		return copy(null, null);
+	}
+	public EmbossProperties copy(String name, Object value) {
+		Rectangle paper = this.paper;
+		Margins margins = this.margins;
+		BrlCell cellType = this.cellType;
+		int copies = this.copies;
+		MultiSides sides = this.sides;
+		switch (name) {
+		case "paper":
+			paper = (Rectangle)paper;
+			break;
+		case "margins":
+			margins = (Margins)value;
+			break;
+		case "cellType":
+			cellType = (BrlCell)value;
+			break;
+		case "copies":
+			copies = ((Integer)value).intValue();
+			break;
+		case "sides":
+			sides = (MultiSides)value;
+			break;
+		}
+		return new EmbossProperties(paper, margins, cellType, copies, sides);
+	}
 	/**
 	 * Get the paper size to be used when embossing.
 	 * 
@@ -36,6 +64,9 @@ public final class EmbossProperties {
 	 */
 	public Rectangle getPaper() {
 		return paper;
+	}
+	public EmbossProperties setPaper(Rectangle paper) {
+		return copy("paper", paper);
 	}
 	/**
 	 * Get the margins to be used when embossing.
@@ -45,12 +76,18 @@ public final class EmbossProperties {
 	public Margins getMargins() {
 		return margins;
 	}
+	public EmbossProperties setMargins(Margins margins) {
+		return copy("margins", margins);
+	}
 	/**
 	 * Get the number of copies to emboss.
 	 * @return Number of copies to emboss.
 	 */
 	public int getCopies() {
 		return copies;
+	}
+	public EmbossProperties setCopies(int copies) {
+		return copy("copies", copies);
 	}
 	/**
 	 * Get the Braille cell type to use.
@@ -60,6 +97,9 @@ public final class EmbossProperties {
 	public BrlCell getCellType() {
 		return cellType;
 	}
+	public EmbossProperties setCellType(BrlCell cellType) {
+		return copy("cellType", cellType);
+	}
 	/**
 	 * Get the sides to emboss on when the embosser supports embossing on multiple sides.
 	 * 
@@ -67,6 +107,9 @@ public final class EmbossProperties {
 	 */
 	public MultiSides getSides() {
 		return sides;
+	}
+	public EmbossProperties setSides(MultiSides sides) {
+		return copy("sides", sides);
 	}
 	@Override
 	public int hashCode() {
