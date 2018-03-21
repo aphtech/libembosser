@@ -23,15 +23,14 @@ import com.google.common.base.Charsets;
 import com.google.common.io.FileBackedOutputStream;
 
 public class IndexBrailleEmbosser extends BaseTextEmbosser {
+	private final int maxCellsPerLine;
 	private final EnumSet<MultiSides> supportedSides;
-	/**
-	 * @deprecated Use {@link #IndexBrailleEmbosser(String,String,String,Rectangle,Rectangle,EnumSet)} instead
-	 */
-	public IndexBrailleEmbosser(String id, String manufacturer, String model, Rectangle maxPaper, Rectangle minPaper) {
-		this(id, manufacturer, model, maxPaper, minPaper, EnumSet.of(MultiSides.P1ONLY, MultiSides.INTERPOINT));
-	}
 	public IndexBrailleEmbosser(String id, String manufacturer, String model, Rectangle maxPaper, Rectangle minPaper, EnumSet<MultiSides> sides) {
+		this(id, manufacturer, model, maxPaper, minPaper, 49, sides);
+	}
+	public IndexBrailleEmbosser(String id, String manufacturer, String model, Rectangle maxPaper, Rectangle minPaper, int maxCellsPerLine, EnumSet<MultiSides> sides) {
 		super(id, manufacturer, model, maxPaper, minPaper);
+		this.maxCellsPerLine = maxCellsPerLine;
 		supportedSides = sides;
 	}
 	private static final Version API_VERSION = new Version(1, 0);
@@ -58,8 +57,9 @@ public class IndexBrailleEmbosser extends BaseTextEmbosser {
 			margins = Margins.NO_MARGINS;
 		}
 		Rectangle paper = embossProperties.getPaper();
-		if (paper == null) {
-			paper = getMaximumPaper();
+		Rectangle maxPaper = getMaximumPaper();
+		if (paper == null || paper.getWidth().compareTo(maxPaper.getWidth()) > 0 || paper.getHeight().compareTo(maxPaper.getHeight()) > 0) {
+			paper = maxPaper;
 		}
 		BigDecimal leftMargin = margins.getLeft();
 		if (BigDecimal.ZERO.compareTo(leftMargin) > 0) {
@@ -82,7 +82,9 @@ public class IndexBrailleEmbosser extends BaseTextEmbosser {
 		// Index only allows defining binding margin, so we will assume left margin is always the binding margin.
 		int bindingMargin = BrlCell.NLS.getCellsForWidth(leftMargin);
 		// Get the number of cells per line
-		int cellsPerLine = BrlCell.NLS.getCellsForWidth(paper.getWidth().subtract(leftMargin).subtract(rightMargin));
+		int cellsPerLine = Math.min(
+				BrlCell.NLS.getCellsForWidth(paper.getWidth().subtract(leftMargin).subtract(rightMargin)),
+				maxCellsPerLine);
 		// Index protocol takes top margin in number of lines.
 		int topLines = BrlCell.NLS.getLinesForHeight(topMargin);
 		// Index protocol requires lines per page to be specified if giving top margin

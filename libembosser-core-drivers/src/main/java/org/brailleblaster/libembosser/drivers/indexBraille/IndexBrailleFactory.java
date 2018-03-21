@@ -22,10 +22,10 @@ public class IndexBrailleFactory implements IEmbosserFactory {
 	public IndexBrailleFactory() {
 		embossers = ImmutableList.<IEmbosser>builder()
 				// The Enabling Technologies Romeo60 and Juliet120 are based on Index Basic D V5
-				.add(new IndexBrailleEmbosser("libembosser.ib.Romeo60", "Enabling Technologies", "Romeo 60", TWELVE_AND_HALF_BY_TWENTY_FOUR_PAPER, FOUR_BY_THREE_PAPER, ENABLING_SIDES))
-				.add(new IndexBrailleEmbosser("libembosser.ib.Juliet120", "Enabling Technologies", "Juliet 120", TWELVE_AND_HALF_BY_TWENTY_FOUR_PAPER, FOUR_BY_THREE_PAPER, ENABLING_SIDES))
-				.add(new IndexBrailleEmbosser("libembosser.ib.BasicDV5", "Index Braille", "Basic-D V5", new Rectangle(new BigDecimal("325"), new BigDecimal("431")), new Rectangle(new BigDecimal("100"), new BigDecimal("25")), BASIC_D_SIDES))
-				.add(new IndexBrailleEmbosser("libembosser.ib.EverestDV5", "Index Braille", "Everest-D V5", new Rectangle(new BigDecimal("297"), new BigDecimal("590")), new Rectangle(new BigDecimal("130"), new BigDecimal("100")), EVEREST_SIDES))
+				.add(new IndexBrailleEmbosser("libembosser.ib.Romeo60", "Enabling Technologies", "Romeo 60", TWELVE_AND_HALF_BY_TWENTY_FOUR_PAPER, FOUR_BY_THREE_PAPER, 49, ENABLING_SIDES))
+				.add(new IndexBrailleEmbosser("libembosser.ib.Juliet120", "Enabling Technologies", "Juliet 120", TWELVE_AND_HALF_BY_TWENTY_FOUR_PAPER, FOUR_BY_THREE_PAPER, 49, ENABLING_SIDES))
+				.add(new IndexBrailleEmbosser("libembosser.ib.BasicDV5", "Index Braille", "Basic-D V5", new Rectangle(new BigDecimal("325"), new BigDecimal("431")), new Rectangle(new BigDecimal("100"), new BigDecimal("25")), 49, BASIC_D_SIDES))
+				.add(new IndexBrailleEmbosser("libembosser.ib.EverestDV5", "Index Braille", "Everest-D V5", new Rectangle(new BigDecimal("297.6"), new BigDecimal("590")), new Rectangle(new BigDecimal("130"), new BigDecimal("100")), 48, EVEREST_SIDES))
 				.build();
 	}
 	@Override
