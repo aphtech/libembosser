@@ -7,6 +7,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -21,6 +22,7 @@ import org.brailleblaster.libembosser.spi.DocumentFormat;
 import org.brailleblaster.libembosser.spi.EmbossException;
 import org.brailleblaster.libembosser.spi.EmbossProperties;
 import org.brailleblaster.libembosser.spi.IEmbosser;
+import org.brailleblaster.libembosser.spi.Margins;
 import org.brailleblaster.libembosser.spi.MultiSides;
 import org.brailleblaster.libembosser.testutils.CopyStreamPrintServiceFactory;
 import org.testng.annotations.DataProvider;
@@ -55,6 +57,7 @@ public class CoreDriversTest {
 	private List<Object[]> createIndexBrailleTestData() {
 		String testBrf = "  ,\"h is \"s text4\n,text on a new l9e4";
 		List<Object[]> data = new ArrayList<>();
+		// Basic single page, single copy.
 		byte[] expectedOutput = "\u001b\u0044BT0,MC1,DP1,BI0,CH49,TM0,LP60;  ,\"h is \"s text4\r\n,text on a new l9e4".getBytes(Charsets.US_ASCII);
 		EmbossProperties props = new EmbossProperties();
 		data.add(new Object[] {"libembosser.ib.Romeo60", testBrf, props, expectedOutput});
@@ -63,6 +66,18 @@ public class CoreDriversTest {
 		data.add(new Object[] {"libembosser.ib.BasicDV5", testBrf, props, expectedOutput});
 		expectedOutput = "\u001b\u0044BT0,MC1,DP1,BI0,CH48,TM0,LP59;  ,\"h is \"s text4\r\n,text on a new l9e4".getBytes(Charsets.US_ASCII);
 		data.add(new Object[] {"libembosser.ib.EverestDV5", testBrf, props, expectedOutput});
+		
+		//Interpoint and margins
+		expectedOutput = "\u001b\u0044BT0,MC1,DP2,BI2,CH49,TM1,LP59;  ,\"h is \"s text4\r\n,text on a new l9e4".getBytes(Charsets.US_ASCII);
+		props = new EmbossProperties().setSides(MultiSides.INTERPOINT).setMargins(new Margins(new BigDecimal("13"), BigDecimal.ZERO, BigDecimal.TEN, BigDecimal.ZERO));
+		data.add(new Object[] {"libembosser.ib.Romeo60", testBrf, props, expectedOutput});
+		data.add(new Object[] {"libembosser.ib.Juliet120", testBrf, props, expectedOutput});
+		expectedOutput = "\u001b\u0044BT0,MC1,DP2,BI2,CH49,TM1,LP42;  ,\"h is \"s text4\r\n,text on a new l9e4".getBytes(Charsets.US_ASCII);
+		data.add(new Object[] {"libembosser.ib.BasicDV5", testBrf, props, expectedOutput});
+		expectedOutput = "\u001b\u0044BT0,MC1,DP2,BI2,CH45,TM1,LP58;  ,\"h is \"s text4\r\n,text on a new l9e4".getBytes(Charsets.US_ASCII);
+		data.add(new Object[] {"libembosser.ib.EverestDV5", testBrf, props, expectedOutput});
+		
+		// Interpoint
 		expectedOutput = "\u001b\u0044BT0,MC1,DP2,BI0,CH49,TM0,LP60;  ,\"h is \"s text4\r\n,text on a new l9e4".getBytes(Charsets.US_ASCII);
 		props = new EmbossProperties().setSides(MultiSides.INTERPOINT);
 		data.add(new Object[] {"libembosser.ib.Romeo60", testBrf, props, expectedOutput});
@@ -71,6 +86,8 @@ public class CoreDriversTest {
 		data.add(new Object[] {"libembosser.ib.BasicDV5", testBrf, props, expectedOutput});
 		expectedOutput = "\u001b\u0044BT0,MC1,DP2,BI0,CH48,TM0,LP59;  ,\"h is \"s text4\r\n,text on a new l9e4".getBytes(Charsets.US_ASCII);
 		data.add(new Object[] {"libembosser.ib.EverestDV5", testBrf, props, expectedOutput});
+		
+		// Multiple copies
 		props = new EmbossProperties().setCopies(2);
 		expectedOutput = "\u001b\u0044BT0,MC2,DP1,BI0,CH49,TM0,LP60;  ,\"h is \"s text4\r\n,text on a new l9e4".getBytes(Charsets.US_ASCII);
 		data.add(new Object[] {"libembosser.ib.Romeo60", testBrf, props, expectedOutput});
