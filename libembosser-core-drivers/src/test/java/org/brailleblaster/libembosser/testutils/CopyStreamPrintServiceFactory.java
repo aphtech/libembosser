@@ -29,6 +29,16 @@ import javax.print.event.PrintServiceAttributeListener;
 
 import com.google.common.io.ByteStreams;
 
+/**
+ * A factory class for StreamPrintService objects which simply copy input to output stream.
+ * 
+ * This class is implemented to assist with testing the text based embosser drivers. Use the StreamPrintService objects created by this factory to be able to test the bytes which will be sent to the embosser by the driver. This is a basic implementation and is not complete and so would not be suitable for more than testing. It would be possible in the future for this implementation to be completed should the need arise for it to be used in production code.
+ * <p>
+ * Due to the testing nature of this class, it is not inserted as a service provider in the printing API. Test classes using this factory will create an instance directly.
+ * 
+ * @author Michael Whapples
+ *
+ */
 public class CopyStreamPrintServiceFactory extends StreamPrintServiceFactory {
 	private static final DocFlavor[] DOC_FLAVORS = new DocFlavor[] { DocFlavor.INPUT_STREAM.AUTOSENSE };
 	private static final String OUTPUT_FORMAT = "text/plain";
