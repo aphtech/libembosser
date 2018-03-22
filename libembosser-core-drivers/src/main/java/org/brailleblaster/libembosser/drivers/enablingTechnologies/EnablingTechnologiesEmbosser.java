@@ -1,28 +1,23 @@
 package org.brailleblaster.libembosser.drivers.enablingTechnologies;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.EnumSet;
 
-import javax.print.PrintException;
 import javax.print.PrintService;
 
-import org.brailleblaster.libembosser.drivers.generic.GenericTextEmbosser;
 import org.brailleblaster.libembosser.drivers.utils.BaseTextEmbosser;
 import org.brailleblaster.libembosser.drivers.utils.CopyInputStream;
 import org.brailleblaster.libembosser.spi.BrlCell;
 import org.brailleblaster.libembosser.spi.DocumentFormat;
 import org.brailleblaster.libembosser.spi.EmbossException;
 import org.brailleblaster.libembosser.spi.EmbossProperties;
-import org.brailleblaster.libembosser.spi.IEmbosser;
 import org.brailleblaster.libembosser.spi.Margins;
 import org.brailleblaster.libembosser.spi.MultiSides;
 import org.brailleblaster.libembosser.spi.Rectangle;
 import org.brailleblaster.libembosser.spi.Version;
 
-import com.google.common.io.ByteStreams;
 import com.google.common.io.FileBackedOutputStream;
 
 public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {

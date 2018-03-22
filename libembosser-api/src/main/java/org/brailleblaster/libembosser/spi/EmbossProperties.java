@@ -1,7 +1,5 @@
 package org.brailleblaster.libembosser.spi;
 
-import java.math.BigDecimal;
-
 /**
  * Properties for emboss jobs.
  * 

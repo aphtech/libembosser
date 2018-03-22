@@ -5,14 +5,7 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.EnumSet;
 
-import javax.print.Doc;
-import javax.print.DocFlavor;
-import javax.print.DocPrintJob;
-import javax.print.PrintException;
 import javax.print.PrintService;
-import javax.print.SimpleDoc;
-import javax.print.event.PrintJobEvent;
-import javax.print.event.PrintJobListener;
 
 import org.brailleblaster.libembosser.drivers.utils.BaseTextEmbosser;
 import org.brailleblaster.libembosser.drivers.utils.CopyInputStream;

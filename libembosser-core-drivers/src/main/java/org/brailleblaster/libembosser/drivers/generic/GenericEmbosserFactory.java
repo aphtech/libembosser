@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Locale;
 
-import org.brailleblaster.libembosser.drivers.generic.GenericTextEmbosser;
-import org.brailleblaster.libembosser.drivers.viewplus.ViewPlusLegacyEmbosser;
 import org.brailleblaster.libembosser.spi.IEmbosser;
 import org.brailleblaster.libembosser.spi.IEmbosserFactory;
 import org.brailleblaster.libembosser.spi.Rectangle;

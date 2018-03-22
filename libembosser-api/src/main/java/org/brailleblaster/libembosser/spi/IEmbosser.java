@@ -3,7 +3,6 @@ package org.brailleblaster.libembosser.spi;
 import java.io.InputStream;
 import java.util.EnumSet;
 
-import javax.print.PrintException;
 import javax.print.PrintService;
 
 /**

@@ -27,9 +27,7 @@ import javax.print.event.PrintJobEvent;
 import javax.print.event.PrintJobListener;
 import javax.print.event.PrintServiceAttributeListener;
 
-import com.google.common.collect.Streams;
 import com.google.common.io.ByteStreams;
-import com.google.common.primitives.Bytes;
 
 public class CopyStreamPrintServiceFactory extends StreamPrintServiceFactory {
 	private static final DocFlavor[] DOC_FLAVORS = new DocFlavor[] { DocFlavor.INPUT_STREAM.AUTOSENSE };
