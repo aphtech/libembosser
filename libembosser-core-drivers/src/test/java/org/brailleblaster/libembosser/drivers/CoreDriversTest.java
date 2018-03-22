@@ -34,18 +34,31 @@ public class CoreDriversTest {
 	private List<Object[]> createEnablingTechnologiesTestData() {
 		String testBrf = "  ,\"h is \"s text4\n,text on a new l9e4";
 		List<Object[]> data = new ArrayList<>();
+		// Basic embossing
 		byte[] expectedOutput = "\u001b@\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bL@\u001bRr  ,\"h is \"s text4\r\n,text on a new l9e4".getBytes(Charsets.US_ASCII);
 		EmbossProperties props = new EmbossProperties();
 		data.add(new Object[] {"libembosser.et.phoenix_gold", testBrf, props, expectedOutput});
 		data.add(new Object[] {"libembosser.et.phoenix_silver", testBrf, props, expectedOutput});
 		data.add(new Object[] {"libembosser.et.cyclone", testBrf, props, expectedOutput});
 		data.add(new Object[] {"libembosser.et.trident", testBrf, props, expectedOutput});
+		
+		// Interpoint
+		props = new EmbossProperties().setSides(MultiSides.INTERPOINT).setMargins(new Margins(new BigDecimal("13"), BigDecimal.ZERO, BigDecimal.TEN, BigDecimal.ZERO));
+		expectedOutput = "\u001b@\u001bA@@\u001bK@\u001bW@\u001bi@\u001bs@\u001bLB\u001bRr\r\n  ,\"h is \"s text4\r\n,text on a new l9e4".getBytes(Charsets.US_ASCII);
+		data.add(new Object[] {"libembosser.et.phoenix_gold", testBrf, props, expectedOutput});
+		data.add(new Object[] {"libembosser.et.phoenix_silver", testBrf, props, expectedOutput});
+		data.add(new Object[] {"libembosser.et.cyclone", testBrf, props, expectedOutput});
+		data.add(new Object[] {"libembosser.et.trident", testBrf, props, expectedOutput});
+		
+		// Interpoint
 		props = new EmbossProperties().setSides(MultiSides.INTERPOINT);
 		expectedOutput = "\u001b@\u001bA@@\u001bK@\u001bW@\u001bi@\u001bs@\u001bL@\u001bRr  ,\"h is \"s text4\r\n,text on a new l9e4".getBytes(Charsets.US_ASCII);
 		data.add(new Object[] {"libembosser.et.phoenix_gold", testBrf, props, expectedOutput});
 		data.add(new Object[] {"libembosser.et.phoenix_silver", testBrf, props, expectedOutput});
 		data.add(new Object[] {"libembosser.et.cyclone", testBrf, props, expectedOutput});
 		data.add(new Object[] {"libembosser.et.trident", testBrf, props, expectedOutput});
+				
+		// Multiple copies
 		props = new EmbossProperties().setCopies(2);
 		expectedOutput = "\u001b@\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bL@\u001bRr  ,\"h is \"s text4\r\n,text on a new l9e4\u001b@\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bL@\u001bRr  ,\"h is \"s text4\r\n,text on a new l9e4".getBytes(Charsets.US_ASCII);
 		data.add(new Object[] {"libembosser.et.phoenix_gold", testBrf, props, expectedOutput});
