@@ -2,6 +2,11 @@ package org.brailleblaster.libembosser.spi;
 
 public class EmbossException extends Exception {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public EmbossException() {
 	}
 
