@@ -31,6 +31,35 @@ import org.testng.annotations.Test;
 import com.google.common.base.Charsets;
 
 public class CoreDriversTest {
+	private List<Object[]> createGenericEmbosserTestData() {
+		String testBrf = "  ,\"h is \"s text4\n,text on a new l9e4\f";
+		List<Object[]> data = new ArrayList<>();
+		// Basic embossing
+		byte[] expectedOutput = "  ,\"h is \"s text4\r\n,text on a new l9e4\f".getBytes(Charsets.US_ASCII);
+		EmbossProperties props = new EmbossProperties();
+		data.add(new Object[] {"libembosser.generic.text", testBrf, props, expectedOutput});
+		data.add(new Object[] {"libembosser.generic.text_with_margins", testBrf, props, expectedOutput});
+		
+		// Interpoint
+		// Generic does not support it so just does as it normally does.
+		props = new EmbossProperties().setSides(MultiSides.INTERPOINT);
+		data.add(new Object[] {"libembosser.generic.text", testBrf, props, expectedOutput});
+		data.add(new Object[] {"libembosser.generic.text_with_margins", testBrf, props, expectedOutput});
+		
+		// Interpoint with margins
+		props = new EmbossProperties().setSides(MultiSides.INTERPOINT).setMargins(new Margins(new BigDecimal("13"), BigDecimal.ZERO, BigDecimal.TEN, BigDecimal.ZERO));
+		data.add(new Object[] {"libembosser.generic.text", testBrf, props, expectedOutput});
+		expectedOutput = "\r\n    ,\"h is \"s text4\r\n  ,text on a new l9e4\f".getBytes(Charsets.US_ASCII);
+		data.add(new Object[] {"libembosser.generic.text_with_margins", testBrf, props, expectedOutput});
+				
+		// Multiple copies
+		props = new EmbossProperties().setCopies(2);
+		expectedOutput = "  ,\"h is \"s text4\r\n,text on a new l9e4\f  ,\"h is \"s text4\r\n,text on a new l9e4\f".getBytes(Charsets.US_ASCII);
+		data.add(new Object[] {"libembosser.generic.text", testBrf, props, expectedOutput});
+		data.add(new Object[] {"libembosser.generic.text_with_margins", testBrf, props, expectedOutput});
+		
+		return data;
+	}
 	private List<Object[]> createEnablingTechnologiesTestData() {
 		String testBrf = "  ,\"h is \"s text4\n,text on a new l9e4";
 		List<Object[]> data = new ArrayList<>();
@@ -114,6 +143,7 @@ public class CoreDriversTest {
 	@DataProvider(name="simpleEmbossProvider")
 	public Iterator<Object[]> simpleEmbossProvider() {
 		List<Object[]> data = new ArrayList<>();
+		data.addAll(createGenericEmbosserTestData());
 		data.addAll(createEnablingTechnologiesTestData());
 		data.addAll(createIndexBrailleTestData());
 		return data.iterator();
