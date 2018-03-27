@@ -28,9 +28,12 @@ public class IndexBrailleFactory implements IEmbosserFactory {
 				// The Enabling Technologies Romeo60 and Juliet120 are based on Index Basic D V5
 				.add(new IndexBrailleEmbosser("libembosser.ib.Romeo60", "Enabling Technologies", "Romeo 60", TWELVE_AND_HALF_BY_TWENTY_FOUR_PAPER, FOUR_BY_THREE_PAPER, 49, ENABLING_SIDES))
 				.add(new IndexBrailleEmbosser("libembosser.ib.Juliet120", "Enabling Technologies", "Juliet 120", TWELVE_AND_HALF_BY_TWENTY_FOUR_PAPER, FOUR_BY_THREE_PAPER, 49, ENABLING_SIDES))
-				.add(new IndexBrailleEmbosser("libembosser.ib.BasicDV5", "Index Braille", "Basic-D V5", new Rectangle(new BigDecimal("325"), new BigDecimal("431")), new Rectangle(new BigDecimal("100"), new BigDecimal("25")), 49, BASIC_D_SIDES))
+				.add(new IndexBrailleEmbosser("libembosser.ib.BasicDV5", "Index Braille", "Basic-D V5", new Rectangle(new BigDecimal("325"), new BigDecimal("431.8")), new Rectangle(new BigDecimal("100"), new BigDecimal("25")), 49, BASIC_D_SIDES))
+				.add(new IndexBrailleEmbosser("libembosser.ib.BasicDV4", "Index Braille", "Basic-D V4", new Rectangle(new BigDecimal("330"), new BigDecimal("431.8")), new Rectangle(new BigDecimal("100"), new BigDecimal("25")), 49, BASIC_D_SIDES))
 				.add(new IndexBrailleEmbosser("libembosser.ib.EverestDV5", "Index Braille", "Everest-D V5", new Rectangle(new BigDecimal("297.6"), new BigDecimal("590")), new Rectangle(new BigDecimal("130"), new BigDecimal("100")), 48, EVEREST_SIDES))
+				.add(new IndexBrailleEmbosser("libembosser.ib.EverestDV4", "Index Braille", "Everest-D V4", new Rectangle(new BigDecimal("297.6"), new BigDecimal("590")), new Rectangle(new BigDecimal("130"), new BigDecimal("120")), 48, EVEREST_SIDES))
 				.add(new IndexBrailleEmbosser("libembosser.ib.BrailleBoxV5", "Index Braille", "BrailleBox V5", BRAILLEBOX_MAX_PAPER, BRAILLEBOX_MIN_PAPER, 48, BRAILLEBOX_SIDES))
+				.add(new IndexBrailleEmbosser("libembosser.ib.BrailleBoxV4", "Index Braille", "BrailleBox V4", BRAILLEBOX_MAX_PAPER, BRAILLEBOX_MIN_PAPER, 48, BRAILLEBOX_SIDES))
 				.add(new IndexBrailleEmbosser("libembosser.ib.FanFoldV5", "Index Braille", "FanFold V5", new Rectangle(new BigDecimal("317.5"), new BigDecimal("304.8")), new Rectangle(new BigDecimal("127"), new BigDecimal("203.2")), 48, EVEREST_SIDES))
 				.build();
 	}
