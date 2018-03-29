@@ -10,6 +10,9 @@ import com.google.common.collect.ImmutableList;
 
 public enum PaperSize {
 	BRAILLE_11_5X11("11.5x11", "292.1", "279.4"),
+	// Needed for legacy
+	// We should be able to remove after a few releases (may be in July 2018)
+	BRAILLE_11X11_5(BRAILLE_11_5X11),
 	A0("A0", "841", "1189"),
 	A1("A1", "594", "841"),
 	A2("A2", "420", "594"),
@@ -46,8 +49,8 @@ public enum PaperSize {
 		// Not replaced as not deprecated so use null
 		replacementSize = null;
 	}
-	private PaperSize(PaperSize replacementSize) {
-		this.replacementSize = checkNotNull(replacementSize);
+	private PaperSize(PaperSize replacement) {
+		this.replacementSize = checkNotNull(replacement);
 		displayName = replacementSize.getDisplayName();
 		size = replacementSize.getSize();
 	}
