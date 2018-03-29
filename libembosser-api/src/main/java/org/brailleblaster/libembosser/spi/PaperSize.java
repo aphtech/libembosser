@@ -1,6 +1,12 @@
 package org.brailleblaster.libembosser.spi;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
+
+import com.google.common.collect.ImmutableList;
 
 public enum PaperSize {
 	BRAILLE_11_5X11("11.5x11", "292.1", "279.4"),
@@ -33,14 +39,47 @@ public enum PaperSize {
 	LEDGER("Ledger", "279.4", "431.8");
 	private String displayName;
 	private Rectangle size;
+	private PaperSize replacementSize;
 	private PaperSize(String name, String width, String height) {
 		this.displayName = name;
 		size = new Rectangle(new BigDecimal(width), new BigDecimal(height));
+		// Not replaced as not deprecated so use null
+		replacementSize = null;
+	}
+	private PaperSize(PaperSize replacementSize) {
+		this.replacementSize = checkNotNull(replacementSize);
+		displayName = replacementSize.getDisplayName();
+		size = replacementSize.getSize();
 	}
 	public String getDisplayName() {
 		return displayName;
 	}
 	public Rectangle getSize() {
 		return size;
+	}
+	/**
+	 * Check if the paper size is deprecated and replaced by another.
+	 * 
+	 * When a paper size has been replaced by another this method will return true. For paper sizes which are deprecated and not replaced then they should simply be removed from the enum and a custom paper size should be used instead.
+	 * 
+	 * @return Whether this paper size is deprecated and replaced by another.
+	 */
+	public boolean isReplaced() {
+		return replacementSize != null;
+	}
+	/** Get the most current implementation of tis paper size standard.
+	 * 
+	 * @return The most current paper size standard relating to this size.
+	 */
+	public PaperSize getCurrentStandard() {
+		return replacementSize == null? this : replacementSize.getCurrentStandard();
+	}
+	/**
+	 * Get all the paper sizes which have not been replaced by another.
+	 * 
+	 * @return An immutable list of the current paper sizes.
+	 */
+	public static List<PaperSize> getCurrentSizes() {
+		return Arrays.stream(PaperSize.values()).filter(s -> !s.isReplaced()).collect(ImmutableList.toImmutableList());
 	}
 }
