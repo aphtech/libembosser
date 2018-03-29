@@ -3,7 +3,7 @@ package org.brailleblaster.libembosser.spi;
 import java.math.BigDecimal;
 
 public enum PaperSize {
-	BRAILLE_11X11_5("11x11.5", "292.1", "279.4"),
+	BRAILLE_11_5X11("11.5x11", "292.1", "279.4"),
 	A0("A0", "841", "1189"),
 	A1("A1", "594", "841"),
 	A2("A2", "420", "594"),
