@@ -1,7 +1,6 @@
 package org.brailleblaster.libembosser.utils.pef.jaxb;
 
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.JAXBContext;
@@ -18,6 +17,8 @@ import org.brailleblaster.libembosser.pef.Meta;
 import org.brailleblaster.libembosser.pef.PEFDocument;
 import org.brailleblaster.libembosser.pef.PEFOutputException;
 
+import com.google.common.collect.Lists;
+
 @XmlRootElement(name="pef", namespace=PEFDocument.PEF_NAMESPACE)
 @XmlAccessorType(XmlAccessType.NONE)
 public class PEFDocumentImpl implements PEFDocument {
@@ -29,7 +30,7 @@ public class PEFDocumentImpl implements PEFDocument {
 	@XmlElement(name="volume", namespace=PEFDocument.PEF_NAMESPACE)
 	private List<VolumeImpl> volumes;
 	private PEFDocumentImpl() {
-		this.volumes = new ArrayList<>();
+		this.volumes = Lists.newArrayList(new VolumeImpl(this));
 	}
 	public PEFDocumentImpl(String identifier) {
 		this();

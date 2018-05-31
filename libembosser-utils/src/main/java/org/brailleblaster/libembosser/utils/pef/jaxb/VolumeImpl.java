@@ -2,7 +2,6 @@ package org.brailleblaster.libembosser.utils.pef.jaxb;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -14,6 +13,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.brailleblaster.libembosser.pef.PEFDocument;
 import org.brailleblaster.libembosser.pef.Section;
 import org.brailleblaster.libembosser.pef.Volume;
+
+import com.google.common.collect.Lists;
 
 @XmlRootElement(name="volume", namespace=PEFDocument.PEF_NAMESPACE)
 @XmlAccessorType(XmlAccessType.NONE)
@@ -30,7 +31,7 @@ public class VolumeImpl implements Volume {
 	private boolean duplex = false;
 	private PEFDocument doc;
 	private VolumeImpl() {
-		this.sections = new ArrayList<>();
+		this.sections = Lists.newArrayList(new SectionImpl(this));
 	}
 	VolumeImpl(PEFDocument doc) {
 		this();

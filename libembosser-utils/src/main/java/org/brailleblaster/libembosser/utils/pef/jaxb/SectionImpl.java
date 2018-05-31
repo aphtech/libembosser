@@ -14,6 +14,8 @@ import org.brailleblaster.libembosser.pef.Page;
 import org.brailleblaster.libembosser.pef.Section;
 import org.brailleblaster.libembosser.pef.Volume;
 
+import com.google.common.collect.Lists;
+
 @XmlRootElement(name="section", namespace=PEFDocument.PEF_NAMESPACE)
 @XmlAccessorType(XmlAccessType.NONE)
 public class SectionImpl implements Section {
@@ -29,7 +31,7 @@ public class SectionImpl implements Section {
 	private Boolean duplex = null;
 	private Volume volume;
 	private SectionImpl() {
-		this.pages = new ArrayList<>();
+		this.pages = Lists.newArrayList(new PageImpl(this));
 	}
 	SectionImpl(Volume volume) {
 		this();
