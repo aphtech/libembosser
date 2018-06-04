@@ -74,14 +74,4 @@ public class PEFDocumentImpl implements PEFDocument {
 	public Meta getMeta() {
 		return head.getMeta();
 	}
-	@Override
-	public void save(OutputStream os) throws PEFOutputException {
-		try {
-			JAXBContext ctx = JAXBContext.newInstance(PEFDocumentImpl.class);
-			Marshaller m = ctx.createMarshaller();
-			m.marshal(this, os);
-		} catch (JAXBException e) {
-			throw new PEFOutputException("Problem producing PEF output", e);
-		}
-	}
 }
