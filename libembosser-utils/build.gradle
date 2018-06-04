@@ -1,0 +1,19 @@
+apply plugin: 'java-library'
+
+dependencies {
+	implementation 'com.google.guava:guava:23.5-jre'
+	api project(':libembosser-api')
+	testCompile 'org.testng:testng:6.13.1'
+}
+
+test {
+	useTestNG()
+}
+
+publishing {
+	publications {
+		utils(MavenPublication) {
+			from components.java
+		}
+	}
+}
