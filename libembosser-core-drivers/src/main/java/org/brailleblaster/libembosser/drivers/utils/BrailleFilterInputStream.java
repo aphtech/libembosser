@@ -5,17 +5,25 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class BrailleFilterInputStream extends FilterInputStream {
-
+	private byte[] brfMappings = new byte[256];
 	public BrailleFilterInputStream(InputStream arg0) {
 		super(arg0);
+		// All bytes up to 0x5f should remain as they are
+		for (int i = 0; i < 0x60; i++) {
+			brfMappings[i] = (byte)i;
+		}
+		// Characters from 0x60 to 0x7f should be mapped to those 0x20 lower
+		for (int i = 0x60; i < 0x80; i++) {
+			brfMappings[i] = (byte)(i - 0x20);
+		}
+		// From 0x80 and up it is not clear what it should be as depends on encoding, but BRF is ASCII
+		// So we will leave it as is.
+		for (int i = 0x80; i < 256; i++) {
+			brfMappings[i] = (byte)i;
+		}
 	}
 	private byte translate(byte b) {
-		switch(b) {
-		case (byte)'|':
-			return (byte)'\\';
-		default:
-			return b;
-		}
+		return brfMappings[(int)b];
 	}
 	@Override
 	public int read() throws IOException {
