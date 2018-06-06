@@ -18,12 +18,6 @@ public interface PEFDocument {
 	public void removeVolume(int index);
 	public void removeVolume(Volume vol);
 	public default void save(OutputStream os) throws PEFOutputException {
-		XMLOutputFactory outFactory = XMLOutputFactory.newFactory();
-		try {
-			XMLStreamWriter writer = outFactory.createXMLStreamWriter(os, "utf-8");
-			DefaultWriter.write(this, writer);
-		} catch (XMLStreamException e) {
-			throw new PEFOutputException("Problem writing PEF document", e);
-		}
+		DefaultPEFWriter.write(this, os);
 	}
 }

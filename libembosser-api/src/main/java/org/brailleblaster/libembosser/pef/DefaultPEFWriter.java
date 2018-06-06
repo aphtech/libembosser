@@ -1,23 +1,39 @@
 package org.brailleblaster.libembosser.pef;
 
-import java.util.Map;
-import java.util.Map.Entry;
+import java.io.OutputStream;
 
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
-import com.google.common.collect.ImmutableMap;
-
-class DefaultWriter {
+class DefaultPEFWriter {
 	private XMLStreamWriter writer;
 	private PEFDocument doc;
-	private DefaultWriter(PEFDocument doc, XMLStreamWriter writer) {
+	private DefaultPEFWriter(PEFDocument doc, XMLStreamWriter writer) {
 		this.writer = writer;
 		this.doc = doc;
 	}
-	static void write(PEFDocument doc, XMLStreamWriter writer) throws XMLStreamException {
-		DefaultWriter dw = new DefaultWriter(doc, writer);
-		dw.writeDocument();
+	private void close() {
+		try {
+			writer.close();
+		} catch (XMLStreamException e) {
+			// Nothing to do
+		}
+	}
+	static void write(PEFDocument doc, OutputStream os) throws PEFOutputException {
+		XMLOutputFactory outFactory = XMLOutputFactory.newInstance();
+		DefaultPEFWriter dw = null;
+		try {
+			dw = new DefaultPEFWriter(doc, outFactory.createXMLStreamWriter(os, "utf-8"));
+			dw.writeDocument();
+		} catch (XMLStreamException e) {
+			throw new PEFOutputException("Problem writing PEF", e);
+		} finally {
+			if (dw != null) {
+				dw.close();
+			}
+		}
 	}
 	private void writeDocument() throws XMLStreamException {
 		writer.writeStartDocument("utf-8", "1.0");

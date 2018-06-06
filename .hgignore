@@ -11,3 +11,5 @@ syntax: regexp
 ^libembosser-api/bin$
 syntax: regexp
 ^libembosser-core-drivers/bin$
+syntax: regexp
+^libembosser-utils/bin$
