@@ -18,9 +18,9 @@ class DefaultPEFReader {
 		public boolean accept(XMLStreamReader reader) {
 			switch(reader.getEventType()) {
 			case XMLStreamConstants.START_ELEMENT:
-				return checkStartElement(XMLStreamReader reader);
+				return checkStartElement(reader);
 			case XMLStreamConstants.END_ELEMENT:
-				return checkEndElement(XMLStreamReader reader);
+				return checkEndElement(reader);
 			default:
 				return true;
 			}
