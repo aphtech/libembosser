@@ -59,7 +59,7 @@ public abstract class BaseTextEmbosser implements IEmbosser {
 	}
 	protected void copyContent(InputStream is, OutputStream os, int topMargin, int leftMargin) throws IOException {
 		// Use a BufferedInputStream in case the input is from a file or such source.
-		BufferedInputStream inBuf = new BufferedInputStream(is);
+		BufferedInputStream inBuf = new BufferedInputStream(new BrailleFilterInputStream(is));
 		// Enabling Technologies embossers do not handle top margins, therefore we need to insert top margins by using blank lines.
 		// Also we will change all line endings to \r\n
 		byte[] topMarginBytes = new byte[topMargin * 2];
