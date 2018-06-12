@@ -37,6 +37,12 @@ public class BrailleFilterInputStreamTest {
 			}
 		} catch (IOException e) {
 			fail("Unexpected exception in test", e);
+		} finally {
+			try {
+				is.close();
+			} catch (IOException e) {
+				// Should never happen
+			}
 		}
 		assertEquals(counter, input.length);
 	}

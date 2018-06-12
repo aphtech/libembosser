@@ -22,10 +22,16 @@ class DefaultPEFReader {
 			case XMLStreamConstants.END_ELEMENT:
 				return checkEndElement(reader);
 			default:
-				return true;
+				return false;
 			}
 		}
 		private boolean checkStartElement(XMLStreamReader reader) {
+			return checkElementName(reader);
+		}
+		private boolean checkEndElement(XMLStreamReader reader) {
+			return checkElementName(reader);
+		}
+		private boolean checkElementName(XMLStreamReader reader) {
 			switch(reader.getNamespaceURI()) {
 			case PEFDocument.PEF_NAMESPACE:
 				return Arrays.stream(pefNames).anyMatch(e -> e.equals(reader.getLocalName()));
@@ -35,12 +41,7 @@ class DefaultPEFReader {
 				return false;
 			}
 		}
-		private boolean checkEndElement(XMLStreamReader reader) {
-			return false;
-		}
-		private boolean checkElementName(XMLStreamReader reader) {
-			return false;
-		}
+		
 	}
 	private XMLStreamReader reader;
 	private PEFFactory factory;
@@ -93,11 +94,19 @@ class DefaultPEFReader {
 		}
 		return doc;
 	}
-	private PEFDocument readPEF() {
+	private PEFDocument readPEF() throws XMLStreamException {
 		String version = reader.getAttributeValue(PEFDocument.PEF_NAMESPACE, "version");
 		// We create the PEF with a temp identifier and change it later when we find it in the document.
 		PEFDocument doc = version == null ? factory.createPEF("TempID") : factory.createPEF("TempID", version);
-		
+		while (reader.hasNext()) {
+			int event = reader.nextTag();
+			switch(event) {
+			case XMLStreamConstants.START_ELEMENT:
+				if ("head".equals(reader.getLocalName())) {
+					
+				}
+			}
+		}
 		return doc;
 	}
 }

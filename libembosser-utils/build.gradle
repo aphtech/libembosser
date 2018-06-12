@@ -1,6 +1,8 @@
 apply plugin: 'java-library'
 
 dependencies {
+	implementation 'javax.xml.bind:jaxb-api:2.3.0'
+	runtime 'org.glassfish.jaxb:jaxb-runtime:2.3.0.1'
 	implementation 'com.google.guava:guava:23.5-jre'
 	api project(':libembosser-api')
 	testCompile 'org.testng:testng:6.13.1'
