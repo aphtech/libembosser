@@ -1,11 +1,7 @@
 package org.brailleblaster.libembosser.utils.pef.jaxb;
 
-import java.io.OutputStream;
 import java.util.List;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -15,7 +11,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.brailleblaster.libembosser.pef.Meta;
 import org.brailleblaster.libembosser.pef.PEFDocument;
-import org.brailleblaster.libembosser.pef.PEFOutputException;
 
 import com.google.common.collect.Lists;
 

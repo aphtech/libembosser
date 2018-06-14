@@ -58,41 +58,42 @@ public abstract class BaseTextEmbosser implements IEmbosser {
 		return minimumPaper;
 	}
 	protected void copyContent(InputStream is, OutputStream os, int topMargin, int leftMargin) throws IOException {
-		// Use a BufferedInputStream in case the input is from a file or such source.
-		BufferedInputStream inBuf = new BufferedInputStream(new BrailleFilterInputStream(is));
 		// Enabling Technologies embossers do not handle top margins, therefore we need to insert top margins by using blank lines.
-		// Also we will change all line endings to \r\n
-		byte[] topMarginBytes = new byte[topMargin * 2];
-		IntStream.range(0, topMarginBytes.length).forEach(i -> topMarginBytes[i] = (byte)(i % 2 == 0? 0x0D : 0x0A));
-		// Create left margin array.
-		byte[] leftMarginBytes = new byte[leftMargin + 2];
-		leftMarginBytes[0] = 0x0D;
-		leftMarginBytes[1] = 0x0A;
-		Arrays.fill(leftMarginBytes, 2, leftMarginBytes.length, (byte)0x20);
-		int r = inBuf.read();
-		int prevChar = 0x0C;
-		while (r >= 0) {
-			// Handle top and left margin after form feed.
-			if (prevChar == 0x0C) {
-				os.write(topMarginBytes);
-				os.write(leftMarginBytes, 2, leftMargin);
+					// Also we will change all line endings to \r\n
+					byte[] topMarginBytes = new byte[topMargin * 2];
+					IntStream.range(0, topMarginBytes.length).forEach(i -> topMarginBytes[i] = (byte)(i % 2 == 0? 0x0D : 0x0A));
+					// Create left margin array.
+					byte[] leftMarginBytes = new byte[leftMargin + 2];
+					leftMarginBytes[0] = 0x0D;
+					leftMarginBytes[1] = 0x0A;
+					Arrays.fill(leftMarginBytes, 2, leftMarginBytes.length, (byte)0x20);
+		// Use a BufferedInputStream in case the input is from a file or such source.
+		try (BufferedInputStream inBuf = new BufferedInputStream(new BrailleFilterInputStream(is))) {
+			int r = inBuf.read();
+			int prevChar = 0x0C;
+			while (r >= 0) {
+				// Handle top and left margin after form feed.
+				if (prevChar == 0x0C) {
+					os.write(topMarginBytes);
+					os.write(leftMarginBytes, 2, leftMargin);
+				}
+				// Handle left margin after newline
+				// Remember \r\n should not be split
+				// New lines before form feeds need no margin.
+				else if (r != 0x0C && (prevChar == 0x0A || (prevChar == 0x0D && r != 0x0A))) {
+					os.write(leftMarginBytes);
+				}
+				switch (r) {
+				// Line endings
+				case 0x0A:
+				case 0x0D:
+					break;
+				default:
+					os.write(r);
+				}
+				prevChar = r;
+				r = inBuf.read();
 			}
-			// Handle left margin after newline
-			// Remember \r\n should not be split
-			// New lines before form feeds need no margin.
-			else if (r != 0x0C && (prevChar == 0x0A || (prevChar == 0x0D && r != 0x0A))) {
-				os.write(leftMarginBytes);
-			}
-			switch (r) {
-			// Line endings
-			case 0x0A:
-			case 0x0D:
-				break;
-			default:
-				os.write(r);
-			}
-			prevChar = r;
-			r = inBuf.read();
 		}
 	}
 	protected boolean embossStream(PrintService embosserDevice, InputStream is) throws EmbossException {
