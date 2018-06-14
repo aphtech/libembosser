@@ -1,7 +1,6 @@
 package org.brailleblaster.libembosser.pef;
 
 import java.io.InputStream;
-import java.util.ServiceLoader;
 
 public interface PEFFactory {
 	public PEFDocument createPEF(String identifier, String version);

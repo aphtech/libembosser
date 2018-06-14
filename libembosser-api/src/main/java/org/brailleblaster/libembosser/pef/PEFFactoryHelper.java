@@ -3,7 +3,6 @@ package org.brailleblaster.libembosser.pef;
 import java.util.NoSuchElementException;
 import java.util.ServiceLoader;
 
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Streams;
 
 class PEFFactoryHelper {

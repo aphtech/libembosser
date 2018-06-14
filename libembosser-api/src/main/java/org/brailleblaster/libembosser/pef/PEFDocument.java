@@ -2,10 +2,6 @@ package org.brailleblaster.libembosser.pef;
 
 import java.io.OutputStream;
 
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-
 public interface PEFDocument {
 	public static final String PEF_NAMESPACE = "http://www.daisy.org/ns/2008/pef";
 	public static final String DC_NAMESPACE = "http://purl.org/dc/elements/1.1/";
