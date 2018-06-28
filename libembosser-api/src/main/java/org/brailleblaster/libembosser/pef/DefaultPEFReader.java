@@ -1,7 +1,12 @@
 package org.brailleblaster.libembosser.pef;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.StreamFilter;
@@ -9,6 +14,9 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Range;
 
 class DefaultPEFReader {
 	static class PEFFilter implements StreamFilter {
@@ -204,18 +212,15 @@ class DefaultPEFReader {
 			throw new PEFInputException("Unexpected element");
 		}
 	}
-	private static class PEFElementHandler extends BaseElementHandler {
+	private static class PEFElementHandler extends ContainerElementHandler {
 		private PEFFactory factory;
-		private BaseElementHandler headHandler = null;
-		private BaseElementHandler bodyHandler = null;
 		public PEFElementHandler(PEFFactory factory) {
+			super(new ChildElementDefinition(PEFDocument.PEF_NAMESPACE, "head", 1, 1, new ContainerElementHandler(
+					new ChildElementDefinition(PEFDocument.PEF_NAMESPACE, "meta", 1, 1, new ContainerElementHandler(
+							new ChildElementDefinition(PEFDocument.DC_NAMESPACE, "identifier", 1, 1, null),
+							new ChildElementDefinition(PEFDocument.DC_NAMESPACE, "title", 0, 1, null))))),
+					new ChildElementDefinition(PEFDocument.PEF_NAMESPACE, "body", 1, 1, new BodyElementHandler()));
 			this.factory = factory;
-			final ChildElementDefinition dcIdentifierDef = new ChildElementDefinition(PEFDocument.DC_NAMESPACE, "identifier", 1, 1, null);
-			final ChildElementDefinition dcTitleDef = new ChildElementDefinition(PEFDocument.DC_NAMESPACE, "title", 0, 1, null);
-			final ChildElementDefinition metaDef = new ChildElementDefinition(PEFDocument.PEF_NAMESPACE, "meta", 1, 1, new ContainerElementHandler(dcIdentifierDef, dcTitleDef));
-			headHandler = new ContainerElementHandler(metaDef);
-			
-			bodyHandler = new BodyElementHandler();
 		}
 		@Override
 		public PEFDocument readElement(PEFDocument doc, XMLStreamReader reader) throws XMLStreamException, PEFInputException {
@@ -224,19 +229,104 @@ class DefaultPEFReader {
 			// We expect doc to be null, we ignore it.
 			// We set a temp ID and set it more correctly later.
 			PEFDocument curDoc = version == null ? PEFFactory.getInstance().createPEF("TempID") : PEFFactory.getInstance().createPEF("TempID", version);
-			curDoc = readChildElements(curDoc, reader);
+			curDoc = super.readElement(curDoc, reader);
+			return curDoc;
+		}
+	}
+	private static class RowElementHandler extends BaseElementHandler {
+		@Override
+		public PEFDocument readElement(PEFDocument doc, XMLStreamReader reader)
+				throws XMLStreamException, PEFInputException {
+			// Create a row
+			Volume vol = doc.getVolume(doc.getVolumeCount() - 1);
+			Section section = vol.getSection(vol.getSectionCount() - 1);
+			Page page = section.getPage(section.getPageCount() - 1);
+			Row row = page.appendNewRow();
+			String value = reader.getAttributeValue(PEFDocument.PEF_NAMESPACE, "rowgap");
+			row.setRowGap(Integer.valueOf(value));
+			String braille = reader.getElementText();
+			row.setBraille(braille);
+			return doc;
+		}
+	}
+	private static class MetaElementHandler extends BaseElementHandler {
+		private static class ChildHandler {
+			private int occurrence = 0;
+			private final Range<Integer> required;
+			private BiConsumer<Meta, String> f;
+			public ChildHandler(Range<Integer> required, BiConsumer<Meta, String> f) {
+				this.required = required;
+				this.f = f;
+			}
+			public boolean checkOccurrences() {
+				return required.apply(occurrence);
+			}
+			public void reset() {
+				occurrence = 0;
+			}
+			public void onValue(Meta meta, String value) {
+				f.accept(meta, value);
+				occurrence++;
+			}
+		}
+		private Map<String, ChildHandler> requiredElements;
+		public MetaElementHandler() {
+			final ChildHandler zeroOrMoreHandler = new ChildHandler(Range.atLeast(0), (m, v) -> {
+				// For now nothing
+			});
+			final ChildHandler optionalHandler = new ChildHandler(Range.closed(0, 1), (m, v) -> {
+				// For now do nothing
+			});
+			this.requiredElements = ImmutableMap.<String, ChildHandler>builder()
+					.put("format", new ChildHandler(Range.closed(1, 1), (m, v) -> {
+						if (!"application/x-pef+xml".equals(v)) {
+							throw new RuntimeException("Invalid value for format");
+						}
+						// We need not set the format as this should already be done.
+					}))
+					.put("identifier", new ChildHandler(Range.closed(1, 1), (m, v) -> m.setIdentifier(v)))
+					.put("title", new ChildHandler(Range.closed(0, 1), (m, v) -> m.setTitle(v)))
+					.put("creator", zeroOrMoreHandler)
+					.put("subject", zeroOrMoreHandler)
+					.put("description", optionalHandler)
+					.put("publisher", zeroOrMoreHandler)
+					.put("contributor", zeroOrMoreHandler)
+					.put("date", optionalHandler)
+					.put("type", zeroOrMoreHandler)
+					.put("source", zeroOrMoreHandler)
+					.put("language", zeroOrMoreHandler)
+					.put("relation", zeroOrMoreHandler)
+					.put("coverage", zeroOrMoreHandler)
+					.put("rights", zeroOrMoreHandler)
+					.build();
+		}
+		@Override
+		public PEFDocument readElement(PEFDocument doc, XMLStreamReader reader)
+				throws XMLStreamException, PEFInputException {
+			// Reset all the handlers, eg. the counters.
+			for (ChildHandler c: requiredElements.values()) {
+				c.reset();
+			}
+			PEFDocument curDoc = this.readChildElements(doc, reader);
+			for (Entry<String, ChildHandler> entry: requiredElements.entrySet()) {
+				if (!entry.getValue().checkOccurrences()) {
+					throw new PEFInputException(String.format("Incorrect number of occurrences for %s", entry.getKey()));
+				}
+			}
 			return curDoc;
 		}
 		@Override
-		public PEFDocument onChildElement(PEFDocument doc, XMLStreamReader reader) throws PEFInputException, XMLStreamException {
-			switch(reader.getLocalName()) {
-			case "head":
-				return headHandler.readElement(doc, reader);
-			case "body":
-				return bodyHandler.readElement(doc, reader);
-			default:
-				throw new PEFInputException("Unexpected element");
+		protected PEFDocument onChildElement(PEFDocument doc, XMLStreamReader reader)
+				throws XMLStreamException, PEFInputException {
+			ChildHandler c = requiredElements.getOrDefault(reader.getLocalName(), null);
+			if (c != null) {
+				Meta meta = doc.getMeta();
+				String value = reader.getElementText();
+				c.onValue(meta, value);
+			} else {
+				throw new PEFInputException("Unknown element");
 			}
+			return doc;
 		}
 	}
 	private static class BodyElementHandler extends ContainerElementHandler {
@@ -259,30 +349,88 @@ class DefaultPEFReader {
 	}
 	private static class VolumeElementHandler extends ContainerElementHandler {
 		public VolumeElementHandler() {
-			super(new ChildElementDefinition(PEFDocument.PEF_NAMESPACE, "section", 1, null));
+			super(new ChildElementDefinition(PEFDocument.PEF_NAMESPACE, "section", 1, new SectionHandler()));
 		}
 		@Override
 		public PEFDocument readElement(PEFDocument doc, XMLStreamReader reader)
 				throws XMLStreamException, PEFInputException {
 			// Add a new volume
-			Volume vol = doc.getVolume(doc.appendnewVolume();
+			Volume vol = doc.appendnewVolume();
 			// Make sure the volume has correct cols, rows, etc
-			String value = reader.getAttributeValue(PEFDocument.PEF_NAMESPACE, "cols");
+			String value = checkNotNull(reader.getAttributeValue(PEFDocument.PEF_NAMESPACE, "cols"));
 			vol.setCols(Integer.valueOf(value));
-			value = reader.getAttributeValue(PEFDocument.PEF_NAMESPACE, "rows");
+			value = checkNotNull(reader.getAttributeValue(PEFDocument.PEF_NAMESPACE, "rows"));
 			vol.setRows(Integer.valueOf(value));
-			value = reader.getAttributeValue(PEFDocument.PEF_NAMESPACE, "rowgap");
+			value = checkNotNull(reader.getAttributeValue(PEFDocument.PEF_NAMESPACE, "rowgap"));
 			vol.setRowGap(Integer.valueOf(value));
-			value = reader.getAttributeValue(PEFDocument.PEF_NAMESPACE, "duplex");
+			value = checkNotNull(reader.getAttributeValue(PEFDocument.PEF_NAMESPACE, "duplex"));
 			vol.setDuplex(Boolean.valueOf(value));
-			return super.readElement(doc, reader);
+			// A volume must contain at least one section, therefore volumes are created with initial sections
+			int initialSections = vol.getSectionCount();
+			PEFDocument result = super.readElement(doc, reader);
+			// Remove the initial sections from the volume
+			while (vol.getSectionCount() > 1 && initialSections > 0) {
+				vol.removeSection(0);
+				initialSections--;
+			}
+			return result;
+		}
+	}
+	private static class SectionHandler extends ContainerElementHandler {
+		public SectionHandler() {
+			super(new ChildElementDefinition(PEFDocument.PEF_NAMESPACE, "page", 1, new PageHandler()));
+		}
+		@Override
+		public PEFDocument readElement(PEFDocument doc, XMLStreamReader reader)
+				throws XMLStreamException, PEFInputException {
+			// The current volume is the last volume
+			Volume vol = doc.getVolume(doc.getVolumeCount());
+			Section section = vol.appendNewSection();
+			String value = reader.getAttributeValue(PEFDocument.PEF_NAMESPACE, "cols");
+			section.setCols(Integer.valueOf(value));
+			value = reader.getAttributeValue(PEFDocument.PEF_NAMESPACE, "duplex");
+			section.setDuplex(Boolean.valueOf(value));
+			value = reader.getAttributeValue(PEFDocument.PEF_NAMESPACE, "rowgap");
+			section.setRowGap(Integer.valueOf(value));
+			value = reader.getAttributeValue(PEFDocument.PEF_NAMESPACE, "rows");
+			section.setRows(Integer.valueOf(value));
+			int initialPages = section.getPageCount();
+			PEFDocument result = super.readElement(doc, reader);
+			// Remove the initial pages
+			while (section.getPageCount() > 1 && initialPages > 0) {
+				section.removePage(0);
+				initialPages--;
+			}
+			return result;
+		}
+	}
+	private static class PageHandler extends ContainerElementHandler {
+		public PageHandler() {
+			super(new ChildElementDefinition(PEFDocument.PEF_NAMESPACE, "row", 0, null));
+		}
+		@Override
+		public PEFDocument readElement(PEFDocument doc, XMLStreamReader reader)
+				throws XMLStreamException, PEFInputException {
+			// Last volume last section is where we are
+			Volume vol = doc.getVolume(doc.getVolumeCount() - 1);
+			Section section = vol.getSection(vol.getSectionCount() - 1);
+			Page page = section.appendNewPage();
+			String value = reader.getAttributeValue(PEFDocument.PEF_NAMESPACE, "rowgap");
+			page.setRowGap(Integer.valueOf(value));
+			int initialRows = page.getRowCount();
+			PEFDocument result = super.readElement(doc, reader);
+			while (page.getRowCount() > 0 && initialRows > 0) {
+				page.removeRow(0);
+				initialRows--;
+			}
+			return result;
 		}
 	}
 	private XMLStreamReader reader;
-	private PEFFactory factory;
+	private PEFElementHandler pefHandler;
 	private DefaultPEFReader(PEFFactory factory, XMLStreamReader reader) {
+		this.pefHandler = new PEFElementHandler(factory);
 		this.reader = reader;
-		this.factory = factory;
 	}
 	private void close() {
 		try {
@@ -309,14 +457,14 @@ class DefaultPEFReader {
 		if (doc == null) throw new PEFInputException("Input is not a PEF");
 		return doc;
 	}
-	private PEFDocument readDocument() throws XMLStreamException {
+	private PEFDocument readDocument() throws XMLStreamException, PEFInputException {
 		PEFDocument doc = null;
 		int event = reader.getEventType();
 		while (true) {
 			switch(event) {
 			case XMLStreamConstants.START_ELEMENT:
 				if (PEFDocument.PEF_NAMESPACE.equals(reader.getNamespaceURI()) && "pef".equals(reader.getLocalName())) {
-					doc = readPEF();
+					doc = pefHandler.readElement(doc, reader);
 				}
 				break;
 			default:
@@ -328,23 +476,5 @@ class DefaultPEFReader {
 			event = reader.next();
 		}
 		return doc;
-	}
-	private PEFDocument readPEF() throws XMLStreamException {
-		String version = reader.getAttributeValue(PEFDocument.PEF_NAMESPACE, "version");
-		// We create the PEF with a temp identifier and change it later when we find it in the document.
-		PEFDocument doc = version == null ? factory.createPEF("TempID") : factory.createPEF("TempID", version);
-		while (reader.hasNext()) {
-			int event = reader.nextTag();
-			switch(event) {
-			case XMLStreamConstants.START_ELEMENT:
-				if ("head".equals(reader.getLocalName())) {
-					readHead(doc);
-				}
-			}
-		}
-		return doc;
-	}
-	private void readHead(PEFDocument doc) {
-		
 	}
 }

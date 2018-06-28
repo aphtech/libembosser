@@ -7,9 +7,8 @@ public interface PEFFactory {
 	public default PEFDocument createPEF(String identifier) {
 		return createPEF(identifier, "2008-1");
 	}
-	public default PEFDocument loadPEF(InputStream in) {
-		// We create with a temp ID, change it when we load the XML
-		PEFDocument doc = createPEF("TempID");
+	public default PEFDocument loadPEF(InputStream in) throws PEFInputException {
+		PEFDocument doc = DefaultPEFReader.read(this, in);
 		return doc;
 	}
 	public static PEFFactory getInstance() {
