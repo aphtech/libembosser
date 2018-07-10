@@ -110,5 +110,65 @@ public class SectionImpl implements Section {
 	public Volume getParent() {
 		return volume;
 	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((cols == null) ? 0 : cols.hashCode());
+		result = prime * result + ((duplex == null) ? 0 : duplex.hashCode());
+		result = prime * result + ((pages == null) ? 0 : pages.hashCode());
+		result = prime * result + ((rowGap == null) ? 0 : rowGap.hashCode());
+		result = prime * result + ((rows == null) ? 0 : rows.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		SectionImpl other = (SectionImpl) obj;
+		if (cols == null) {
+			if (other.cols != null) {
+				return false;
+			}
+		} else if (!cols.equals(other.cols)) {
+			return false;
+		}
+		if (duplex == null) {
+			if (other.duplex != null) {
+				return false;
+			}
+		} else if (!duplex.equals(other.duplex)) {
+			return false;
+		}
+		if (pages == null) {
+			if (other.pages != null) {
+				return false;
+			}
+		} else if (!pages.equals(other.pages)) {
+			return false;
+		}
+		if (rowGap == null) {
+			if (other.rowGap != null) {
+				return false;
+			}
+		} else if (!rowGap.equals(other.rowGap)) {
+			return false;
+		}
+		if (rows == null) {
+			if (other.rows != null) {
+				return false;
+			}
+		} else if (!rows.equals(other.rows)) {
+			return false;
+		}
+		return true;
+	}
 
 }

@@ -127,5 +127,49 @@ public class VolumeImpl implements Volume {
 	public boolean getDuplexValue() {
 		return duplex;
 	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + cols;
+		result = prime * result + (duplex ? 1231 : 1237);
+		result = prime * result + rowGap;
+		result = prime * result + rows;
+		result = prime * result + ((sections == null) ? 0 : sections.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		VolumeImpl other = (VolumeImpl) obj;
+		if (cols != other.cols) {
+			return false;
+		}
+		if (duplex != other.duplex) {
+			return false;
+		}
+		if (rowGap != other.rowGap) {
+			return false;
+		}
+		if (rows != other.rows) {
+			return false;
+		}
+		if (sections == null) {
+			if (other.sections != null) {
+				return false;
+			}
+		} else if (!sections.equals(other.sections)) {
+			return false;
+		}
+		return true;
+	}
 	
 }

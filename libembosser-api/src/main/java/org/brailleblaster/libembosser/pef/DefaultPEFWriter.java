@@ -52,14 +52,18 @@ class DefaultPEFWriter {
 		writer.writeStartElement("head");
 		writer.writeStartElement("meta");
 		writer.writeNamespace("dc", PEFDocument.DC_NAMESPACE);
+		writer.writeStartElement("dc", "format", PEFDocument.PEF_NAMESPACE);
+		final Meta meta = doc.getMeta();
+		writer.writeCharacters(meta.getFormat());
+		writer.writeEndElement();
 		// Handle the identifier
 		writer.writeStartElement("dc", "identifier", PEFDocument.DC_NAMESPACE);
-		writer.writeCharacters(doc.getMeta().getIdentifier());
+		writer.writeCharacters(meta.getIdentifier());
 		// End Identifier
 		writer.writeEndElement();
 		// Title
 		writer.writeStartElement("dc", "title", PEFDocument.DC_NAMESPACE);
-		writer.writeCharacters(doc.getMeta().getTitle());
+		writer.writeCharacters(meta.getTitle());
 		// End title
 		writer.writeEndElement();
 		// End meta

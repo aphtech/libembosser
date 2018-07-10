@@ -1,8 +1,5 @@
 package org.brailleblaster.libembosser.utils.pef.jaxb;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -16,6 +13,8 @@ import org.brailleblaster.libembosser.pef.Page;
 import org.brailleblaster.libembosser.pef.Row;
 import org.brailleblaster.libembosser.pef.Section;
 
+import com.google.common.collect.Lists;
+
 @XmlRootElement(name="page", namespace=PEFDocument.PEF_NAMESPACE)
 @XmlAccessorType(XmlAccessType.NONE)
 public class PageImpl implements Page {
@@ -25,7 +24,7 @@ public class PageImpl implements Page {
 	private Integer rowGap = null;
 	private Section section;
 	private PageImpl() {
-		this.rows = new ArrayList<>();
+		this.rows = Lists.newArrayList();
 		this.section = null;
 	}
 	PageImpl(Section section) {
@@ -90,14 +89,50 @@ public class PageImpl implements Page {
 	public Integer getRowGap() {
 		return rowGap;
 	}
-
+	
 	@Override
 	public void setRowGap(Integer gap) {
-		rowGap = checkNotNull(gap);
+		rowGap = gap;
 	}
 	@Override
 	public Section getParent() {
 		return section;
+	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((rowGap == null) ? 0 : rowGap.hashCode());
+		result = prime * result + ((rows == null) ? 0 : rows.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		PageImpl other = (PageImpl) obj;
+		if (rowGap == null) {
+			if (other.rowGap != null) {
+				return false;
+			}
+		} else if (!rowGap.equals(other.rowGap)) {
+			return false;
+		}
+		if (rows == null) {
+			if (other.rows != null) {
+				return false;
+			}
+		} else if (!rows.equals(other.rows)) {
+			return false;
+		}
+		return true;
 	}
 
 }
