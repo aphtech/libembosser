@@ -2,22 +2,11 @@ package org.brailleblaster.libembosser.utils.pef.simple;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlValue;
-
-import org.brailleblaster.libembosser.pef.PEFDocument;
 import org.brailleblaster.libembosser.pef.Page;
 import org.brailleblaster.libembosser.pef.Row;
 
-@XmlRootElement(name="row", namespace=PEFDocument.PEF_NAMESPACE)
-@XmlAccessorType(XmlAccessType.NONE)
 public class RowImpl implements Row {
-	@XmlValue
 	private String braille;
-	@XmlAttribute(name="rowgap", namespace=PEFDocument.PEF_NAMESPACE)
 	private Integer rowGap = null;
 	private Page page;
 	RowImpl(Page page) {

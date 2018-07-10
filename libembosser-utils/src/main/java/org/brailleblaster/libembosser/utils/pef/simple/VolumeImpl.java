@@ -4,30 +4,17 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
 import org.brailleblaster.libembosser.pef.PEFDocument;
 import org.brailleblaster.libembosser.pef.Section;
 import org.brailleblaster.libembosser.pef.Volume;
 
 import com.google.common.collect.Lists;
 
-@XmlRootElement(name="volume", namespace=PEFDocument.PEF_NAMESPACE)
-@XmlAccessorType(XmlAccessType.NONE)
 public class VolumeImpl implements Volume {
-	@XmlElement(name="section", namespace=PEFDocument.PEF_NAMESPACE)
 	private List<SectionImpl> sections;
-	@XmlAttribute(name="rowgap", namespace=PEFDocument.PEF_NAMESPACE)
 	private int rowGap = 0;
-	@XmlAttribute(name="cols", namespace=PEFDocument.PEF_NAMESPACE)
 	private int cols = 1;
-	@XmlAttribute(name="rows", namespace=PEFDocument.PEF_NAMESPACE)
 	private int rows = 1;
-	@XmlAttribute(name="duplex", namespace=PEFDocument.PEF_NAMESPACE)
 	private boolean duplex = false;
 	private PEFDocument doc;
 	private VolumeImpl() {

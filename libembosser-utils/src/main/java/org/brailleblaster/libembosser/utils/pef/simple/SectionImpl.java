@@ -2,31 +2,17 @@ package org.brailleblaster.libembosser.utils.pef.simple;
 
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
-import org.brailleblaster.libembosser.pef.PEFDocument;
 import org.brailleblaster.libembosser.pef.Page;
 import org.brailleblaster.libembosser.pef.Section;
 import org.brailleblaster.libembosser.pef.Volume;
 
 import com.google.common.collect.Lists;
 
-@XmlRootElement(name="section", namespace=PEFDocument.PEF_NAMESPACE)
-@XmlAccessorType(XmlAccessType.NONE)
 public class SectionImpl implements Section {
-	@XmlElement(name="page", namespace=PEFDocument.PEF_NAMESPACE)
 	private List<PageImpl> pages;
-	@XmlAttribute(name="rowgap", namespace=PEFDocument.PEF_NAMESPACE)
 	private Integer rowGap = null;
-	@XmlAttribute(name="cols", namespace=PEFDocument.PEF_NAMESPACE)
 	private Integer cols = null;
-	@XmlAttribute(name="rows", namespace=PEFDocument.PEF_NAMESPACE)
 	private Integer rows = null;
-	@XmlAttribute(name="duplex", namespace=PEFDocument.PEF_NAMESPACE)
 	private Boolean duplex = null;
 	private Volume volume;
 	private SectionImpl() {

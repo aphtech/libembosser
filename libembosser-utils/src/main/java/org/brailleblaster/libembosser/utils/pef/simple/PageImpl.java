@@ -2,25 +2,14 @@ package org.brailleblaster.libembosser.utils.pef.simple;
 
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
-import org.brailleblaster.libembosser.pef.PEFDocument;
 import org.brailleblaster.libembosser.pef.Page;
 import org.brailleblaster.libembosser.pef.Row;
 import org.brailleblaster.libembosser.pef.Section;
 
 import com.google.common.collect.Lists;
 
-@XmlRootElement(name="page", namespace=PEFDocument.PEF_NAMESPACE)
-@XmlAccessorType(XmlAccessType.NONE)
 public class PageImpl implements Page {
-	@XmlElement(name="row", namespace=PEFDocument.PEF_NAMESPACE)
 	private List<RowImpl> rows;
-	@XmlAttribute(name="rowgap", namespace=PEFDocument.PEF_NAMESPACE)
 	private Integer rowGap = null;
 	private Section section;
 	private PageImpl() {

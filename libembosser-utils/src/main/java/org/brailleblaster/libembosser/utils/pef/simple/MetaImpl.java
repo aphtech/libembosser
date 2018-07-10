@@ -2,22 +2,11 @@ package org.brailleblaster.libembosser.utils.pef.simple;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
 import org.brailleblaster.libembosser.pef.Meta;
-import org.brailleblaster.libembosser.pef.PEFDocument;
 
-@XmlRootElement(name="meta", namespace=PEFDocument.PEF_NAMESPACE)
-@XmlAccessorType(XmlAccessType.NONE)
 public class MetaImpl implements Meta {
-	@XmlElement(name="format", namespace=PEFDocument.DC_NAMESPACE, required=true)
 	private String format = "application/x-pef+xml";
-	@XmlElement(name="identifier", namespace=PEFDocument.DC_NAMESPACE, required=true)
 	private String identifier;
-	@XmlElement(name="title", namespace=PEFDocument.DC_NAMESPACE)
 	private String title;
 	private MetaImpl() {
 		this.identifier = "";
