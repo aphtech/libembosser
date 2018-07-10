@@ -62,11 +62,9 @@ class DefaultPEFReader {
 				int event = reader.nextTag();
 				switch(event) {
 				case XMLStreamConstants.START_ELEMENT:
-					System.out.println(String.format("Start element %s", reader.getLocalName()));
 					curDoc = onChildElement(curDoc, reader);
 					break;
 				case XMLStreamConstants.END_ELEMENT:
-					System.out.println(String.format("End element %s", reader.getLocalName()));
 					// Should be end of our element due to onChildElement contract.
 					continueLoop = false;
 					break;
