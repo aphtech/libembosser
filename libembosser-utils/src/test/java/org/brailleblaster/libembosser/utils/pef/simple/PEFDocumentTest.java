@@ -1,4 +1,4 @@
-package org.brailleblaster.libembosser.utils.pef.jaxb;
+package org.brailleblaster.libembosser.utils.pef.simple;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
@@ -14,6 +14,8 @@ import org.brailleblaster.libembosser.pef.PEFDocument;
 import org.brailleblaster.libembosser.pef.PEFFactory;
 import org.brailleblaster.libembosser.pef.PEFInputException;
 import org.brailleblaster.libembosser.pef.PEFOutputException;
+import org.brailleblaster.libembosser.utils.pef.simple.PEFDocumentImpl;
+import org.brailleblaster.libembosser.utils.pef.simple.SimplePEFFactory;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 

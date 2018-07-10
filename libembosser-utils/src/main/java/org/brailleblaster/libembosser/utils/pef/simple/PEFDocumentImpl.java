@@ -1,35 +1,20 @@
-package org.brailleblaster.libembosser.utils.pef.jaxb;
+package org.brailleblaster.libembosser.utils.pef.simple;
 
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlRootElement;
-
 import org.brailleblaster.libembosser.pef.Meta;
 import org.brailleblaster.libembosser.pef.PEFDocument;
+import org.brailleblaster.libembosser.pef.Volume;
 
 import com.google.common.collect.Lists;
 
-@XmlRootElement(name="pef", namespace=PEFDocument.PEF_NAMESPACE)
-@XmlAccessorType(XmlAccessType.NONE)
 public class PEFDocumentImpl implements PEFDocument {
-	@XmlAttribute(name="version", namespace=PEFDocument.PEF_NAMESPACE)
 	private String version = "2008-1";
-	@XmlElement(name="head", namespace=PEFDocument.PEF_NAMESPACE)
-	private Head head = new Head("");
-	@XmlElementWrapper(name="body", namespace=org.brailleblaster.libembosser.pef.PEFDocument.PEF_NAMESPACE)
-	@XmlElement(name="volume", namespace=PEFDocument.PEF_NAMESPACE)
+	private Meta meta;
 	private List<VolumeImpl> volumes;
-	private PEFDocumentImpl() {
-		this.volumes = Lists.newArrayList(new VolumeImpl(this));
-	}
 	public PEFDocumentImpl(String identifier) {
-		this();
-		this.getMeta().setIdentifier(identifier);
+		this.volumes = Lists.newArrayList(new VolumeImpl(this));
+		this.meta = new MetaImpl(identifier);
 	}
 	@Override
 	public org.brailleblaster.libembosser.pef.Volume getVolume(int index) {
@@ -40,13 +25,13 @@ public class PEFDocumentImpl implements PEFDocument {
 		return volumes.size();
 	}
 	@Override
-	public org.brailleblaster.libembosser.pef.Volume appendnewVolume() {
+	public Volume appendnewVolume() {
 		VolumeImpl result = new VolumeImpl(this);
 		volumes.add(result);
 		return result;
 	}
 	@Override
-	public org.brailleblaster.libembosser.pef.Volume insertnewVolume(int index) {
+	public Volume insertnewVolume(int index) {
 		VolumeImpl newVol = new VolumeImpl(this);
 		volumes.add(index, newVol);
 		return newVol;
@@ -67,13 +52,13 @@ public class PEFDocumentImpl implements PEFDocument {
 	}
 	@Override
 	public Meta getMeta() {
-		return head.getMeta();
+		return meta;
 	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((head == null) ? 0 : head.hashCode());
+		result = prime * result + ((meta == null) ? 0 : meta.hashCode());
 		result = prime * result + ((version == null) ? 0 : version.hashCode());
 		result = prime * result + ((volumes == null) ? 0 : volumes.hashCode());
 		return result;
@@ -90,11 +75,11 @@ public class PEFDocumentImpl implements PEFDocument {
 			return false;
 		}
 		PEFDocumentImpl other = (PEFDocumentImpl) obj;
-		if (head == null) {
-			if (other.head != null) {
+		if (meta == null) {
+			if (other.meta != null) {
 				return false;
 			}
-		} else if (!head.equals(other.head)) {
+		} else if (!meta.equals(other.meta)) {
 			return false;
 		}
 		if (version == null) {

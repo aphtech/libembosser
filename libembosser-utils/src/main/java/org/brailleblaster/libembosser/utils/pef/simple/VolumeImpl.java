@@ -1,4 +1,4 @@
-package org.brailleblaster.libembosser.utils.pef.jaxb;
+package org.brailleblaster.libembosser.utils.pef.simple;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
