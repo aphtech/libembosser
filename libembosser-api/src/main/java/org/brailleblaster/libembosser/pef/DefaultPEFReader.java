@@ -22,7 +22,7 @@ import com.google.common.collect.Range;
 class DefaultPEFReader {
 	static class PEFFilter implements StreamFilter {
 		private String[] pefNames = new String[] { "pef", "head", "meta", "body", "volume", "section", "page", "row" };
-		private String[] dcNames = new String[] { "format", "identifier", "title" };
+		private String[] dcNames = new String[] { "coverage", "contributor", "creator", "date", "description", "format", "identifier", "language", "publisher", "relation", "rights", "source", "subject", "title", "type" };
 		private String[] extpefnames = new String[] { "graphic" };
 		@Override
 		public boolean accept(XMLStreamReader reader) {
@@ -281,28 +281,27 @@ class DefaultPEFReader {
 			}
 		}
 		private Map<String, ChildHandler> requiredElements;
-		public MetaElementHandler() {
+		MetaElementHandler() {
 			final ChildHandler zeroOrMoreHandler = new ChildHandler(Range.atLeast(0), (m, v) -> {
 				// For now nothing
 			});
-			final ChildHandler optionalHandler = new ChildHandler(Range.closed(0, 1), (m, v) -> {
-				// For now do nothing
-			});
+			final Range<Integer> optionalRange = Range.closed(0, 1);
+			final Range<Integer> mandatoryRange = Range.closed(1, 1);
 			this.requiredElements = ImmutableMap.<String, ChildHandler>builder()
-					.put("format", new ChildHandler(Range.closed(1, 1), (m, v) -> {
+					.put("format", new ChildHandler(mandatoryRange, (m, v) -> {
 						if (!"application/x-pef+xml".equals(v)) {
 							throw new RuntimeException("Invalid value for format");
 						}
 						// We need not set the format as this should already be done.
 					}))
-					.put("identifier", new ChildHandler(Range.closed(1, 1), (m, v) -> m.setIdentifier(v)))
-					.put("title", new ChildHandler(Range.closed(0, 1), (m, v) -> m.setTitle(v)))
+					.put("identifier", new ChildHandler(mandatoryRange, (m, v) -> m.setIdentifier(v)))
+					.put("title", new ChildHandler(optionalRange, (m, v) -> m.setTitle(v)))
 					.put("creator", zeroOrMoreHandler)
 					.put("subject", zeroOrMoreHandler)
-					.put("description", optionalHandler)
+					.put("description", new ChildHandler(optionalRange, (m, v) -> m.setDescription(v)))
 					.put("publisher", zeroOrMoreHandler)
 					.put("contributor", zeroOrMoreHandler)
-					.put("date", optionalHandler)
+					.put("date", new ChildHandler(optionalRange, (m, v) -> m.setDate(v)))
 					.put("type", zeroOrMoreHandler)
 					.put("source", zeroOrMoreHandler)
 					.put("language", zeroOrMoreHandler)
@@ -456,7 +455,7 @@ class DefaultPEFReader {
 		XMLInputFactory inFactory = XMLInputFactory.newInstance();
 		try {
 			XMLStreamReader reader = inFactory.createXMLStreamReader(is, "utf-8");
-			dr = new DefaultPEFReader(factory, inFactory.createFilteredReader(reader, new PEFFilter()));
+			dr = new DefaultPEFReader(factory, reader);
 			doc = dr.readDocument();
 		} catch (XMLStreamException e) {
 			throw new PEFInputException("Problem creating PEF", e);

@@ -1,4 +1,4 @@
-package org.brailleblaster.libembosser.utils.pef.simple;
+package org.brailleblaster.libembosser.simplepef;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
@@ -14,8 +14,8 @@ import org.brailleblaster.libembosser.pef.PEFDocument;
 import org.brailleblaster.libembosser.pef.PEFFactory;
 import org.brailleblaster.libembosser.pef.PEFInputException;
 import org.brailleblaster.libembosser.pef.PEFOutputException;
-import org.brailleblaster.libembosser.utils.pef.simple.PEFDocumentImpl;
-import org.brailleblaster.libembosser.utils.pef.simple.SimplePEFFactory;
+import org.brailleblaster.libembosser.simplepef.PEFDocumentImpl;
+import org.brailleblaster.libembosser.simplepef.SimplePEFFactory;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -45,13 +45,15 @@ public class PEFDocumentTest {
 				+ "</pef>";
 		data.add(new Object[] {pef, expected});
 		pef = new PEFDocumentImpl("TestPEF0002");
-		pef.getMeta().setTitle("Basic default marshalling PEF");
+		pef.getMeta().setDate("11 July 2018");
+		pef.getMeta().setDescription("An untitled PEF");
 		expected = "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
 				+ "<pef xmlns=\"http://www.daisy.org/ns/2008/pef\" version=\"2008-1\">"
 				+ "<head><meta xmlns:dc=\"http://purl.org/dc/elements/1.1/\">"
+				+ "<dc:date>11 July 2018</dc:date>"
+				+ "<dc:description>An untitled PEF</dc:description>"
 				+ "<dc:format>application/x-pef+xml</dc:format>"
 				+ "<dc:identifier>TestPEF0002</dc:identifier>"
-				+ "<dc:title>Basic default marshalling PEF</dc:title>"
 				+ "</meta></head>"
 				+ "<body>"
 				+ "<volume cols=\"1\" duplex=\"false\" rowgap=\"0\" rows=\"1\">"

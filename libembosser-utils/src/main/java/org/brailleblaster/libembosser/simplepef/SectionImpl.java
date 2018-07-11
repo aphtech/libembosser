@@ -1,4 +1,4 @@
-package org.brailleblaster.libembosser.utils.pef.simple;
+package org.brailleblaster.libembosser.simplepef;
 
 import java.util.List;
 

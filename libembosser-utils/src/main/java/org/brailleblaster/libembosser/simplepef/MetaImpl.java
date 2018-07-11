@@ -1,20 +1,20 @@
-package org.brailleblaster.libembosser.utils.pef.simple;
+package org.brailleblaster.libembosser.simplepef;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.brailleblaster.libembosser.pef.Meta;
 
 public class MetaImpl implements Meta {
-	private String format = "application/x-pef+xml";
+	public String date;
+	public String description;
+	private final String format = "application/x-pef+xml";
 	private String identifier;
 	private String title;
-	private MetaImpl() {
-		this.identifier = "";
-		this.title = null;
-	}
 	MetaImpl(String identifier) {
-		this();
 		this.identifier = identifier;
+		this.title = null;
+		this.date = null;
+		this.description = null;
 	}
 	@Override
 	public String getFormat() {
@@ -43,7 +43,8 @@ public class MetaImpl implements Meta {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((format == null) ? 0 : format.hashCode());
+		result = prime * result + ((date == null) ? 0 : date.hashCode());
+		result = prime * result + ((description == null) ? 0 : description.hashCode());
 		result = prime * result + ((identifier == null) ? 0 : identifier.hashCode());
 		result = prime * result + ((title == null) ? 0 : title.hashCode());
 		return result;
@@ -60,11 +61,18 @@ public class MetaImpl implements Meta {
 			return false;
 		}
 		MetaImpl other = (MetaImpl) obj;
-		if (format == null) {
-			if (other.format != null) {
+		if (date == null) {
+			if (other.date != null) {
 				return false;
 			}
-		} else if (!format.equals(other.format)) {
+		} else if (!date.equals(other.date)) {
+			return false;
+		}
+		if (description == null) {
+			if (other.description != null) {
+				return false;
+			}
+		} else if (!description.equals(other.description)) {
 			return false;
 		}
 		if (identifier == null) {
@@ -82,6 +90,22 @@ public class MetaImpl implements Meta {
 			return false;
 		}
 		return true;
+	}
+	@Override
+	public String getDate() {
+		return date;
+	}
+	@Override
+	public void setDate(String date) {
+		this.date = date;
+	}
+	@Override
+	public String getDescription() {
+		return description;
+	}
+	@Override
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 }

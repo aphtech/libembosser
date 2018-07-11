@@ -47,25 +47,30 @@ class DefaultPEFWriter {
 		writer.writeEndElement();
 		writer.writeEndDocument();
 	}
+	private void writeDCElement(String elementName, String value) throws XMLStreamException {
+		if (value == null) {
+			return;
+		}
+		writer.writeStartElement("dc", elementName, PEFDocument.DC_NAMESPACE);
+		writer.writeCharacters(value);
+		writer.writeEndElement();
+	}
 	private void writeHead() throws XMLStreamException {
+		final Meta meta = doc.getMeta();
 		// Handle the head
 		writer.writeStartElement("head");
 		writer.writeStartElement("meta");
 		writer.writeNamespace("dc", PEFDocument.DC_NAMESPACE);
-		writer.writeStartElement("dc", "format", PEFDocument.PEF_NAMESPACE);
-		final Meta meta = doc.getMeta();
-		writer.writeCharacters(meta.getFormat());
-		writer.writeEndElement();
+		// Handle date
+		writeDCElement("date", meta.getDate());
+		// Handle description
+		writeDCElement("description", meta.getDescription());
+		// Handle format
+		writeDCElement("format", meta.getFormat());
 		// Handle the identifier
-		writer.writeStartElement("dc", "identifier", PEFDocument.DC_NAMESPACE);
-		writer.writeCharacters(meta.getIdentifier());
-		// End Identifier
-		writer.writeEndElement();
+		writeDCElement("identifier", meta.getIdentifier());
 		// Title
-		writer.writeStartElement("dc", "title", PEFDocument.DC_NAMESPACE);
-		writer.writeCharacters(meta.getTitle());
-		// End title
-		writer.writeEndElement();
+		writeDCElement("title", meta.getTitle());
 		// End meta
 		writer.writeEndElement();
 		//end head

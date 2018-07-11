@@ -1,4 +1,4 @@
-package org.brailleblaster.libembosser.utils.pef.simple;
+package org.brailleblaster.libembosser.simplepef;
 
 import org.brailleblaster.libembosser.pef.PEFDocument;
 import org.brailleblaster.libembosser.pef.PEFFactory;
