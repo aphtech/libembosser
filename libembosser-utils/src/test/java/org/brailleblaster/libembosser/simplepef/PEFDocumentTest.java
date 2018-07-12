@@ -14,6 +14,8 @@ import org.brailleblaster.libembosser.pef.PEFDocument;
 import org.brailleblaster.libembosser.pef.PEFFactory;
 import org.brailleblaster.libembosser.pef.PEFInputException;
 import org.brailleblaster.libembosser.pef.PEFOutputException;
+import org.brailleblaster.libembosser.pef.Page;
+import org.brailleblaster.libembosser.pef.Volume;
 import org.brailleblaster.libembosser.simplepef.PEFDocumentImpl;
 import org.brailleblaster.libembosser.simplepef.SimplePEFFactory;
 import org.testng.annotations.DataProvider;
@@ -65,6 +67,33 @@ public class PEFDocumentTest {
 				+ "</body>"
 				+ "</pef>";
 		data.add(new Object[] {pef, expected});
+		pef = new PEFDocumentImpl("Test0003");
+		pef.getMeta().setTitle("PEF with Braille");
+		pef.getMeta().setDescription("A test PEF which contains some Braille");
+		Volume vol = pef.getVolume(0);
+		vol.setCols(35);
+		vol.setDuplex(true);
+		vol.setRowGap(2);
+		vol.setRows(28);
+		Page page = pef.getVolume(0).getSection(0).getPage(0);
+		page.appendRow("\u2803\u2817\u2807\u2800\u2812\u281e\u2822\u281e");
+		expected = "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
+				+ "<pef xmlns=\"http://www.daisy.org/ns/2008/pef\" version=\"2008-1\">"
+				+ "<head><meta xmlns:dc=\"http://purl.org/dc/elements/1.1/\">"
+				+ "<dc:description>A test PEF which contains some Braille</dc:description>"
+				+ "<dc:format>application/x-pef+xml</dc:format>"
+				+ "<dc:identifier>Test0003</dc:identifier>"
+				+ "<dc:title>PEF with Braille</dc:title>"
+				+ "</meta></head>"
+				+ "<body>"
+				+ "<volume cols=\"35\" duplex=\"true\" rowgap=\"2\" rows=\"28\">"
+				+ "<section><page>"
+				+ "<row>\u2803\u2817\u2807\u2800\u2812\u281e\u2822\u281e</row>"
+				+ "</page></section>"
+				+ "</volume>"
+				+ "</body>"
+				+ "</pef>";
+		data.add(new Object[] { pef, expected });
 		return data.iterator();
 	}
 	@Test(dataProvider="pefProvider")

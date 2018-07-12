@@ -254,7 +254,7 @@ class DefaultPEFReader {
 			Page page = section.getPage(section.getPageCount() - 1);
 			Row row = page.appendNewRow();
 			String value = reader.getAttributeValue(PEFDocument.PEF_NAMESPACE, "rowgap");
-			row.setRowGap(Integer.valueOf(value));
+			row.setRowGap(value == null ? null : Integer.valueOf(value));
 			String braille = reader.getElementText();
 			row.setBraille(braille);
 			return doc;
