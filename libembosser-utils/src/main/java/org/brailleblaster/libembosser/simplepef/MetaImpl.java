@@ -2,19 +2,43 @@ package org.brailleblaster.libembosser.simplepef;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.List;
+
 import org.brailleblaster.libembosser.pef.Meta;
 
+import com.google.common.collect.ImmutableList;
+
 public class MetaImpl implements Meta {
-	public String date;
-	public String description;
+	private ImmutableList<String> contributors;
+	private ImmutableList<String> coverages;
+	private ImmutableList<String> creators;
+	private String date;
+	private String description;
 	private final String format = "application/x-pef+xml";
 	private String identifier;
+	private ImmutableList<String> languages;
+	private ImmutableList<String> publishers;
+	private ImmutableList<String> relations;
+	private ImmutableList<String> rights;
+	private ImmutableList<String> sources;
+	private ImmutableList<String> subjects;
 	private String title;
+	private ImmutableList<String> types;
 	MetaImpl(String identifier) {
-		this.identifier = identifier;
-		this.title = null;
+		this.contributors = ImmutableList.of();
+		this.coverages = ImmutableList.of();
+		this.creators = ImmutableList.of();
 		this.date = null;
 		this.description = null;
+		this.identifier = identifier;
+		this.languages = ImmutableList.of();
+		this.publishers = ImmutableList.of();
+		this.relations = ImmutableList.of();
+		this.rights = ImmutableList.of();
+		this.sources = ImmutableList.of();
+		this.subjects = ImmutableList.of();
+		this.title = null;
+		this.types = ImmutableList.of();
 	}
 	@Override
 	public String getFormat() {
@@ -106,6 +130,86 @@ public class MetaImpl implements Meta {
 	@Override
 	public void setDescription(String description) {
 		this.description = description;
+	}
+	@Override
+	public List<String> getContributors() {
+		return contributors;
+	}
+	@Override
+	public void setContributors(List<String> contributors) {
+		this.contributors = ImmutableList.copyOf(contributors);
+	}
+	@Override
+	public List<String> getCoverages() {
+		return this.coverages;
+	}
+	@Override
+	public void setCoverages(List<String> coverages) {
+		this.coverages = ImmutableList.copyOf(coverages);
+	}
+	@Override
+	public List<String> getCreators() {
+		return creators;
+	}
+	@Override
+	public void setCreators(List<String> creators) {
+		this.creators = ImmutableList.copyOf(creators);
+	}
+	@Override
+	public List<String> getLanguages() {
+		return this.languages;
+	}
+	@Override
+	public void setLanguages(List<String> languages) {
+		this.languages = ImmutableList.copyOf(languages);
+	}
+	@Override
+	public List<String> getPublishers() {
+		return publishers;
+	}
+	@Override
+	public void setPublishers(List<String> publishers) {
+		this.publishers = ImmutableList.copyOf(publishers);
+	}
+	@Override
+	public List<String> getRelations() {
+		return this.relations;
+	}
+	@Override
+	public void setRelations(List<String> relations) {
+		this.relations = ImmutableList.copyOf(relations);
+	}
+	@Override
+	public List<String> getRights() {
+		return this.rights;
+	}
+	@Override
+	public void setRights(List<String> rights) {
+		this.rights = ImmutableList.copyOf(rights);
+	}
+	@Override
+	public List<String> getSources() {
+		return this.sources;
+	}
+	@Override
+	public void setSources(List<String> sources) {
+		this.sources = ImmutableList.copyOf(sources);
+	}
+	@Override
+	public List<String> getSubjects() {
+		return this.subjects;
+	}
+	@Override
+	public void setSubjects(List<String> subjects) {
+		this.subjects = ImmutableList.copyOf(subjects);
+	}
+	@Override
+	public List<String> getTypes() {
+		return this.types;
+	}
+	@Override
+	public void setTypes(List<String> types) {
+		this.types = ImmutableList.copyOf(types);
 	}
 
 }

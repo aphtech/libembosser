@@ -4,12 +4,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.BiConsumer;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.StreamFilter;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -17,42 +17,10 @@ import javax.xml.stream.XMLStreamReader;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
 
 class DefaultPEFReader {
-	static class PEFFilter implements StreamFilter {
-		private String[] pefNames = new String[] { "pef", "head", "meta", "body", "volume", "section", "page", "row" };
-		private String[] dcNames = new String[] { "coverage", "contributor", "creator", "date", "description", "format", "identifier", "language", "publisher", "relation", "rights", "source", "subject", "title", "type" };
-		private String[] extpefnames = new String[] { "graphic" };
-		@Override
-		public boolean accept(XMLStreamReader reader) {
-			switch(reader.getEventType()) {
-			case XMLStreamConstants.START_ELEMENT:
-				return checkStartElement(reader);
-			case XMLStreamConstants.END_ELEMENT:
-				return checkEndElement(reader);
-			default:
-				return false;
-			}
-		}
-		private boolean checkStartElement(XMLStreamReader reader) {
-			return checkElementName(reader);
-		}
-		private boolean checkEndElement(XMLStreamReader reader) {
-			return checkElementName(reader);
-		}
-		private boolean checkElementName(XMLStreamReader reader) {
-			switch(reader.getNamespaceURI()) {
-			case PEFDocument.PEF_NAMESPACE:
-				return Arrays.stream(pefNames).anyMatch(e -> e.equals(reader.getLocalName()));
-			case PEFDocument.DC_NAMESPACE:
-				return Arrays.stream(dcNames).anyMatch(e -> e.equals(reader.getLocalName()));
-			default:
-				return false;
-			}
-		}
-		
-	}
 	private static abstract class BaseElementHandler {
 		public abstract PEFDocument readElement(PEFDocument doc, XMLStreamReader reader) throws XMLStreamException, PEFInputException;
 		protected PEFDocument readChildElements(PEFDocument doc, XMLStreamReader reader) throws XMLStreamException, PEFInputException {
@@ -282,11 +250,9 @@ class DefaultPEFReader {
 		}
 		private Map<String, ChildHandler> requiredElements;
 		MetaElementHandler() {
-			final ChildHandler zeroOrMoreHandler = new ChildHandler(Range.atLeast(0), (m, v) -> {
-				// For now nothing
-			});
 			final Range<Integer> optionalRange = Range.closed(0, 1);
 			final Range<Integer> mandatoryRange = Range.closed(1, 1);
+			final Range<Integer> zeroOrMoreRange = Range.atLeast(0);
 			this.requiredElements = ImmutableMap.<String, ChildHandler>builder()
 					.put("format", new ChildHandler(mandatoryRange, (m, v) -> {
 						if (!"application/x-pef+xml".equals(v)) {
@@ -296,18 +262,58 @@ class DefaultPEFReader {
 					}))
 					.put("identifier", new ChildHandler(mandatoryRange, (m, v) -> m.setIdentifier(v)))
 					.put("title", new ChildHandler(optionalRange, (m, v) -> m.setTitle(v)))
-					.put("creator", zeroOrMoreHandler)
-					.put("subject", zeroOrMoreHandler)
+					.put("creator", new ChildHandler(zeroOrMoreRange, (m, v) -> {
+						List<String> creators = Lists.newLinkedList(m.getCreators());
+						creators.add(v);
+						m.setCreators(creators);
+					}))
+					.put("subject", new ChildHandler(zeroOrMoreRange, (m, v) -> {
+						List<String> subjects = Lists.newLinkedList(m.getSubjects());
+						subjects.add(v);
+						m.setSubjects(subjects);
+					}))
 					.put("description", new ChildHandler(optionalRange, (m, v) -> m.setDescription(v)))
-					.put("publisher", zeroOrMoreHandler)
-					.put("contributor", zeroOrMoreHandler)
+					.put("publisher", new ChildHandler(zeroOrMoreRange, (m,v) -> {
+						List<String> publishers = Lists.newLinkedList(m.getPublishers());
+						publishers.add(v);
+						m.setPublishers(publishers);
+					}))
+					.put("contributor", new ChildHandler(zeroOrMoreRange, (m,v) -> {
+						List<String> contributors = Lists.newLinkedList(m.getContributors());
+						contributors.add(v);
+						m.setContributors(contributors);
+					}))
 					.put("date", new ChildHandler(optionalRange, (m, v) -> m.setDate(v)))
-					.put("type", zeroOrMoreHandler)
-					.put("source", zeroOrMoreHandler)
-					.put("language", zeroOrMoreHandler)
-					.put("relation", zeroOrMoreHandler)
-					.put("coverage", zeroOrMoreHandler)
-					.put("rights", zeroOrMoreHandler)
+					.put("type", new ChildHandler(zeroOrMoreRange, (m,v) -> {
+						List<String> types = Lists.newLinkedList(m.getTypes());
+						types.add(v);
+						m.setTypes(types);
+					}))
+					.put("source", new ChildHandler(zeroOrMoreRange, (m, v) -> {
+						List<String> sources = Lists.newLinkedList(m.getSources());
+						sources.add(v);
+						m.setSources(sources);
+					}))
+					.put("language", new ChildHandler(zeroOrMoreRange, (m,v) -> {
+						List<String> languages = Lists.newLinkedList(m.getLanguages());
+						languages.add(v);
+						m.setLanguages(languages);
+					}))
+					.put("relation", new ChildHandler(zeroOrMoreRange, (m, v) -> {
+						List<String> relations = Lists.newLinkedList(m.getRelations());
+						relations.add(v);
+						m.setRelations(relations);
+					}))
+					.put("coverage", new ChildHandler(zeroOrMoreRange, (m, v) -> {
+						List<String> coverages = Lists.newLinkedList(m.getCoverages());
+						coverages.add(v);
+						m.setCoverages(coverages);
+					}))
+					.put("rights", new ChildHandler(zeroOrMoreRange, (m,v) -> {
+						List<String> rights = Lists.newLinkedList(m.getRights());
+						rights.add(v);
+						m.setRights(rights);
+					}))
 					.build();
 		}
 		@Override

@@ -7,6 +7,11 @@ package org.brailleblaster.libembosser.pef;
  */
 public class PEFOutputException extends Exception {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public PEFOutputException() {
 		super();
 	}

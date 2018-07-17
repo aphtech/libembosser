@@ -57,10 +57,23 @@ class DefaultPEFWriter {
 	}
 	private void writeHead() throws XMLStreamException {
 		final Meta meta = doc.getMeta();
-		// Handle the head
+		// Handle the head element
 		writer.writeStartElement("head");
+		// Then the nested meta element
 		writer.writeStartElement("meta");
 		writer.writeNamespace("dc", PEFDocument.DC_NAMESPACE);
+		// Handle all contributors
+		for (String v: meta.getContributors()) {
+			writeDCElement("contributor", v);
+		}
+		// Handle all coverages
+		for (String v: meta.getCoverages()) {
+			writeDCElement("coverage", v);
+		}
+		// Handle all creators
+		for (String v: meta.getCreators()) {
+			writeDCElement("creator", v);
+		}
 		// Handle date
 		writeDCElement("date", meta.getDate());
 		// Handle description
@@ -69,8 +82,36 @@ class DefaultPEFWriter {
 		writeDCElement("format", meta.getFormat());
 		// Handle the identifier
 		writeDCElement("identifier", meta.getIdentifier());
+		// Handle all languages
+		for (String v: meta.getLanguages()) {
+			writeDCElement("language", v);
+		}
+		// Handle all publishers
+		for (String v: meta.getPublishers()) {
+			writeDCElement("publisher", v);
+		}
+		// Handle all relations
+		for (String v: meta.getRelations()) {
+			writeDCElement("relation", v);
+		}
+		// Handle all rights
+		for (String v: meta.getRights()) {
+			writeDCElement("rights", v);
+		}
+		// Handle all sources
+		for (String v: meta.getSources()) {
+			writeDCElement("source", v);
+		}
+		// Handle all subjects
+		for (String v: meta.getSubjects()) {
+			writeDCElement("subject", v);
+		}
 		// Title
 		writeDCElement("title", meta.getTitle());
+		// Handle all types
+		for (String v: meta.getTypes()) {
+			writeDCElement("type", v);
+		}
 		// End meta
 		writer.writeEndElement();
 		//end head
