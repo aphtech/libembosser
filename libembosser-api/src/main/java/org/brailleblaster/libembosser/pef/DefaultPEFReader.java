@@ -3,11 +3,9 @@ package org.brailleblaster.libembosser.pef;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.BiConsumer;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
@@ -15,13 +13,20 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
 
 class DefaultPEFReader {
-	private static abstract class BaseElementHandler {
+	private static abstract class BaseElementHandler implements ThrowingBiFunction<PEFDocument, XMLStreamReader, PEFDocument, PEFInputException> {
+		@Override
+		public PEFDocument apply(PEFDocument arg1, XMLStreamReader arg2) throws PEFInputException {
+			try {
+				return readElement(arg1, arg2);
+			} catch (XMLStreamException e) {
+				throw new PEFInputException("Problem with XML", e);
+			}
+		}
 		public abstract PEFDocument readElement(PEFDocument doc, XMLStreamReader reader) throws XMLStreamException, PEFInputException;
 		protected PEFDocument readChildElements(PEFDocument doc, XMLStreamReader reader) throws XMLStreamException, PEFInputException {
 			PEFDocument curDoc = doc;
@@ -120,44 +125,10 @@ class DefaultPEFReader {
 			return doc;
 		}
 	}
-	private static class ChildElementDefinition {
-		private final String ns;
-		private final String name;
-		private final int min;
-		private final int max;
-		private BaseElementHandler handler;
-		public ChildElementDefinition(String ns, String name, int min, BaseElementHandler reader) {
-			this(ns, name, min, Integer.MAX_VALUE, reader);
-		}
-		public ChildElementDefinition(String ns, String name, int min, int max, BaseElementHandler reader) {
-			this.ns = ns;
-			this.name = checkNotNull(name);
-			this.min = min;
-			this.max = max;
-			this.handler = checkNotNull(reader);
-		}
-		public String getNS() {
-			return ns;
-		}
-		public String getName() {
-			return name;
-		}
-		public int getMin() {
-			return min;
-		}
-		public int getMax() {
-			return max;
-		}
-		public BaseElementHandler getHandler() {
-			return handler;
-		}
-	}
 	private static class ContainerElementHandler extends BaseElementHandler {
-		private ChildElementDefinition[] childDefs;
-		private int[] occurrences; 
-		public ContainerElementHandler(ChildElementDefinition... childDefs) {
-			this.childDefs = childDefs;
-			this.occurrences = new int[childDefs.length];
+		private final Map<QName, ChildHandler<PEFDocument, XMLStreamReader, PEFDocument>> childDefMap;
+		public ContainerElementHandler(Map<QName, ChildHandler<PEFDocument, XMLStreamReader, PEFDocument>> childDefs) {
+			this.childDefMap = childDefs;
 		}
 		@Override
 		public PEFDocument readElement(PEFDocument doc, XMLStreamReader reader)
@@ -167,38 +138,31 @@ class DefaultPEFReader {
 		@Override
 		protected PEFDocument readChildElements(PEFDocument doc, XMLStreamReader reader)
 				throws XMLStreamException, PEFInputException {
-			// Ensure occurrences are all 0, protect against problems of reuse.
-			Arrays.fill(occurrences, 0);
+			// Ensure counters in child handlers are reset
+			childDefMap.values().forEach(c -> c.reset());
 			return super.readChildElements(doc, reader);
 		}
 		@Override
 		protected PEFDocument onChildElement(PEFDocument doc, XMLStreamReader reader)
 				throws XMLStreamException, PEFInputException {
 			QName elemName = reader.getName();
-			for (int i = 0; i < childDefs.length; i++) {
-				ChildElementDefinition curDef = childDefs[i];
-				if (Objects.equal(curDef.getName(), elemName.getLocalPart())) {
-					occurrences[i]++;
-					return curDef.getHandler().readElement(doc, reader);
-				}
+			if (childDefMap.containsKey(elemName)) {
+				return childDefMap.get(elemName).onValue(doc, reader);
+			} else {
+				StringBuilder sb = new StringBuilder();
+				sb.append("[");
+				childDefMap.keySet().forEach(c -> sb.append(String.format("%s:%s, ", c.getNamespaceURI(), c.getLocalPart())));
+				sb.append("] ");
+				sb.append(getClass().getName());
+				throw new PEFInputException(String.format("Unexpected element: %s:%s %s", elemName.getNamespaceURI(), elemName.getLocalPart(), sb.toString()));
 			}
-			// Have not found any matching child definition so element should not be permitted
-			StringBuilder sb = new StringBuilder();
-			sb.append("[");
-			for (int i = 0; i < childDefs.length; i++) {
-				sb.append(String.format("%s:%s", childDefs[i].getNS(), childDefs[i].getName()));
-				sb.append(", ");
-			}
-			sb.append("] ");
-			sb.append(getClass().getName());
-			throw new PEFInputException(String.format("Unexpected element: %s:%s %s", elemName.getNamespaceURI(), elemName.getLocalPart(), sb.toString()));
 		}
 	}
 	private static class PEFElementHandler extends ContainerElementHandler {
 		private PEFFactory factory;
 		public PEFElementHandler(PEFFactory factory) {
-			super(new ChildElementDefinition(PEFDocument.PEF_NAMESPACE, "head", 1, 1, new ContainerElementHandler(new ChildElementDefinition(PEFDocument.PEF_NAMESPACE, "meta", 1, 1, new MetaElementHandler()))),
-					new ChildElementDefinition(PEFDocument.PEF_NAMESPACE, "body", 1, 1, new BodyElementHandler()));
+			super(ImmutableMap.of(new QName(PEFDocument.PEF_NAMESPACE, "head"), new ChildHandler<>(Range.singleton(1), new ContainerElementHandler(ImmutableMap.of(new QName(PEFDocument.PEF_NAMESPACE, "meta"), new ChildHandler<>(Range.singleton(1), new MetaElementHandler())))),
+					new QName(PEFDocument.PEF_NAMESPACE, "body"), new ChildHandler<>(Range.singleton(1), new BodyElementHandler())));
 			this.factory = checkNotNull(factory);
 		}
 		@Override
@@ -215,7 +179,7 @@ class DefaultPEFReader {
 	private static class RowElementHandler extends BaseElementHandler {
 		@Override
 		public PEFDocument readElement(PEFDocument doc, XMLStreamReader reader)
-				throws XMLStreamException, PEFInputException {
+				throws PEFInputException, XMLStreamException {
 			// Create a row
 			Volume vol = doc.getVolume(doc.getVolumeCount() - 1);
 			Section section = vol.getSection(vol.getSectionCount() - 1);
@@ -229,90 +193,94 @@ class DefaultPEFReader {
 		}
 	}
 	private static class MetaElementHandler extends BaseElementHandler {
-		private static class ChildHandler {
-			private int occurrence = 0;
-			private final Range<Integer> required;
-			private BiConsumer<Meta, String> f;
-			public ChildHandler(Range<Integer> required, BiConsumer<Meta, String> f) {
-				this.required = required;
-				this.f = f;
-			}
-			public boolean checkOccurrences() {
-				return required.contains(occurrence);
-			}
-			public void reset() {
-				occurrence = 0;
-			}
-			public void onValue(Meta meta, String value) {
-				f.accept(meta, value);
-				occurrence++;
-			}
-		}
-		private Map<String, ChildHandler> requiredElements;
+		private Map<String, DefaultPEFReader.ChildHandler<Meta, String, Void>> requiredElements;
 		MetaElementHandler() {
 			final Range<Integer> optionalRange = Range.closed(0, 1);
 			final Range<Integer> mandatoryRange = Range.closed(1, 1);
 			final Range<Integer> zeroOrMoreRange = Range.atLeast(0);
-			this.requiredElements = ImmutableMap.<String, ChildHandler>builder()
-					.put("format", new ChildHandler(mandatoryRange, (m, v) -> {
+			this.requiredElements = ImmutableMap.<String, DefaultPEFReader.ChildHandler<Meta, String, Void>>builder()
+					.put("format", new DefaultPEFReader.ChildHandler<Meta, String, Void>(mandatoryRange, (m, v) -> {
 						if (!"application/x-pef+xml".equals(v)) {
 							throw new RuntimeException("Invalid value for format");
 						}
 						// We need not set the format as this should already be done.
+						return null;
 					}))
-					.put("identifier", new ChildHandler(mandatoryRange, (m, v) -> m.setIdentifier(v)))
-					.put("title", new ChildHandler(optionalRange, (m, v) -> m.setTitle(v)))
-					.put("creator", new ChildHandler(zeroOrMoreRange, (m, v) -> {
+					.put("identifier", new DefaultPEFReader.ChildHandler<Meta, String, Void>(mandatoryRange, (m, v) -> {
+						m.setIdentifier(v);
+						return null;
+					}))
+					.put("title", new DefaultPEFReader.ChildHandler<Meta, String, Void>(optionalRange, (m, v) -> {
+						m.setTitle(v);
+						return null;
+					}))
+					.put("creator", new DefaultPEFReader.ChildHandler<Meta, String, Void>(zeroOrMoreRange, (m, v) -> {
 						List<String> creators = Lists.newLinkedList(m.getCreators());
 						creators.add(v);
 						m.setCreators(creators);
+						return null;
 					}))
-					.put("subject", new ChildHandler(zeroOrMoreRange, (m, v) -> {
+					.put("subject", new DefaultPEFReader.ChildHandler<Meta, String, Void>(zeroOrMoreRange, (m, v) -> {
 						List<String> subjects = Lists.newLinkedList(m.getSubjects());
 						subjects.add(v);
 						m.setSubjects(subjects);
+						return null;
 					}))
-					.put("description", new ChildHandler(optionalRange, (m, v) -> m.setDescription(v)))
-					.put("publisher", new ChildHandler(zeroOrMoreRange, (m,v) -> {
+					.put("description", new DefaultPEFReader.ChildHandler<Meta, String, Void>(optionalRange, (m, v) -> {
+						m.setDescription(v);
+						return null;
+					}))
+					.put("publisher", new DefaultPEFReader.ChildHandler<Meta, String, Void>(zeroOrMoreRange, (m,v) -> {
 						List<String> publishers = Lists.newLinkedList(m.getPublishers());
 						publishers.add(v);
 						m.setPublishers(publishers);
+						return null;
 					}))
-					.put("contributor", new ChildHandler(zeroOrMoreRange, (m,v) -> {
+					.put("contributor", new DefaultPEFReader.ChildHandler<Meta, String, Void>(zeroOrMoreRange, (m,v) -> {
 						List<String> contributors = Lists.newLinkedList(m.getContributors());
 						contributors.add(v);
 						m.setContributors(contributors);
+						return null;
 					}))
-					.put("date", new ChildHandler(optionalRange, (m, v) -> m.setDate(v)))
-					.put("type", new ChildHandler(zeroOrMoreRange, (m,v) -> {
+					.put("date", new DefaultPEFReader.ChildHandler<Meta, String, Void>(optionalRange, (m, v) -> {
+						m.setDate(v);
+						return null;
+					}))
+					.put("type", new DefaultPEFReader.ChildHandler<Meta, String, Void>(zeroOrMoreRange, (m, v) -> {
 						List<String> types = Lists.newLinkedList(m.getTypes());
 						types.add(v);
 						m.setTypes(types);
+						return null;
 					}))
-					.put("source", new ChildHandler(zeroOrMoreRange, (m, v) -> {
+					.put("source", new DefaultPEFReader.ChildHandler<Meta, String, Void>(zeroOrMoreRange, (m, v) -> {
 						List<String> sources = Lists.newLinkedList(m.getSources());
 						sources.add(v);
 						m.setSources(sources);
+						return null;
 					}))
-					.put("language", new ChildHandler(zeroOrMoreRange, (m,v) -> {
+					.put("language", new DefaultPEFReader.ChildHandler<Meta, String, Void>(zeroOrMoreRange, (m,v) -> {
 						List<String> languages = Lists.newLinkedList(m.getLanguages());
 						languages.add(v);
 						m.setLanguages(languages);
+						return null;
 					}))
-					.put("relation", new ChildHandler(zeroOrMoreRange, (m, v) -> {
+					.put("relation", new DefaultPEFReader.ChildHandler<Meta, String, Void>(zeroOrMoreRange, (m, v) -> {
 						List<String> relations = Lists.newLinkedList(m.getRelations());
 						relations.add(v);
 						m.setRelations(relations);
+						return null;
 					}))
-					.put("coverage", new ChildHandler(zeroOrMoreRange, (m, v) -> {
+					.put("coverage", new DefaultPEFReader.ChildHandler<Meta, String, Void>(zeroOrMoreRange, (m, v) -> {
 						List<String> coverages = Lists.newLinkedList(m.getCoverages());
 						coverages.add(v);
 						m.setCoverages(coverages);
+						return null;
 					}))
-					.put("rights", new ChildHandler(zeroOrMoreRange, (m,v) -> {
+					.put("rights", new DefaultPEFReader.ChildHandler<Meta, String, Void>(zeroOrMoreRange, (m,v) -> {
 						List<String> rights = Lists.newLinkedList(m.getRights());
 						rights.add(v);
 						m.setRights(rights);
+						return null;
 					}))
 					.build();
 		}
@@ -320,11 +288,11 @@ class DefaultPEFReader {
 		public PEFDocument readElement(PEFDocument doc, XMLStreamReader reader)
 				throws XMLStreamException, PEFInputException {
 			// Reset all the handlers, eg. the counters.
-			for (ChildHandler c: requiredElements.values()) {
+			for (DefaultPEFReader.ChildHandler<Meta, String, Void> c: requiredElements.values()) {
 				c.reset();
 			}
 			PEFDocument curDoc = this.readChildElements(doc, reader);
-			for (Entry<String, ChildHandler> entry: requiredElements.entrySet()) {
+			for (Entry<String, DefaultPEFReader.ChildHandler<Meta,String, Void>> entry: requiredElements.entrySet()) {
 				if (!entry.getValue().checkOccurrences()) {
 					throw new PEFInputException(String.format("Incorrect number of occurrences for %s", entry.getKey()));
 				}
@@ -334,7 +302,7 @@ class DefaultPEFReader {
 		@Override
 		protected PEFDocument onChildElement(PEFDocument doc, XMLStreamReader reader)
 				throws XMLStreamException, PEFInputException {
-			ChildHandler c = requiredElements.getOrDefault(reader.getLocalName(), null);
+			DefaultPEFReader.ChildHandler<Meta, String, Void> c = requiredElements.getOrDefault(reader.getLocalName(), null);
 			if (c != null) {
 				Meta meta = doc.getMeta();
 				String value = reader.getElementText();
@@ -347,7 +315,7 @@ class DefaultPEFReader {
 	}
 	private static class BodyElementHandler extends ContainerElementHandler {
 		public BodyElementHandler() {
-			super(new ChildElementDefinition(PEFDocument.PEF_NAMESPACE, "volume", 1, new VolumeElementHandler()));
+			super(ImmutableMap.of(new QName(PEFDocument.PEF_NAMESPACE, "volume"), new ChildHandler<>(Range.atLeast(1), new VolumeElementHandler())));
 		}
 		@Override
 		public PEFDocument readElement(PEFDocument doc, XMLStreamReader reader)
@@ -365,7 +333,7 @@ class DefaultPEFReader {
 	}
 	private static class VolumeElementHandler extends ContainerElementHandler {
 		public VolumeElementHandler() {
-			super(new ChildElementDefinition(PEFDocument.PEF_NAMESPACE, "section", 1, new SectionHandler()));
+			super(ImmutableMap.of(new QName(PEFDocument.PEF_NAMESPACE, "section"), new ChildHandler<>(Range.atLeast(1), new SectionHandler())));
 		}
 		@Override
 		public PEFDocument readElement(PEFDocument doc, XMLStreamReader reader)
@@ -394,7 +362,7 @@ class DefaultPEFReader {
 	}
 	private static class SectionHandler extends ContainerElementHandler {
 		public SectionHandler() {
-			super(new ChildElementDefinition(PEFDocument.PEF_NAMESPACE, "page", 1, new PageHandler()));
+			super(ImmutableMap.of(new QName(PEFDocument.PEF_NAMESPACE, "page"), new ChildHandler<>(Range.atLeast(1), new PageHandler())));
 		}
 		@Override
 		public PEFDocument readElement(PEFDocument doc, XMLStreamReader reader)
@@ -422,11 +390,11 @@ class DefaultPEFReader {
 	}
 	private static class PageHandler extends ContainerElementHandler {
 		public PageHandler() {
-			super(new ChildElementDefinition(PEFDocument.PEF_NAMESPACE, "row", 0, new RowElementHandler()));
+			super(ImmutableMap.of(new QName(PEFDocument.PEF_NAMESPACE, "row"), new ChildHandler<>(Range.atLeast(0), new RowElementHandler())));
 		}
 		@Override
 		public PEFDocument readElement(PEFDocument doc, XMLStreamReader reader)
-				throws XMLStreamException, PEFInputException {
+				throws PEFInputException, XMLStreamException {
 			// Last volume last section is where we are
 			Volume vol = doc.getVolume(doc.getVolumeCount() - 1);
 			Section section = vol.getSection(vol.getSectionCount() - 1);
@@ -439,6 +407,26 @@ class DefaultPEFReader {
 				page.removeRow(0);
 				initialRows--;
 			}
+			return result;
+		}
+	}
+	private static class ChildHandler<T1, T2, R> {
+		private int occurrence = 0;
+		private final Range<Integer> required;
+		private final ThrowingBiFunction<T1, T2, R, PEFInputException> f;
+		public ChildHandler(Range<Integer> required, ThrowingBiFunction<T1, T2, R, PEFInputException> f) {
+			this.required = required;
+			this.f = f;
+		}
+		public boolean checkOccurrences() {
+			return required.contains(occurrence);
+		}
+		public void reset() {
+			occurrence = 0;
+		}
+		public R onValue(T1 meta, T2 value) throws PEFInputException {
+			R result = f.apply(meta, value);
+			occurrence++;
 			return result;
 		}
 	}
