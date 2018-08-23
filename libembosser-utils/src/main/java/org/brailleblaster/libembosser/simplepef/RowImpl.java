@@ -1,6 +1,9 @@
 package org.brailleblaster.libembosser.simplepef;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.util.stream.IntStream;
 
 import org.brailleblaster.libembosser.pef.Page;
 import org.brailleblaster.libembosser.pef.Row;
@@ -27,7 +30,10 @@ public class RowImpl implements Row {
 
 	@Override
 	public void setBraille(String braille) {
-		this.braille = checkNotNull(braille);
+		checkNotNull(braille);
+		// Ensure input is only unicode Braille
+		checkArgument(IntStream.range(0, braille.length()).allMatch(i -> braille.charAt(i) >= '\u2800' && braille.charAt(i) <= '\u28ff'), "Braille is not unicode Braille", braille);
+		this.braille = braille;
 	}
 	
 	@Override
