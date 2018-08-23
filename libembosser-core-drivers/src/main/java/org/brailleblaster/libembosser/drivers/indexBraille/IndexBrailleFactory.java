@@ -34,7 +34,7 @@ public class IndexBrailleFactory implements IEmbosserFactory {
 				.add(new IndexBrailleEmbosser("libembosser.ib.EverestDV4", "Index Braille", "Everest-D V4", new Rectangle(new BigDecimal("297.6"), new BigDecimal("590")), new Rectangle(new BigDecimal("130"), new BigDecimal("120")), 48, EVEREST_SIDES))
 				.add(new IndexBrailleEmbosser("libembosser.ib.BrailleBoxV5", "Index Braille", "BrailleBox V5", BRAILLEBOX_MAX_PAPER, BRAILLEBOX_MIN_PAPER, 48, BRAILLEBOX_SIDES))
 				.add(new IndexBrailleEmbosser("libembosser.ib.BrailleBoxV4", "Index Braille", "BrailleBox V4", BRAILLEBOX_MAX_PAPER, BRAILLEBOX_MIN_PAPER, 48, BRAILLEBOX_SIDES))
-				.add(new IndexBrailleEmbosser("libembosser.ib.FanFoldV5", "Index Braille", "FanFold V5", new Rectangle(new BigDecimal("317.5"), new BigDecimal("304.8")), new Rectangle(new BigDecimal("127"), new BigDecimal("203.2")), 48, EVEREST_SIDES))
+				.add(new IndexBrailleEmbosser("libembosser.ib.FanFoldV5", "Index Braille", "FanFold V5", new Rectangle(new BigDecimal("317.5"), new BigDecimal("304.8")), new Rectangle(new BigDecimal("127"), new BigDecimal("203.2")), 48, FANFOLD_SIDES))
 				.build();
 	}
 	@Override
