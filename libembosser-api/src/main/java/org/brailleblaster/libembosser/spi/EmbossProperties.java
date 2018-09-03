@@ -38,7 +38,7 @@ public final class EmbossProperties {
 		MultiSides sides = this.sides;
 		switch (name) {
 		case "paper":
-			paper = (Rectangle)paper;
+			paper = (Rectangle)value;
 			break;
 		case "margins":
 			margins = (Margins)value;

@@ -24,6 +24,7 @@ import org.brailleblaster.libembosser.spi.EmbossProperties;
 import org.brailleblaster.libembosser.spi.IEmbosser;
 import org.brailleblaster.libembosser.spi.Margins;
 import org.brailleblaster.libembosser.spi.MultiSides;
+import org.brailleblaster.libembosser.spi.PaperSize;
 import org.brailleblaster.libembosser.testutils.CopyStreamPrintServiceFactory;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -128,6 +129,11 @@ public class CoreDriversTest {
 		data.add(new Object[] {"libembosser.ib.BasicDV5", testBrf, props, expectedOutput});
 		expectedOutput = "\u001b\u0044BT0,MC1,DP2,BI0,CH48,TM0,LP59;  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4".getBytes(Charsets.US_ASCII);
 		data.add(new Object[] {"libembosser.ib.EverestDV5", testBrf, props, expectedOutput});
+		
+		// Sending of paper size (PA) command
+		props = new EmbossProperties().setPaper(PaperSize.LETTER.getSize());
+		expectedOutput = "\u001b\u0044BT0,MC1,DP1,PA1,BI0,CH34,TM0,LP27;  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4".getBytes(Charsets.US_ASCII);
+		data.add(new Object[] {"libembosser.ib.Juliet120", testBrf, props, expectedOutput});
 		
 		// Multiple copies
 		props = new EmbossProperties().setCopies(2);

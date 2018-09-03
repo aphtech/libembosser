@@ -28,8 +28,8 @@ public final class Rectangle {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((height == null) ? 0 : height.hashCode());
-		result = prime * result + ((width == null) ? 0 : width.hashCode());
+		result = prime * result + ((height == null) ? 0 : height.intValue());
+		result = prime * result + ((width == null) ? 0 : width.intValue());
 		return result;
 	}
 	@Override
@@ -44,12 +44,12 @@ public final class Rectangle {
 		if (height == null) {
 			if (other.height != null)
 				return false;
-		} else if (!height.equals(other.height))
+		} else if (height.compareTo(other.height) != 0)
 			return false;
 		if (width == null) {
 			if (other.width != null)
 				return false;
-		} else if (!width.equals(other.width))
+		} else if (width.compareTo(other.width) != 0)
 			return false;
 		return true;
 	}

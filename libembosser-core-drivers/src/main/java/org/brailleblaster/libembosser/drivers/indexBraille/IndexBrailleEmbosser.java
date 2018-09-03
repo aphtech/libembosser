@@ -1,11 +1,14 @@
 package org.brailleblaster.libembosser.drivers.indexBraille;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.print.PrintService;
 
@@ -20,18 +23,24 @@ import org.brailleblaster.libembosser.spi.Rectangle;
 import org.brailleblaster.libembosser.spi.Version;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.io.FileBackedOutputStream;
 
 public class IndexBrailleEmbosser extends BaseTextEmbosser {
 	private final int maxCellsPerLine;
 	private final EnumSet<MultiSides> supportedSides;
+	private final Map<Rectangle, Integer> paperSizes;
 	public IndexBrailleEmbosser(String id, String manufacturer, String model, Rectangle maxPaper, Rectangle minPaper, EnumSet<MultiSides> sides) {
 		this(id, manufacturer, model, maxPaper, minPaper, 49, sides);
 	}
 	public IndexBrailleEmbosser(String id, String manufacturer, String model, Rectangle maxPaper, Rectangle minPaper, int maxCellsPerLine, EnumSet<MultiSides> sides) {
+		this(id, manufacturer, model, maxPaper, minPaper, 49, sides, ImmutableMap.of());
+	}
+	public IndexBrailleEmbosser(String id, String manufacturer, String model, Rectangle maxPaper, Rectangle minPaper, int maxCellsPerLine, EnumSet<MultiSides> sides, Map<Rectangle, Integer> paperSizes) {
 		super(id, manufacturer, model, maxPaper, minPaper);
 		this.maxCellsPerLine = maxCellsPerLine;
 		supportedSides = sides;
+		this.paperSizes = ImmutableMap.copyOf(checkNotNull(paperSizes));
 	}
 	private static final Version API_VERSION = new Version(1, 0);
 	@Override
@@ -58,9 +67,14 @@ public class IndexBrailleEmbosser extends BaseTextEmbosser {
 		}
 		Rectangle paper = embossProperties.getPaper();
 		Rectangle maxPaper = getMaximumPaper();
+		// Index V5 embossers allow sending the paper size to the embosser with the PA command
+		// Use null if there is no matching paper size in the predefined list.
+		Integer paperSizeValue = paperSizes.getOrDefault(paper, null);
 		if (paper == null || paper.getWidth().compareTo(maxPaper.getWidth()) > 0 || paper.getHeight().compareTo(maxPaper.getHeight()) > 0) {
 			paper = maxPaper;
 		}
+		
+		// Now handle margins
 		BigDecimal leftMargin = margins.getLeft();
 		if (BigDecimal.ZERO.compareTo(leftMargin) > 0) {
 			leftMargin = BigDecimal.ZERO;
@@ -100,6 +114,10 @@ public class IndexBrailleEmbosser extends BaseTextEmbosser {
 			params.add("MC" + Integer.toString(embossProperties.getCopies()));
 			// Set the page format
 			params.add("DP" + Integer.toString(embossPageFormat));
+			// If there were a paper size add the PA command
+			if (paperSizeValue != null) {
+				params.add("PA" + paperSizeValue.toString());
+			}
 			// Left margin and cells per line
 			// The Index protocol requires both or none to be given.
 			params.add("BI" + Integer.toString(bindingMargin));

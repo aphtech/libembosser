@@ -2,8 +2,12 @@ apply plugin: 'java-library'
 
 dependencies {
 	implementation 'com.google.guava:guava:23.5-jre'
+	testCompile 'org.testng:testng:6.13.1'
 }
 
+test {
+	useTestNG()
+}
 publishing {
 	publications {
 		api(MavenPublication) {
