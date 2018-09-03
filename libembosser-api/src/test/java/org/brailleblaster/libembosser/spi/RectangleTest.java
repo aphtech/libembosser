@@ -1,24 +1,35 @@
 package org.brailleblaster.libembosser.spi;
 
 import static org.testng.Assert.assertEquals;
-import java.math.BigDecimal;
+import static org.testng.Assert.assertTrue;
 
+import java.math.BigDecimal;
+import java.util.Iterator;
+import java.util.List;
+
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import com.google.common.collect.Lists;
+
 public class RectangleTest {
-	@Test
-	public void testEquals() {
-		Rectangle a = new Rectangle(new BigDecimal("10.0"), new BigDecimal("10.1"));
-		Rectangle b = new Rectangle(new BigDecimal("10"), new BigDecimal("10.1"));
-		Rectangle c = new Rectangle(new BigDecimal("10.00"), new BigDecimal("10.10"));
-		boolean expectedAB = true;
-		boolean expectedBC = true;
+	@DataProvider(name="rectangleEqualsProvider")
+	public Iterator<Object[]> rectangleEqualsProvider() {
+		List<Object[]> data = Lists.newArrayList();
+		data.add(new Object[] {new Rectangle("10.0", "10.1"), new Rectangle("10", "10.1"), new Rectangle("10.0", "10.10"), true, true});
+		data.add(new Object[] {new Rectangle("24.5", "24.5"), new Rectangle("24.50", "24.50"), new Rectangle("24.5", "31.1"), true, false});
+		return data.iterator();
+	}
+	@Test(dataProvider="rectangleEqualsProvider")
+	public void testEquals(Rectangle a, Rectangle b, Rectangle c, boolean expectedAB, boolean expectedBC) {
 		assertEquals(a.equals(b), expectedAB);
 		assertEquals(b.equals(a), expectedAB);
-		assertEquals(a.hashCode() == b.hashCode(), expectedAB);
+		if (expectedAB)
+			assertTrue(a.hashCode() == b.hashCode());
 		assertEquals(b.equals(c), expectedBC);
 		assertEquals(c.equals(b), expectedBC);
-		assertEquals(b.hashCode() == c.hashCode(), expectedBC);
+		if (expectedBC) 
+			assertTrue(b.hashCode() == c.hashCode());
 		assertEquals(a.equals(c), expectedAB && expectedBC);
 		assertEquals(c.equals(a), expectedAB && expectedBC);
 	}

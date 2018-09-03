@@ -11,6 +11,9 @@ import java.math.BigDecimal;
 public final class Rectangle {
 	private final BigDecimal width;
 	private final BigDecimal height;
+	public Rectangle(String width, String height) {
+		this(new BigDecimal(width), new BigDecimal(height));
+	}
 	public Rectangle(BigDecimal width, BigDecimal height) {
 		if (width == null || height == null) {
 			throw new NullPointerException("Neither width or height can be null");
