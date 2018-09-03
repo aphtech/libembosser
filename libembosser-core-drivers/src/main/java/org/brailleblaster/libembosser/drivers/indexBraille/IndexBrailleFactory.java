@@ -26,14 +26,15 @@ public class IndexBrailleFactory implements IEmbosserFactory {
 	private static final Rectangle ELEVEN_BY_ELEVEN_PAPER = new Rectangle(new BigDecimal("279.4"), new BigDecimal("279.4"));
 	private static final Rectangle TEN_BY_ELEVEN_PAPER = new Rectangle(new BigDecimal("254.0"), new BigDecimal("279.4"));
 	private static final Rectangle LETTER_PAPER = PaperSize.LETTER.getSize();
+	private static final ImmutableMap<Rectangle, Integer> ET_PA_PAPER_SIZES = ImmutableMap.of(ELEVEN_AND_HALF_BY_ELEVEN_PAPER, Integer.valueOf(0), LETTER_PAPER, Integer.valueOf(1), TEN_BY_ELEVEN_PAPER, Integer.valueOf(2), ELEVEN_BY_ELEVEN_PAPER, Integer.valueOf(3));
 	private static final Rectangle BRAILLEBOX_MAX_PAPER = new Rectangle(new BigDecimal("300"), new BigDecimal("440"));
 	private static final Rectangle BRAILLEBOX_MIN_PAPER = new Rectangle(new BigDecimal("200"), new BigDecimal("250"));
 	private List<IEmbosser> embossers;
 	public IndexBrailleFactory() {
 		embossers = ImmutableList.<IEmbosser>builder()
 				// The Enabling Technologies Romeo60 and Juliet120 are based on Index Basic D V5
-				.add(new IndexBrailleEmbosser("libembosser.ib.Romeo60", "Enabling Technologies", "Romeo 60", TWELVE_AND_HALF_BY_TWENTY_FOUR_PAPER, FOUR_BY_THREE_PAPER, 49, ENABLING_SIDES))
-				.add(new IndexBrailleEmbosser("libembosser.ib.Juliet120", "Enabling Technologies", "Juliet 120", TWELVE_AND_HALF_BY_TWENTY_FOUR_PAPER, FOUR_BY_THREE_PAPER, 49, ENABLING_SIDES, ImmutableMap.of(ELEVEN_AND_HALF_BY_ELEVEN_PAPER, Integer.valueOf(0), LETTER_PAPER, Integer.valueOf(1), TEN_BY_ELEVEN_PAPER, Integer.valueOf(2), ELEVEN_BY_ELEVEN_PAPER, Integer.valueOf(3))))
+				.add(new IndexBrailleEmbosser("libembosser.ib.Romeo60", "Enabling Technologies", "Romeo 60", TWELVE_AND_HALF_BY_TWENTY_FOUR_PAPER, FOUR_BY_THREE_PAPER, 49, ENABLING_SIDES, ET_PA_PAPER_SIZES))
+				.add(new IndexBrailleEmbosser("libembosser.ib.Juliet120", "Enabling Technologies", "Juliet 120", TWELVE_AND_HALF_BY_TWENTY_FOUR_PAPER, FOUR_BY_THREE_PAPER, 49, ENABLING_SIDES, ET_PA_PAPER_SIZES))
 				.add(new IndexBrailleEmbosser("libembosser.ib.BasicDV5", "Index Braille", "Basic-D V5", new Rectangle(new BigDecimal("325"), new BigDecimal("431.8")), new Rectangle(new BigDecimal("100"), new BigDecimal("25")), 49, BASIC_D_SIDES))
 				.add(new IndexBrailleEmbosser("libembosser.ib.BasicDV4", "Index Braille", "Basic-D V4", new Rectangle(new BigDecimal("330"), new BigDecimal("431.8")), new Rectangle(new BigDecimal("100"), new BigDecimal("25")), 49, BASIC_D_SIDES))
 				.add(new IndexBrailleEmbosser("libembosser.ib.EverestDV5", "Index Braille", "Everest-D V5", new Rectangle(new BigDecimal("297.6"), new BigDecimal("590")), new Rectangle(new BigDecimal("130"), new BigDecimal("100")), 48, EVEREST_SIDES))

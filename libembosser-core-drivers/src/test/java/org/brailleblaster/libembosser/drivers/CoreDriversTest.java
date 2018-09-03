@@ -134,6 +134,7 @@ public class CoreDriversTest {
 		props = new EmbossProperties().setPaper(PaperSize.LETTER.getSize());
 		expectedOutput = "\u001b\u0044BT0,MC1,DP1,PA1,BI0,CH34,TM0,LP27;  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4".getBytes(Charsets.US_ASCII);
 		data.add(new Object[] {"libembosser.ib.Juliet120", testBrf, props, expectedOutput});
+		data.add(new Object[] {"libembosser.ib.Romeo60", testBrf, props, expectedOutput});
 		
 		// Multiple copies
 		props = new EmbossProperties().setCopies(2);
