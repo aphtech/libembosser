@@ -3,7 +3,6 @@ package org.brailleblaster.libembosser.spi;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
-import java.math.BigDecimal;
 import java.util.Iterator;
 import java.util.List;
 
