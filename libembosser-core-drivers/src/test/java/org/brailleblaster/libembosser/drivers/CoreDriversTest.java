@@ -65,7 +65,7 @@ public class CoreDriversTest {
 		String testBrf = "  ,\"h is \"s text4\n,text on a new l9e4";
 		List<Object[]> data = new ArrayList<>();
 		// Basic embossing
-		byte[] expectedOutput = "\u001b@\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bL@\u001bRq  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4".getBytes(Charsets.US_ASCII);
+		byte[] expectedOutput = "\u001b@\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bL@\u001bRq\u001bTN\u001bQc  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4".getBytes(Charsets.US_ASCII);
 		EmbossProperties props = new EmbossProperties();
 		data.add(new Object[] {"libembosser.et.phoenix_gold", testBrf, props, expectedOutput});
 		data.add(new Object[] {"libembosser.et.phoenix_silver", testBrf, props, expectedOutput});
@@ -73,7 +73,7 @@ public class CoreDriversTest {
 		data.add(new Object[] {"libembosser.et.trident", testBrf, props, expectedOutput});
 		
 		// Paper size
-		expectedOutput = "\u001b@\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bL@\u001bRb  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4".getBytes(Charsets.US_ASCII);
+		expectedOutput = "\u001b@\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bL@\u001bRb\u001bTK\u001bQ[  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4".getBytes(Charsets.US_ASCII);
 		props = new EmbossProperties().setPaper(PaperSize.LETTER.getSize());
 		data.add(new Object[] {"libembosser.et.phoenix_gold", testBrf, props, expectedOutput});
 		data.add(new Object[] {"libembosser.et.phoenix_silver", testBrf, props, expectedOutput});
@@ -82,7 +82,7 @@ public class CoreDriversTest {
 		
 		// Interpoint with margins
 		props = new EmbossProperties().setSides(MultiSides.INTERPOINT).setMargins(new Margins(new BigDecimal("13"), BigDecimal.ZERO, BigDecimal.TEN, BigDecimal.ZERO));
-		expectedOutput = "\u001b@\u001bA@@\u001bK@\u001bW@\u001bi@\u001bs@\u001bLB\u001bRq\r\n  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4".getBytes(Charsets.US_ASCII);
+		expectedOutput = "\u001b@\u001bA@@\u001bK@\u001bW@\u001bi@\u001bs@\u001bLB\u001bRq\u001bTN\u001bQc\r\n  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4".getBytes(Charsets.US_ASCII);
 		data.add(new Object[] {"libembosser.et.phoenix_gold", testBrf, props, expectedOutput});
 		data.add(new Object[] {"libembosser.et.phoenix_silver", testBrf, props, expectedOutput});
 		data.add(new Object[] {"libembosser.et.cyclone", testBrf, props, expectedOutput});
@@ -90,7 +90,7 @@ public class CoreDriversTest {
 		
 		// Interpoint
 		props = new EmbossProperties().setSides(MultiSides.INTERPOINT);
-		expectedOutput = "\u001b@\u001bA@@\u001bK@\u001bW@\u001bi@\u001bs@\u001bL@\u001bRq  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4".getBytes(Charsets.US_ASCII);
+		expectedOutput = "\u001b@\u001bA@@\u001bK@\u001bW@\u001bi@\u001bs@\u001bL@\u001bRq\u001bTN\u001bQc  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4".getBytes(Charsets.US_ASCII);
 		data.add(new Object[] {"libembosser.et.phoenix_gold", testBrf, props, expectedOutput});
 		data.add(new Object[] {"libembosser.et.phoenix_silver", testBrf, props, expectedOutput});
 		data.add(new Object[] {"libembosser.et.cyclone", testBrf, props, expectedOutput});
@@ -98,7 +98,7 @@ public class CoreDriversTest {
 				
 		// Multiple copies
 		props = new EmbossProperties().setCopies(2);
-		expectedOutput = "\u001b@\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bL@\u001bRq  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\u001b@\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bL@\u001bRq  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4".getBytes(Charsets.US_ASCII);
+		expectedOutput = "\u001b@\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bL@\u001bRq\u001bTN\u001bQc  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\u001b@\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bL@\u001bRq\u001bTN\u001bQc  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4".getBytes(Charsets.US_ASCII);
 		data.add(new Object[] {"libembosser.et.phoenix_gold", testBrf, props, expectedOutput});
 		data.add(new Object[] {"libembosser.et.phoenix_silver", testBrf, props, expectedOutput});
 		data.add(new Object[] {"libembosser.et.cyclone", testBrf, props, expectedOutput});

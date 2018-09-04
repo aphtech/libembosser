@@ -37,6 +37,7 @@ public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 		LEFT_MARGIN('L', 1),
 		// Command has 1 arg, size in cells from left margin.
 		RIGHT_MARGIN('R', 1),
+		PAGE_LENGTH('T', 1),
 		LINES_PER_PAGE('Q', 1),
 		LINE_WRAP_ON('W', 0, 1), LINE_WRAP_OFF('W', 0, 0),
 		INTERPOINT_ON('i', 0, 0), INTERPOINT_P1('i', 0, 1), INTERPOINT_P2('i', 0, 2),
@@ -148,6 +149,15 @@ public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 		if (paper == null) {
 			paper = getMaximumPaper();
 		}
+		// Calculate paper height and lines per page.
+		BigDecimal[] heightInInches = paper.getHeight().divideAndRemainder(new BigDecimal("25.4"));
+		// The enabling Technologies embossers need paper height in whole inches
+		// To ensure all lines fit, it must be rounded up if there is any fractional part
+		// Allow a tolerance of 0.5mm
+		int paperHeight = heightInInches[1].compareTo(new BigDecimal("0.5")) > 0 ? heightInInches[0].intValue() + 1 : heightInInches[0].intValue();
+		int linesPerPage = cell.getLinesForHeight(paper.getHeight());
+		
+		// Calculate the margins
 		Margins margins = props.getMargins();
 		if (margins == null) {
 			margins = Margins.NO_MARGINS;
@@ -184,6 +194,8 @@ public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 			os.write(getCellCommand(cell).getBytes());
 			os.write(Command.LEFT_MARGIN.getBytes(leftMargin));
 			os.write(Command.RIGHT_MARGIN.getBytes(rightMargin));
+			os.write(Command.PAGE_LENGTH.getBytes(paperHeight));
+			os.write(Command.LINES_PER_PAGE.getBytes(linesPerPage));
 			copyContent(is, os, topMargin, 0);
 			CopyInputStream embosserStream = new CopyInputStream(os.asByteSource(), props.getCopies());
 			return embossStream(embosserDevice, embosserStream);
