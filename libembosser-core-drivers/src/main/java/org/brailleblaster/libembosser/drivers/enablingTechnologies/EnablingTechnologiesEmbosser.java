@@ -25,7 +25,7 @@ public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 	// ASCII encoding select the value at the index of the number value from the
 	// below array.
 	private static final byte[] NUMBER_ARG = new byte[] { '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
-			'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '[', '\\', ']', '^', '_', 'a',
+			'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '[', '\\', ']', '^', '_', '`', 'a',
 			'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
 			'w', 'x', 'y', 'z', '{' };
 
@@ -36,7 +36,8 @@ public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 		// Command has one arg, margin size in cells.
 		LEFT_MARGIN('L', 1),
 		// Command has 1 arg, size in cells from left margin.
-		RIGHT_MARGIN('R', 1), 
+		RIGHT_MARGIN('R', 1),
+		LINES_PER_PAGE('Q', 1),
 		LINE_WRAP_ON('W', 0, 1), LINE_WRAP_OFF('W', 0, 0),
 		INTERPOINT_ON('i', 0, 0), INTERPOINT_P1('i', 0, 1), INTERPOINT_P2('i', 0, 2),
 		CELL_LIBRARY_OF_CONGRESS('s', 0, 0), CELL_CALIFORNIA_SIGN('s', 0, 1),
