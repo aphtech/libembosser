@@ -1,12 +1,56 @@
 package org.brailleblaster.libembosser.pef;
 
 import java.io.OutputStream;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import com.google.common.base.Strings;
+
 class DefaultPEFWriter {
+	private static class PrettyPrintHandler implements InvocationHandler {
+		private final XMLStreamWriter target;
+		private int depth = 0;
+		private final Map<Integer, Boolean> hasChildElement = new HashMap<>();
+		private static final String INDENT_TEXT = " ";
+		private static final String LINE_SEPARATOR = "\n";
+		public PrettyPrintHandler(XMLStreamWriter target) {
+			this.target = target;
+		}
+		@Override
+		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+			String methodName = method.getName();
+			if ("writeStartElement".equals(methodName)) {
+				if (depth > 0) {
+					hasChildElement.put(depth - 1, Boolean.TRUE);
+				}
+				hasChildElement.put(depth, Boolean.FALSE);
+				target.writeCharacters(LINE_SEPARATOR);
+				target.writeCharacters(Strings.repeat(INDENT_TEXT, depth));
+				depth++;
+			} else if ("writeEndElement".equals(methodName)) {
+				depth--;
+				if (hasChildElement.get(depth).equals(Boolean.TRUE)) {
+					target.writeCharacters(LINE_SEPARATOR);
+					target.writeCharacters(Strings.repeat(INDENT_TEXT, depth));
+				}
+			} else if ("writeEmptyElement".equals(methodName)) {
+				if (depth > 0) {
+					hasChildElement.put(depth - 1, Boolean.TRUE);
+				}
+				target.writeCharacters(LINE_SEPARATOR);
+				target.writeCharacters(Strings.repeat(INDENT_TEXT, depth));
+			}
+			method.invoke(target, args);
+			return null;
+		}
+	}
 	private XMLStreamWriter writer;
 	private PEFDocument doc;
 	private DefaultPEFWriter(PEFDocument doc, XMLStreamWriter writer) {
@@ -23,8 +67,13 @@ class DefaultPEFWriter {
 	static void write(PEFDocument doc, OutputStream os) throws PEFOutputException {
 		XMLOutputFactory outFactory = XMLOutputFactory.newInstance();
 		DefaultPEFWriter dw = null;
+		XMLStreamWriter xsw = null;
+		XMLStreamWriter prettyPrintWriter = null;
 		try {
-			dw = new DefaultPEFWriter(doc, outFactory.createXMLStreamWriter(os, "utf-8"));
+			xsw = outFactory.createXMLStreamWriter(os, "utf-8");
+			PrettyPrintHandler handler = new PrettyPrintHandler(xsw);
+			prettyPrintWriter = (XMLStreamWriter) Proxy.newProxyInstance(XMLStreamWriter.class.getClassLoader(), new Class[] {XMLStreamWriter.class}, handler);
+			dw = new DefaultPEFWriter(doc, prettyPrintWriter);
 			dw.writeDocument();
 		} catch (XMLStreamException e) {
 			throw new PEFOutputException("Problem writing PEF", e);
@@ -171,16 +220,20 @@ class DefaultPEFWriter {
 		writer.writeEndElement();
 	}
 	private void writeRow(Row row) throws XMLStreamException {
-		writer.writeStartElement("row");
+		String braille = row.getBraille();
+		if (Strings.isNullOrEmpty(braille)) {
+			writer.writeEmptyElement("row");
+		} else {
+			writer.writeStartElement("row");
+		}
 		Integer rowGap = row.getRowGap();
 		if (rowGap != null) {
 			writer.writeAttribute("rowgap", rowGap.toString());
 		}
 		
-		String braille = row.getBraille();
-		if (braille != null) {
+		if (!Strings.isNullOrEmpty(braille)) {
 			writer.writeCharacters(braille);
+			writer.writeEndElement();
 		}
-		writer.writeEndElement();
 	}
 }
