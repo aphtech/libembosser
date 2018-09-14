@@ -1,5 +1,7 @@
 package org.brailleblaster.libembosser.spi;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * A class to represent API versions.
  * 
@@ -72,9 +74,7 @@ public final class Version {
 	}
 	
 	public boolean canUse(Version callee) {
-		if (callee == null) {
-			throw new NullPointerException("The callee cannot be null");
-		}
+		checkNotNull(callee);
 		return major == callee.getMajor() && minor >= callee.getMinor();
 	}
 

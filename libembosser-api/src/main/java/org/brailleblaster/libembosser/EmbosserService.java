@@ -39,6 +39,6 @@ public class EmbosserService {
 	 * @return An embosser matching the id.
 	 */
 	public IEmbosser getEmbosser(String id) {
-		return getEmbosserStream().filter(e -> e.getId().equals(id)).findAny().orElseThrow(() -> new NoSuchElementException());
+		return getEmbosserStream().filter(e -> e.getId().equals(id)).findAny().orElseThrow(() -> new NoSuchElementException(String.format("Cannot find embosser driver with \"%s\"", id)));
 	}
 }
