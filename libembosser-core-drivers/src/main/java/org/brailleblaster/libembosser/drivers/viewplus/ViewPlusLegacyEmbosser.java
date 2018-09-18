@@ -6,6 +6,7 @@ import java.util.EnumSet;
 import javax.print.PrintService;
 
 import org.brailleblaster.libembosser.drivers.utils.BaseTextEmbosser;
+import org.brailleblaster.libembosser.pef.PEFDocument;
 import org.brailleblaster.libembosser.spi.DocumentFormat;
 import org.brailleblaster.libembosser.spi.EmbossException;
 import org.brailleblaster.libembosser.spi.EmbossProperties;
@@ -43,5 +44,9 @@ public class ViewPlusLegacyEmbosser extends BaseTextEmbosser {
 		// For now say they don't do interpoint.
 		// In fact some do and even those which cannot do it automatically supposedly can by having the user manually flip the paper.
 		return false;
+	}
+	@Override
+	public boolean emboss(PrintService printer, PEFDocument pef, EmbossProperties props) throws EmbossException {
+		throw new UnsupportedOperationException("Embossing PEF not implemented yet");
 	}
 }

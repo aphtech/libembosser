@@ -9,6 +9,7 @@ import javax.print.PrintService;
 
 import org.brailleblaster.libembosser.drivers.utils.BaseTextEmbosser;
 import org.brailleblaster.libembosser.drivers.utils.CopyInputStream;
+import org.brailleblaster.libembosser.pef.PEFDocument;
 import org.brailleblaster.libembosser.spi.BrlCell;
 import org.brailleblaster.libembosser.spi.DocumentFormat;
 import org.brailleblaster.libembosser.spi.EmbossException;
@@ -70,6 +71,11 @@ public class GenericTextEmbosser extends BaseTextEmbosser {
 	public boolean supportsInterpoint() {
 		// For now just say all generic embossers do not support interpoint.
 		// In the future should we want a interpoint generic embosser then we are still reliant on the embosser being configured and cannot actually set it from software in a generic way.
+		return false;
+	}
+	@Override
+	public boolean emboss(PrintService printer, PEFDocument pef, EmbossProperties props) throws EmbossException {
+		// TODO Auto-generated method stub
 		return false;
 	}
 }

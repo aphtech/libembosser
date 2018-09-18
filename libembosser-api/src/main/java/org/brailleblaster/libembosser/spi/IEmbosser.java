@@ -5,6 +5,8 @@ import java.util.EnumSet;
 
 import javax.print.PrintService;
 
+import org.brailleblaster.libembosser.pef.PEFDocument;
+
 /**
  * Interface for embosser drivers.
  * 
@@ -67,6 +69,17 @@ public interface IEmbosser {
 	 * @return An enum set of the document formats this embosser driver can emboss.
 	 */
 	public EnumSet<DocumentFormat> getSupportedDocumentFormats();
+	/**
+	 * Emboss a PEF document.
+	 * 
+	 * 
+	 * @param printer The printer device for the embosser.
+	 * @param pef The PEF document to emboss.
+	 * @param props The emboss properties such as number of copies, etc.
+	 * @return Whether the document was successfully embossed.
+	 * @throws EmbossException When there is a problem embossing.
+	 */
+	public boolean emboss(PrintService printer, PEFDocument pef, EmbossProperties props) throws EmbossException;
 
 	/**
 	 * Emboss a BRF using this driver.
