@@ -9,7 +9,6 @@ import javax.print.PrintService;
 
 import org.brailleblaster.libembosser.drivers.utils.BaseTextEmbosser;
 import org.brailleblaster.libembosser.drivers.utils.CopyInputStream;
-import org.brailleblaster.libembosser.pef.PEFDocument;
 import org.brailleblaster.libembosser.spi.BrlCell;
 import org.brailleblaster.libembosser.spi.DocumentFormat;
 import org.brailleblaster.libembosser.spi.EmbossException;
@@ -17,6 +16,7 @@ import org.brailleblaster.libembosser.spi.EmbossProperties;
 import org.brailleblaster.libembosser.spi.Margins;
 import org.brailleblaster.libembosser.spi.Rectangle;
 import org.brailleblaster.libembosser.spi.Version;
+import org.w3c.dom.Document;
 
 import com.google.common.io.FileBackedOutputStream;
 
@@ -74,7 +74,7 @@ public class GenericTextEmbosser extends BaseTextEmbosser {
 		return false;
 	}
 	@Override
-	public boolean emboss(PrintService printer, PEFDocument pef, EmbossProperties props) throws EmbossException {
+	public boolean emboss(PrintService printer, Document pef, EmbossProperties props) throws EmbossException {
 		// TODO Auto-generated method stub
 		return false;
 	}

@@ -13,7 +13,6 @@ import java.util.Map;
 import javax.print.PrintService;
 
 import org.brailleblaster.libembosser.drivers.utils.BaseTextEmbosser;
-import org.brailleblaster.libembosser.pef.PEFDocument;
 import org.brailleblaster.libembosser.spi.BrlCell;
 import org.brailleblaster.libembosser.spi.DocumentFormat;
 import org.brailleblaster.libembosser.spi.EmbossException;
@@ -185,7 +184,7 @@ public class IndexBrailleEmbosser extends BaseTextEmbosser {
 		return MultiSides.P1ONLY;
 	}
 	@Override
-	public boolean emboss(PrintService printer, PEFDocument pef, EmbossProperties props) throws EmbossException {
+	public boolean emboss(PrintService printer, org.w3c.dom.Document pef, EmbossProperties props) throws EmbossException {
 		// TODO Auto-generated method stub
 		return false;
 	}
