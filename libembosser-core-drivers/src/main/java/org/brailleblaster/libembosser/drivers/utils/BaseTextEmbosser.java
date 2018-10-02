@@ -15,12 +15,31 @@ import javax.print.PrintService;
 import javax.print.SimpleDoc;
 import javax.print.event.PrintJobEvent;
 import javax.print.event.PrintJobListener;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathFactory;
 
 import org.brailleblaster.libembosser.spi.EmbossException;
 import org.brailleblaster.libembosser.spi.IEmbosser;
 import org.brailleblaster.libembosser.spi.Rectangle;
+import org.w3c.dom.Document;
 
 public abstract class BaseTextEmbosser implements IEmbosser {
+	public static interface DocumentHandler {
+		public void setTopMargin(int lines);
+		public void setLeftMargin(int cells);
+		public void setLinesPerPage(int lines);
+		public void setCellsPerLine(int cells);
+		public void startPage();
+		public void endPage();
+		public void startLine();
+		public void endLine();
+		public void writeBraille(String Braille);
+		public default void writeLine(String line) {
+			startLine();
+			writeBraille(line);
+			endLine();
+		}
+	}
 	private final String id;
 	private String manufacturer;
 	private String model;
@@ -37,6 +56,10 @@ public abstract class BaseTextEmbosser implements IEmbosser {
 		this.model = model;
 		this.maximumPaper = maxPaper;
 		this.minimumPaper = minPaper;
+	}
+	@Override
+	public String getId() {
+		return id;
 	}
 	@Override
 	public String getManufacturer() {
@@ -96,6 +119,14 @@ public abstract class BaseTextEmbosser implements IEmbosser {
 			}
 		}
 	}
+	/**
+	 * A helper method for sending an InputStream to a printer device.
+	 * 
+	 * @param embosserDevice The printer device representing the embosser.
+	 * @param is The InputStream to send to the embosser.
+	 * @return True if the print job is successful false if there is a problem.
+	 * @throws EmbossException Thrown if there is a problem embossing.
+	 */
 	protected boolean embossStream(PrintService embosserDevice, InputStream is) throws EmbossException {
 		Doc doc = new SimpleDoc(is, DocFlavor.INPUT_STREAM.AUTOSENSE, null);
 		DocPrintJob dpj = embosserDevice.createPrintJob();
@@ -138,8 +169,9 @@ public abstract class BaseTextEmbosser implements IEmbosser {
 		});
 		return jobFinished;
 	}
-	@Override
-	public String getId() {
-		return id;
+	protected void readPEF(Document pef, DocumentHandler handler) {
+		XPathFactory xpf = XPathFactory.newInstance();
+		XPath xpath = xpf.newXPath();
+		
 	}
 }
