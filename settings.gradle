@@ -1,2 +1,3 @@
 include 'libembosser-api','libembosser-core-drivers','libembosser-utils'
 rootProject.name = 'libembosser'
+enableFeaturePreview('STABLE_PUBLISHING')
