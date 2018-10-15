@@ -16,12 +16,18 @@ import javax.print.SimpleDoc;
 import javax.print.event.PrintJobEvent;
 import javax.print.event.PrintJobListener;
 import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.brailleblaster.libembosser.spi.EmbossException;
 import org.brailleblaster.libembosser.spi.IEmbosser;
 import org.brailleblaster.libembosser.spi.Rectangle;
+import org.brailleblaster.libembosser.utils.PEFNamespaceContext;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 public abstract class BaseTextEmbosser implements IEmbosser {
 	public static interface DocumentHandler {
@@ -29,6 +35,10 @@ public abstract class BaseTextEmbosser implements IEmbosser {
 		public void setLeftMargin(int cells);
 		public void setLinesPerPage(int lines);
 		public void setCellsPerLine(int cells);
+		public void startDocument();
+		public void endDocument();
+		public void startVolume();
+		public void endVolume();
 		public void startPage();
 		public void endPage();
 		public void startLine();
@@ -49,6 +59,11 @@ public abstract class BaseTextEmbosser implements IEmbosser {
 	// Doing it as this for now as this is how it worked previously in BrailleBlaster and so want too not break things.
 	private boolean jobFinished;
 	public static final byte ESC = 0x1B;
+	private final XPath xpath;
+	private final XPathExpression findVolumes;
+	private final XPathExpression findRelativeSections;
+	private final XPathExpression findRelativePages;
+	private final XPathExpression findRelativeRows;
 	
 	public BaseTextEmbosser(String id, String manufacturer, String model, Rectangle maxPaper, Rectangle minPaper) {
 		this.id = id;
@@ -56,6 +71,18 @@ public abstract class BaseTextEmbosser implements IEmbosser {
 		this.model = model;
 		this.maximumPaper = maxPaper;
 		this.minimumPaper = minPaper;
+		XPathFactory xpf = XPathFactory.newInstance();
+		xpath = xpf.newXPath();
+		xpath.setNamespaceContext(new PEFNamespaceContext());
+		try {
+			findVolumes = xpath.compile("/pef:pef/pef:body/pef:volume");
+			findRelativeSections = xpath.compile("section");
+			findRelativePages = xpath.compile("page");
+			findRelativeRows = xpath.compile(".//row");
+		} catch (XPathExpressionException e) {
+			// Should not happen but play it safe
+			throw new RuntimeException("Problem compiling XPath expressions", e);
+		}
 	}
 	@Override
 	public String getId() {
@@ -170,8 +197,41 @@ public abstract class BaseTextEmbosser implements IEmbosser {
 		return jobFinished;
 	}
 	protected void readPEF(Document pef, DocumentHandler handler) {
-		XPathFactory xpf = XPathFactory.newInstance();
-		XPath xpath = xpf.newXPath();
-		
+		try {
+			processVolumes(pef, handler);
+		} catch (XPathExpressionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	private void processVolumes(Document pef, DocumentHandler handler) throws XPathExpressionException {
+		NodeList volumes = (NodeList)findVolumes.evaluate(pef, XPathConstants.NODESET);
+		for (int v = 0; v < volumes.getLength(); ++v) {
+			Element volElem = (Element)volumes.item(v);
+			handler.startVolume();
+			processSections(volElem, handler);
+			handler.endVolume();
+		}
+	}
+	private void processSections(Element volElem, DocumentHandler handler) throws XPathExpressionException {
+		NodeList sections = (NodeList)findRelativeSections.evaluate(volElem, XPathConstants.NODESET);
+		for (int s = 0; s < sections.getLength(); ++s) {
+			Element sectionElem = (Element)sections.item(s);
+			processPages(sectionElem, handler);
+		}
+	}
+	private void processPages(Element sectionElem, DocumentHandler handler) throws XPathExpressionException {
+		NodeList pages = (NodeList)findRelativePages.evaluate(sectionElem, XPathConstants.NODESET);
+		for (int p = 0; p < pages.getLength(); ++p) {
+			Element pageElem = (Element)pages.item(p);
+			handler.startPage();
+			NodeList rows = (NodeList)findRelativeRows.evaluate(pageElem, XPathConstants.NODESET);
+			for (int r = 0; r < rows.getLength(); ++r) {
+				Element rowElem = (Element)rows.item(r);
+				String line = rowElem.getTextContent();
+				handler.writeLine(line);
+			}
+			handler.endPage();
+		}
 	}
 }

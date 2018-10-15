@@ -3,6 +3,7 @@ apply plugin: 'java-library'
 dependencies {
 	implementation 'com.google.guava:guava:23.5-jre'
 	api project(':libembosser-api')
+	implementation project(':libembosser-utils')
 	testCompile 'org.testng:testng:6.13.1'
 }
 
