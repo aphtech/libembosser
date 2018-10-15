@@ -8,5 +8,5 @@ application {
 }
 
 dependencies {
-  kotlin("stdlib")
+  implementation(kotlin("stdlib"))
 }

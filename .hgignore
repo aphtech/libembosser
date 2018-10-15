@@ -13,3 +13,5 @@ syntax: regexp
 ^libembosser-core-drivers/bin$
 syntax: regexp
 ^libembosser-utils/bin$
+syntax: regexp
+^et-test/bin$
