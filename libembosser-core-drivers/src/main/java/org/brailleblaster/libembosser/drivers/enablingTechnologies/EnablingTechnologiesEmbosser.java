@@ -29,6 +29,15 @@ public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 			'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '[', '\\', ']', '^', '_', '`', 'a',
 			'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
 			'w', 'x', 'y', 'z', '{' };
+	private static final byte getNumberArgValue(int value) {
+		if (value < 0) {
+			return 0;
+		} else if (value >= NUMBER_ARG.length) {
+			return NUMBER_ARG[NUMBER_ARG.length - 1];
+		} else {
+			return NUMBER_ARG[value];
+		}
+	}
 
 	public static enum Command {
 		RESTART_EMBOSSER('@', 0), DOTS_MODE_6('K', 0, 0), DOTS_MODE_8('K', 0, 1),
@@ -68,7 +77,7 @@ public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 			this.cmd[1] = cmd;
 			int cmdI = 2;
 			for (int i = 0; i < data.length; i++) {
-				this.cmd[cmdI] = NUMBER_ARG[data[i]];
+				this.cmd[cmdI] = getNumberArgValue(data[i]);
 				cmdI++;
 			}
 			this.numOfArgs = numOfArgs;
@@ -89,7 +98,7 @@ public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 			System.arraycopy(cmd, 0, result, 0, cmd.length);
 			int cmdI = cmd.length;
 			for (int i = 0; i < args.length; i++) {
-				result[cmdI] = NUMBER_ARG[args[i]];
+				result[cmdI] = getNumberArgValue(args[i]);
 				cmdI++;
 			}
 			return result;
