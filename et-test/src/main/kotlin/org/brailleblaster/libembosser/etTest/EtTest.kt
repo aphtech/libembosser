@@ -1,21 +1,19 @@
 package org.brailleblaster.libembosser.etTest
  
-import kotlin.io.readLine
-import javax.print.PrintService
-import java.io.InputStream
-
 fun main(args: Array<String>) {
 	val testDocs = listOf(
-			",a test docu;t4".byteInputStream(),
-			",ano!r test docu;t4".byteInputStream()
+			"\u001b@\u001bLA\u001bRg\u001bQY\u001bK@\u001bA@@\u001bW@\u001biA,a test docu;t4".byteInputStream(),
+			"\u001bLA\u001bRg\u001bQY\u001bK@\u001bA@@\u001bW@\u001biA,a test docu;t4".byteInputStream(),
+			"\u001b@\u001bLA\u001bRg\u001bQY\u001bK@\u001bA@@\u001bW@,a test docu;t4".byteInputStream(),
+			"\u001b@\u001bLA\u001bR{}\u001bQY\u001bK@\u001bA@@\u001bW@\u001biA,a test docu;t4".byteInputStream()
 	)
 	val app = AppModel()
 	val ui = CliApp()
 	var exitApp = false
 	val testOptions = testDocs.mapIndexed { index, doc ->
 		val testNum = (index + 1).toString()
-		UserOption(testNum, "Test ${testNum}", {
-			a -> a.inStream = doc
+		UserOption(testNum, "Test ${testNum}", { a ->
+			a.inStream = doc
 			a.print()
 		})
 	} + UserOption("q", "Quit", { _ -> ui.quit() })

@@ -6,14 +6,23 @@ import javax.print.PrintService
 import javax.print.PrintServiceLookup
 import javax.print.SimpleDoc
 import java.io.InputStream
+import javax.print.PrintException
+import javax.print.event.PrintJobAdapter
+import javax.print.event.PrintJobEvent
+import javax.print.event.PrintJobListener
 
 class AppModel {
 	var printer: PrintService = getDefaultPrinter()
 	var inStream: InputStream = "".byteInputStream()
-	fun print(): Unit {
+	fun print(listener: PrintJobListener = object : PrintJobAdapter() {}): Unit {
 		val doc = SimpleDoc(inStream, DocFlavor.INPUT_STREAM.AUTOSENSE, null)
 		val job = printer.createPrintJob()
-		job.print(doc, null)
+		job.addPrintJobListener(listener)
+		try {
+			job.print(doc, null)
+		} catch (e: PrintException) {
+			// Don't do anything here.
+		}
 	}
 }
 
