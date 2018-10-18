@@ -3,7 +3,6 @@ package org.brailleblaster.libembosser.drivers.utils;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
-import com.sun.jdi.event.Event;
 
 public interface DocumentHandler {
 	interface DocumentEvent {}
