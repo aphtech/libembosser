@@ -21,6 +21,11 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.BrailleEvent;
+import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndPageEvent;
+import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndVolumeEvent;
+import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartPageEvent;
+import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartVolumeEvent;
 import org.brailleblaster.libembosser.spi.EmbossException;
 import org.brailleblaster.libembosser.spi.IEmbosser;
 import org.brailleblaster.libembosser.spi.Rectangle;
@@ -30,26 +35,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 public abstract class BaseTextEmbosser implements IEmbosser {
-	public static interface DocumentHandler {
-		public void setTopMargin(int lines);
-		public void setLeftMargin(int cells);
-		public void setLinesPerPage(int lines);
-		public void setCellsPerLine(int cells);
-		public void startDocument();
-		public void endDocument();
-		public void startVolume();
-		public void endVolume();
-		public void startPage();
-		public void endPage();
-		public void startLine();
-		public void endLine();
-		public void writeBraille(String Braille);
-		public default void writeLine(String line) {
-			startLine();
-			writeBraille(line);
-			endLine();
-		}
-	}
 	private final String id;
 	private String manufacturer;
 	private String model;
@@ -208,9 +193,9 @@ public abstract class BaseTextEmbosser implements IEmbosser {
 		NodeList volumes = (NodeList)findVolumes.evaluate(pef, XPathConstants.NODESET);
 		for (int v = 0; v < volumes.getLength(); ++v) {
 			Element volElem = (Element)volumes.item(v);
-			handler.startVolume();
+			handler.onEvent(new StartVolumeEvent());
 			processSections(volElem, handler);
-			handler.endVolume();
+			handler.onEvent(new EndVolumeEvent());
 		}
 	}
 	private void processSections(Element volElem, DocumentHandler handler) throws XPathExpressionException {
@@ -224,14 +209,14 @@ public abstract class BaseTextEmbosser implements IEmbosser {
 		NodeList pages = (NodeList)findRelativePages.evaluate(sectionElem, XPathConstants.NODESET);
 		for (int p = 0; p < pages.getLength(); ++p) {
 			Element pageElem = (Element)pages.item(p);
-			handler.startPage();
+			handler.onEvent(new StartPageEvent());
 			NodeList rows = (NodeList)findRelativeRows.evaluate(pageElem, XPathConstants.NODESET);
 			for (int r = 0; r < rows.getLength(); ++r) {
 				Element rowElem = (Element)rows.item(r);
 				String line = rowElem.getTextContent();
-				handler.writeLine(line);
+				handler.onEvent(new BrailleEvent(line));
 			}
-			handler.endPage();
+			handler.onEvent(new EndPageEvent());
 		}
 	}
 }
