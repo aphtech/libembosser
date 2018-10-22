@@ -156,8 +156,10 @@ public class GenericTextDocumentHandler implements DocumentHandler {
 	}
 
 	public void writeBraille(String braille) {
-		String asciiBraille = BrailleMapper.UNICODE_TO_ASCII_FAST.map(braille);
-		write(asciiBraille.getBytes(Charsets.UTF_8));
+		if (linesRemaining >= 0) {
+			String asciiBraille = BrailleMapper.UNICODE_TO_ASCII_FAST.map(braille);
+			write(asciiBraille.getBytes(Charsets.UTF_8));
+		}
 	}
 	private void write(byte[] bytes) {
 		output.write(bytes, 0, bytes.length);

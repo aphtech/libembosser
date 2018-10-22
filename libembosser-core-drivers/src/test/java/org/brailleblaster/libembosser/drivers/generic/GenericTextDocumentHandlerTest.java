@@ -35,12 +35,22 @@ public class GenericTextDocumentHandlerTest {
 		data.add(new Object[] {new GenericTextDocumentHandler.Builder().build(), minimalDocumentInput, Strings.repeat("\r\n", 24).getBytes(Charsets.US_ASCII)});
 		data.add(new Object[] {new GenericTextDocumentHandler.Builder().setLinesPerPage(30).build(), minimalDocumentInput, Strings.repeat("\r\n", 29).getBytes(Charsets.US_ASCII)});
 		final ImmutableList<DocumentEvent> basicDocumentInput = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(",a te/ docu;t4"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
-		final byte[] basicDocumentOutput = ",A TE/ DOCU;T4".concat(Strings.repeat("\r\n", 24)).getBytes(Charsets.US_ASCII);
+		final String basicDocumentOutputString = ",A TE/ DOCU;T4";
+		final byte[] basicDocumentOutput = basicDocumentOutputString.concat(Strings.repeat("\r\n", 24)).getBytes(Charsets.US_ASCII);
 		final ImmutableList<DocumentEvent> basicCapsDocumentInput = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(",A TE/ DOCU;T4"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		final ImmutableList<DocumentEvent> basicUnicodeDocumentInput = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2820\u2801\u2800\u281e\u2811\u280c\u2800\u2819\u2815\u2809\u2825\u2830\u281e\u2832"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		data.add(new Object[] {new GenericTextDocumentHandler.Builder().build(), basicDocumentInput, basicDocumentOutput});
 		data.add(new Object[] {new GenericTextDocumentHandler.Builder().build(), basicCapsDocumentInput, basicDocumentOutput});
 		data.add(new Object[] {new GenericTextDocumentHandler.Builder().build(), basicUnicodeDocumentInput, basicDocumentOutput});
+		data.add(new Object[] {new GenericTextDocumentHandler.Builder().setLinesPerPage(28).build(), basicDocumentInput, basicDocumentOutputString.concat(Strings.repeat("\r\n", 27)).getBytes(Charsets.US_ASCII)});
+		final ImmutableList<DocumentEvent> multiLineDocumentInput = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(",! F/ L9E4"), new EndLineEvent(), new StartLineEvent(), new BrailleEvent(",second l9e4"), new EndLineEvent(), new StartLineEvent(), new BrailleEvent(",a ?ird l9e4"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		final String[] multiLineDocumentOutputString = new String[] {",! F/ L9E4", ",SECOND L9E4", ",A ?IRD L9E4"};
+		data.add(new Object[] {new GenericTextDocumentHandler.Builder().build(), multiLineDocumentInput, String.join("\r\n", multiLineDocumentOutputString).concat(Strings.repeat("\r\n", 22)).getBytes(Charsets.US_ASCII)});
+		data.add(new Object[] {new GenericTextDocumentHandler.Builder().setLinesPerPage(30).build(), multiLineDocumentInput, String.join("\r\n", multiLineDocumentOutputString).concat(Strings.repeat("\r\n", 27)).getBytes(Charsets.US_ASCII)});
+		data.add(new Object[] {new GenericTextDocumentHandler.Builder().setCellsPerLine(35).build(), multiLineDocumentInput, String.join("\r\n", multiLineDocumentOutputString).concat(Strings.repeat("\r\n", 22)).getBytes(Charsets.US_ASCII)});
+		data.add(new Object[] {new GenericTextDocumentHandler.Builder().setLinesPerPage(3).build(), multiLineDocumentInput, String.join("\r\n", multiLineDocumentOutputString).getBytes(Charsets.US_ASCII)});
+		data.add(new Object[] {new GenericTextDocumentHandler.Builder().setLinesPerPage(2).build(), multiLineDocumentInput, String.join("\r\n", multiLineDocumentOutputString[0], multiLineDocumentOutputString[1]).getBytes(Charsets.US_ASCII)});
+		
 		return data.iterator();
 	}
 	@Test(dataProvider="handlerProvider")
