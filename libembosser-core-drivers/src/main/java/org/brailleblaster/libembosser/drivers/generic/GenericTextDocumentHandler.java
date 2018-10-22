@@ -40,12 +40,15 @@ public class GenericTextDocumentHandler implements DocumentHandler {
 	private final boolean defaultInterpoint;
 	private final int defaultRowGap = 0;
 	private int linesRemaining = 0;
+	private int cellsPerLine;
+	private int cellsRemaining = 0;
 	private final Deque<Set<? extends Option>> optionStack = new LinkedList<>();
 	private final byte[] newLineBytes;
 	private byte[] newPageBytes;
 
 	private GenericTextDocumentHandler(int cellsPerLine, int linesPerPage, boolean interpoint) {
 		defaultCellsPerLine = cellsPerLine;
+		this.cellsPerLine = defaultCellsPerLine;
 		defaultLinesPerPage = linesPerPage;
 		defaultInterpoint = interpoint;
 		initialBufferCapacity = 1000000;
@@ -117,6 +120,7 @@ public class GenericTextDocumentHandler implements DocumentHandler {
 		optionStack.push(options);
 		// Get the linesPerPage
 		linesRemaining = optionStack.stream().flatMap(o -> o.stream()).filter(o -> o instanceof LinesPerPage).findFirst().map(o -> ((LinesPerPage)o).getValue()).orElse(defaultLinesPerPage) - 1;
+		cellsPerLine = optionStack.stream().flatMap(o -> o.stream()).filter(o -> o instanceof CellsPerLine).findFirst().map(o -> ((CellsPerLine)o).getValue()).orElse(defaultCellsPerLine);
 		// When at the start of the document we do not insert a form feed.
 		// Assume embosser is already on a new page due to starting a new job.
 		if (pageNum > 0) {
@@ -143,6 +147,7 @@ public class GenericTextDocumentHandler implements DocumentHandler {
 
 	public void startLine(Set<RowOption> options) {
 		optionStack.push(options);
+		cellsRemaining = cellsPerLine;
 	}
 
 	public void endLine() {
@@ -157,8 +162,9 @@ public class GenericTextDocumentHandler implements DocumentHandler {
 
 	public void writeBraille(String braille) {
 		if (linesRemaining >= 0) {
-			String asciiBraille = BrailleMapper.UNICODE_TO_ASCII_FAST.map(braille);
+			String asciiBraille = BrailleMapper.UNICODE_TO_ASCII_FAST.map(braille.substring(0, Math.min(braille.length(), cellsRemaining)));
 			write(asciiBraille.getBytes(Charsets.UTF_8));
+			cellsRemaining -= asciiBraille.length();
 		}
 	}
 	private void write(byte[] bytes) {

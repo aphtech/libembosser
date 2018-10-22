@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.BrailleEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.DocumentEvent;
@@ -51,7 +52,8 @@ public class GenericTextDocumentHandlerTest {
 		data.add(new Object[] {new GenericTextDocumentHandler.Builder().setCellsPerLine(35).build(), multiLineDocumentInput, String.join("\r\n", multiLineDocumentOutputString).concat(Strings.repeat("\r\n", 22)).getBytes(Charsets.US_ASCII)});
 		data.add(new Object[] {new GenericTextDocumentHandler.Builder().setLinesPerPage(3).build(), multiLineDocumentInput, String.join("\r\n", multiLineDocumentOutputString).getBytes(Charsets.US_ASCII)});
 		data.add(new Object[] {new GenericTextDocumentHandler.Builder().setLinesPerPage(2).build(), multiLineDocumentInput, String.join("\r\n", multiLineDocumentOutputString[0], multiLineDocumentOutputString[1]).getBytes(Charsets.US_ASCII)});
-		data.add(new Object[] {new GenericTextDocumentHandler.Builder().setCellsPerLine(6).build(), multiLineDocumentInput, String.join("\r\n", Arrays.stream(multiLineDocumentOutputString).map(s -> s.substring(0, Math.min(s.length(), 6))).toArray()).concat(Strings.repeat("\r\n", 22)).getBytes(Charsets.US_ASCII)});
+		data.add(new Object[] {new GenericTextDocumentHandler.Builder().setCellsPerLine(6).build(), multiLineDocumentInput, String.join("\r\n", Arrays.stream(multiLineDocumentOutputString).map(s -> s.substring(0, Math.min(s.length(), 6))).collect(Collectors.toUnmodifiableList())).concat(Strings.repeat("\r\n", 22)).getBytes(Charsets.US_ASCII)});
+		
 		
 		return data.iterator();
 	}
