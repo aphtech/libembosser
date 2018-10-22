@@ -12,17 +12,42 @@ import com.google.common.base.Charsets;
 import com.google.common.io.ByteSource;
 
 public class GenericTextDocumentHandler implements DocumentHandler {
+	public final static class Builder {
+		private int cellsPerLine = 40;
+		private int linesPerPage = 25;
+		private boolean interpoint = false;
+		public Builder setCellsPerLine(int cellsPerLine) {
+			this.cellsPerLine = cellsPerLine;
+			return this;
+		}
+		public Builder setLinesPerPage(int linesPerPage) {
+			this.linesPerPage = linesPerPage;
+			return this;
+		}
+		public Builder setInterpoint(boolean interpoint) {
+			this.interpoint = interpoint;
+			return this;
+		}
+		public GenericTextDocumentHandler build() {
+			return new GenericTextDocumentHandler(cellsPerLine, linesPerPage, interpoint);
+		}
+	}
 	private int pageNum = 0;
 	private ByteArrayOutputStream output;
 	private final int initialBufferCapacity;
-	private final int defaultLinesPerPage = 25;
+	private final int defaultCellsPerLine;
+	private final int defaultLinesPerPage;
+	private final boolean defaultInterpoint;
 	private final int defaultRowGap = 0;
 	private int linesRemaining = 0;
 	private final Deque<Set<? extends Option>> optionStack = new LinkedList<>();
 	private final byte[] newLineBytes;
 	private byte[] newPageBytes;
 
-	public GenericTextDocumentHandler() {
+	private GenericTextDocumentHandler(int cellsPerLine, int linesPerPage, boolean interpoint) {
+		defaultCellsPerLine = cellsPerLine;
+		defaultLinesPerPage = linesPerPage;
+		defaultInterpoint = interpoint;
 		initialBufferCapacity = 1000000;
 		output = new ByteArrayOutputStream(initialBufferCapacity);
 		newLineBytes = new byte[] {'\r','\n'};

@@ -31,13 +31,20 @@ public class GenericTextDocumentHandlerTest {
 	@DataProvider(name="handlerProvider")
 	public Iterator<Object[]> handlerProvider() {
 		List<Object[]> data = new ArrayList<>();
-		data.add(new Object[] {ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent()), Strings.repeat("\r\n", 24).getBytes(Charsets.US_ASCII)});
-		data.add(new Object[] {ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(",a te/ docu;t4"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent()), ",A TE/ DOCU;T4".concat(Strings.repeat("\r\n", 24)).getBytes(Charsets.US_ASCII)});
+		final ImmutableList<DocumentEvent> minimalDocumentInput = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		data.add(new Object[] {new GenericTextDocumentHandler.Builder().build(), minimalDocumentInput, Strings.repeat("\r\n", 24).getBytes(Charsets.US_ASCII)});
+		data.add(new Object[] {new GenericTextDocumentHandler.Builder().setLinesPerPage(30).build(), minimalDocumentInput, Strings.repeat("\r\n", 29).getBytes(Charsets.US_ASCII)});
+		final ImmutableList<DocumentEvent> basicDocumentInput = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(",a te/ docu;t4"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		final byte[] basicDocumentOutput = ",A TE/ DOCU;T4".concat(Strings.repeat("\r\n", 24)).getBytes(Charsets.US_ASCII);
+		final ImmutableList<DocumentEvent> basicCapsDocumentInput = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(",A TE/ DOCU;T4"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		final ImmutableList<DocumentEvent> basicUnicodeDocumentInput = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2820\u2801\u2800\u281e\u2811\u280c\u2800\u2819\u2815\u2809\u2825\u2830\u281e\u2832"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		data.add(new Object[] {new GenericTextDocumentHandler.Builder().build(), basicDocumentInput, basicDocumentOutput});
+		data.add(new Object[] {new GenericTextDocumentHandler.Builder().build(), basicCapsDocumentInput, basicDocumentOutput});
+		data.add(new Object[] {new GenericTextDocumentHandler.Builder().build(), basicUnicodeDocumentInput, basicDocumentOutput});
 		return data.iterator();
 	}
 	@Test(dataProvider="handlerProvider")
-	public void testMinimumDocument(List<DocumentEvent> events, byte[] expected) {
-		GenericTextDocumentHandler handler = new GenericTextDocumentHandler();
+	public void testMinimumDocument(GenericTextDocumentHandler handler, List<DocumentEvent> events, byte[] expected) {
 		for (DocumentEvent event: events) {
 			handler.onEvent(event);
 		}
