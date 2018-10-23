@@ -51,9 +51,13 @@ public class GenericTextDocumentHandlerTest {
 		data.add(new Object[] {new GenericTextDocumentHandler.Builder().setLinesPerPage(30).build(), multiLineDocumentInput, String.join("\r\n", multiLineDocumentOutputString).concat(Strings.repeat("\r\n", 27)).getBytes(Charsets.US_ASCII)});
 		data.add(new Object[] {new GenericTextDocumentHandler.Builder().setCellsPerLine(35).build(), multiLineDocumentInput, String.join("\r\n", multiLineDocumentOutputString).concat(Strings.repeat("\r\n", 22)).getBytes(Charsets.US_ASCII)});
 		data.add(new Object[] {new GenericTextDocumentHandler.Builder().setLinesPerPage(3).build(), multiLineDocumentInput, String.join("\r\n", multiLineDocumentOutputString).getBytes(Charsets.US_ASCII)});
+		// Confirm Braille is truncated to fit page limits.
 		data.add(new Object[] {new GenericTextDocumentHandler.Builder().setLinesPerPage(2).build(), multiLineDocumentInput, String.join("\r\n", multiLineDocumentOutputString[0], multiLineDocumentOutputString[1]).getBytes(Charsets.US_ASCII)});
 		data.add(new Object[] {new GenericTextDocumentHandler.Builder().setCellsPerLine(6).build(), multiLineDocumentInput, String.join("\r\n", Arrays.stream(multiLineDocumentOutputString).map(s -> s.substring(0, Math.min(s.length(), 6))).collect(Collectors.toUnmodifiableList())).concat(Strings.repeat("\r\n", 22)).getBytes(Charsets.US_ASCII)});
-		
+		// Test that multiple pages work.
+		final ImmutableList<DocumentEvent> multiPageDocumentInput = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("f/ page"), new EndLineEvent(), new EndPageEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("second page"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		final String[] multiPageDocumentOutputStrings = new String[] {"F/ PAGE", "SECOND PAGE"};
+		data.add(new Object[] {new GenericTextDocumentHandler.Builder().build(), multiPageDocumentInput, String.join("\f", Arrays.stream(multiPageDocumentOutputStrings).map(s -> s.concat(Strings.repeat("\r\n", 24))).collect(Collectors.toList())).getBytes(Charsets.US_ASCII)});
 		
 		return data.iterator();
 	}
