@@ -58,11 +58,12 @@ public class GenericTextDocumentHandlerTest {
 		final ImmutableList<DocumentEvent> multiPageDocumentInput = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("f/ page"), new EndLineEvent(), new EndPageEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("second page"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		final String[] multiPageDocumentOutputStrings = new String[] {"F/ PAGE", "SECOND PAGE"};
 		data.add(new Object[] {new GenericTextDocumentHandler.Builder().build(), multiPageDocumentInput, String.join("\f", Arrays.stream(multiPageDocumentOutputStrings).map(s -> s.concat(Strings.repeat("\r\n", 24))).collect(Collectors.toList())).getBytes(Charsets.US_ASCII)});
+		data.add(new Object[] {new GenericTextDocumentHandler.Builder().setLinesPerPage(30).build(), multiPageDocumentInput, String.join("\f", Arrays.stream(multiPageDocumentOutputStrings).map(s -> s.concat(Strings.repeat("\r\n", 29))).collect(Collectors.toList())).getBytes(Charsets.US_ASCII)});
 		
 		return data.iterator();
 	}
 	@Test(dataProvider="handlerProvider")
-	public void testMinimumDocument(GenericTextDocumentHandler handler, List<DocumentEvent> events, byte[] expected) {
+	public void testDocumentConversion(GenericTextDocumentHandler handler, List<DocumentEvent> events, byte[] expected) {
 		for (DocumentEvent event: events) {
 			handler.onEvent(event);
 		}
