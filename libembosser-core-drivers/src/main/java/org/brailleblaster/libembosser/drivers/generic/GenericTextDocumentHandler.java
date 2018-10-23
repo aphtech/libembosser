@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Set;
+import java.util.function.BiConsumer;
 
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler;
 import org.brailleblaster.libembosser.utils.BrailleMapper;
@@ -12,6 +13,70 @@ import com.google.common.base.Charsets;
 import com.google.common.io.ByteSource;
 
 public class GenericTextDocumentHandler implements DocumentHandler {
+	private static void throwInvalidStateException(DocumentEvent event, String state) {
+		throw new IllegalStateException(String.format("Invalid event %s for state %s", event.getClass().getName(), state));
+	}
+	private enum HandlerStates {
+		READY((h, e) -> {
+			if (e instanceof StartDocumentEvent) {
+				h.startDocument(((StartDocumentEvent)e).getOptions());
+			} else {
+				throwInvalidStateException(e, "READY");
+			}
+		}),
+		DOCUMENT((h, e) -> {
+			if (e instanceof StartVolumeEvent) {
+				h.startVolume(((StartVolumeEvent)e).getOptions());
+			} else if (e instanceof EndDocumentEvent) {
+				h.endDocument();
+			} else {
+				throwInvalidStateException(e, "DOCUMENT");
+			}
+		}),
+		VOLUME((h, e) -> {
+			if (e instanceof StartSectionEvent) {
+				h.startSection(((StartSectionEvent)e).getOptions());
+			} else if (e instanceof EndVolumeEvent) {
+				h.endVolume();
+			} else {
+				throwInvalidStateException(e, "VOLUME");
+			}
+		}),
+		SECTION((h, e) -> {
+			if (e instanceof StartPageEvent) {
+				h.startPage(((StartPageEvent)e).getOptions());
+			} else if (e instanceof EndSectionEvent) {
+				h.endSection();
+			} else {
+				throwInvalidStateException(e, "SECTION");
+			}
+		}),
+		PAGE((h, e) -> {
+			if (e instanceof StartLineEvent) {
+				h.startLine(((StartLineEvent)e).getOptions());
+			} else if (e instanceof EndPageEvent) {
+				h.endPage();
+			} else {
+				throwInvalidStateException(e, "PAGE");
+			}
+		}),
+		LINE((h, e) -> {
+			if (e instanceof BrailleEvent) {
+				h.writeBraille(((BrailleEvent)e).getBraille());
+			} else if (e instanceof EndLineEvent) {
+				h.endLine();
+			} else {
+				throwInvalidStateException(e, "LINE");
+			}
+		});
+		private BiConsumer<GenericTextDocumentHandler, DocumentEvent> f;
+		private HandlerStates(BiConsumer<GenericTextDocumentHandler, DocumentEvent> f) {
+			this.f = f;
+		}
+		public void accept(GenericTextDocumentHandler h, DocumentEvent e) {
+			f.accept(h, e);
+		}
+	}
 	public final static class Builder {
 		private int cellsPerLine = 40;
 		private int linesPerPage = 25;
@@ -43,6 +108,7 @@ public class GenericTextDocumentHandler implements DocumentHandler {
 	private int cellsPerLine;
 	private int cellsRemaining = 0;
 	private final Deque<Set<? extends Option>> optionStack = new LinkedList<>();
+	private final Deque<HandlerStates> stateStack = new LinkedList<>();
 	private final byte[] newLineBytes;
 	private byte[] newPageBytes;
 
@@ -59,29 +125,8 @@ public class GenericTextDocumentHandler implements DocumentHandler {
 	
 	@Override
 	public void onEvent(DocumentEvent event) {
-		if (event instanceof StartDocumentEvent) {
-			startDocument(((StartDocumentEvent)event).getOptions());
-		} else if (event instanceof StartVolumeEvent) {
-			startVolume(((StartVolumeEvent)event).getOptions());
-		} else if (event instanceof StartSectionEvent) {
-			startSection(((StartSectionEvent)event).getOptions());
-		} else if (event instanceof StartPageEvent) {
-			startPage(((StartPageEvent)event).getOptions());
-		} else if (event instanceof StartLineEvent) {
-			startLine(((StartLineEvent)event).getOptions());
-		} else if (event instanceof BrailleEvent) {
-			writeBraille(((BrailleEvent)event).getBraille());
-		} else if (event instanceof EndLineEvent) {
-			endLine();
-		} else if (event instanceof EndPageEvent) {
-			endPage();
-		} else if (event instanceof EndSectionEvent) {
-			endSection();
-		} else if (event instanceof EndVolumeEvent) {
-			endVolume();
-		} else if (event instanceof EndDocumentEvent) {
-			endDocument();
-		}
+		HandlerStates state = stateStack.isEmpty()? HandlerStates.READY : stateStack.peek();
+		state.accept(this, event);
 	}
 	
 	public void startDocument(Set<DocumentOption> options) {
@@ -91,29 +136,35 @@ public class GenericTextDocumentHandler implements DocumentHandler {
 		optionStack.clear();
 		// Push the options to the stack
 		optionStack.push(options);;
+		stateStack.push(HandlerStates.DOCUMENT);
 	}
 	
 	public void endDocument() {
 		// Remove document options from the stack
 		optionStack.pop();
+		stateStack.pop();
 	}
 	
 	public void startVolume(Set<VolumeOption> options) {
 		// Push the volume options to the stack
 		optionStack.push(options);
+		stateStack.push(HandlerStates.VOLUME);
 	}
 
 	public void endVolume() {
 		// Remove the volume options
 		optionStack.pop();
+		stateStack.pop();
 	}
 	
 	public void startSection(Set<SectionOption> options) {
 		optionStack.push(options);
+		stateStack.push(HandlerStates.SECTION);
 	}
 	
 	public void endSection() {
 		optionStack.pop();
+		stateStack.pop();
 	}
 
 	public void startPage(Set<PageOption> options) {
@@ -127,6 +178,7 @@ public class GenericTextDocumentHandler implements DocumentHandler {
 			write(newPageBytes);
 		}
 		pageNum++;
+		stateStack.push(HandlerStates.PAGE);
 	}
 	
 	public void endPage() {
@@ -135,6 +187,7 @@ public class GenericTextDocumentHandler implements DocumentHandler {
 			write(repeatedBytes(newLineBytes, linesRemaining));
 		}
 		optionStack.pop();
+		stateStack.pop();
 	}
 
 	private byte[] repeatedBytes(byte[] inBytes, int count) {
@@ -148,6 +201,7 @@ public class GenericTextDocumentHandler implements DocumentHandler {
 	public void startLine(Set<RowOption> options) {
 		optionStack.push(options);
 		cellsRemaining = cellsPerLine;
+		stateStack.push(HandlerStates.LINE);
 	}
 
 	public void endLine() {
@@ -158,6 +212,7 @@ public class GenericTextDocumentHandler implements DocumentHandler {
 		}
 		linesRemaining -= rowGap;
 		optionStack.pop();
+		stateStack.pop();
 	}
 
 	public void writeBraille(String braille) {
