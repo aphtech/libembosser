@@ -1,6 +1,7 @@
 package org.brailleblaster.libembosser.drivers.generic;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Set;
@@ -81,6 +82,8 @@ public class GenericTextDocumentHandler implements DocumentHandler {
 		private int cellsPerLine = 40;
 		private int linesPerPage = 25;
 		private boolean interpoint = false;
+		private int leftMargin = 0;
+		private int topMargin = 0;
 		public Builder setCellsPerLine(int cellsPerLine) {
 			this.cellsPerLine = cellsPerLine;
 			return this;
@@ -93,8 +96,16 @@ public class GenericTextDocumentHandler implements DocumentHandler {
 			this.interpoint = interpoint;
 			return this;
 		}
+		public Builder setLeftMargin(int leftMargin) {
+			this.leftMargin = leftMargin;
+			return this;
+		}
+		public Builder setTopMargin(int topMargin) {
+			this.topMargin = topMargin;
+			return this;
+		}
 		public GenericTextDocumentHandler build() {
-			return new GenericTextDocumentHandler(cellsPerLine, linesPerPage, interpoint);
+			return new GenericTextDocumentHandler(leftMargin, topMargin, cellsPerLine, linesPerPage, interpoint);
 		}
 	}
 	private int pageNum = 0;
@@ -104,6 +115,8 @@ public class GenericTextDocumentHandler implements DocumentHandler {
 	private final int defaultLinesPerPage;
 	private final boolean defaultInterpoint;
 	private final int defaultRowGap = 0;
+	private int leftMargin;
+	private int topMargin;
 	private int linesRemaining = 0;
 	private int cellsPerLine;
 	private int cellsRemaining = 0;
@@ -112,11 +125,13 @@ public class GenericTextDocumentHandler implements DocumentHandler {
 	private final byte[] newLineBytes;
 	private byte[] newPageBytes;
 
-	private GenericTextDocumentHandler(int cellsPerLine, int linesPerPage, boolean interpoint) {
+	private GenericTextDocumentHandler(int leftMargin, int topMargin, int cellsPerLine, int linesPerPage, boolean interpoint) {
 		defaultCellsPerLine = cellsPerLine;
 		this.cellsPerLine = defaultCellsPerLine;
 		defaultLinesPerPage = linesPerPage;
 		defaultInterpoint = interpoint;
+		this.leftMargin = leftMargin;
+		this.topMargin = topMargin;
 		initialBufferCapacity = 1000000;
 		output = new ByteArrayOutputStream(initialBufferCapacity);
 		newLineBytes = new byte[] {'\r','\n'};
@@ -177,6 +192,10 @@ public class GenericTextDocumentHandler implements DocumentHandler {
 		if (pageNum > 0) {
 			write(newPageBytes);
 		}
+		// Add the top margin
+		if (topMargin > 0) {
+			write(repeatedBytes(newLineBytes, topMargin));
+		}
 		pageNum++;
 		stateStack.push(HandlerStates.PAGE);
 	}
@@ -200,6 +219,11 @@ public class GenericTextDocumentHandler implements DocumentHandler {
 
 	public void startLine(Set<RowOption> options) {
 		optionStack.push(options);
+		if (leftMargin > 0) {
+			byte[] margin = new byte[leftMargin];
+			Arrays.fill(margin, (byte)' ');
+			write(margin);
+		}
 		cellsRemaining = cellsPerLine;
 		stateStack.push(HandlerStates.LINE);
 	}

@@ -61,7 +61,8 @@ public class GenericTextDocumentHandlerTest {
 		final String[] multiPageDocumentOutputStrings = new String[] {"F/ PAGE", "SECOND PAGE"};
 		data.add(new Object[] {new GenericTextDocumentHandler.Builder().build(), multiPageDocumentInput, String.join("\f", Arrays.stream(multiPageDocumentOutputStrings).map(s -> s.concat(Strings.repeat("\r\n", 24))).collect(Collectors.toList())).getBytes(Charsets.US_ASCII)});
 		data.add(new Object[] {new GenericTextDocumentHandler.Builder().setLinesPerPage(30).build(), multiPageDocumentInput, String.join("\f", Arrays.stream(multiPageDocumentOutputStrings).map(s -> s.concat(Strings.repeat("\r\n", 29))).collect(Collectors.toList())).getBytes(Charsets.US_ASCII)});
-		
+		// Tests for adding/padding margins
+		data.add(new Object[] {new GenericTextDocumentHandler.Builder().setLeftMargin(3).setTopMargin(2).build(), multiPageDocumentInput, String.join("\f", Arrays.stream(multiPageDocumentOutputStrings).map(s -> String.format("\r\n\r\n   %s%s", s, Strings.repeat("\r\n", 24))).collect(Collectors.toList())).getBytes(Charsets.US_ASCII)});
 		return data.iterator();
 	}
 	@Test(dataProvider="handlerProvider")
