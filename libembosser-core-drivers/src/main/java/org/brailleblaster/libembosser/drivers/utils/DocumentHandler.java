@@ -4,21 +4,26 @@ import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
 
+@FunctionalInterface	
 public interface DocumentHandler {
 	interface DocumentEvent {}
-	abstract class OptionEvent<T extends Option> implements DocumentEvent {
+	interface OptionEvent {
+		public Set<? extends Option> getOptions();
+	}
+	abstract class BaseOptionEvent<T extends Option> implements OptionEvent, DocumentEvent {
 		private Set<T> options;
-		protected OptionEvent() {
+		protected BaseOptionEvent() {
 			this.options = ImmutableSet.of();
 		}
-		protected OptionEvent(Set<T> options) {
+		protected BaseOptionEvent(Set<T> options) {
 			this.options = ImmutableSet.copyOf(options);
 		}
+		@Override
 		public Set<T> getOptions() {
 			return options;
 		}
 	}
-	class StartDocumentEvent extends OptionEvent<DocumentOption> {
+	class StartDocumentEvent extends BaseOptionEvent<DocumentOption> {
 		public StartDocumentEvent() {
 			super();
 		}
@@ -26,7 +31,7 @@ public interface DocumentHandler {
 			super(options);
 		}
 	}
-	class StartVolumeEvent extends OptionEvent<VolumeOption> {
+	class StartVolumeEvent extends BaseOptionEvent<VolumeOption> {
 		public StartVolumeEvent() {
 			super();
 		}
@@ -34,7 +39,7 @@ public interface DocumentHandler {
 			super(options);
 		}
 	}
-	class StartSectionEvent extends OptionEvent<SectionOption> {
+	class StartSectionEvent extends BaseOptionEvent<SectionOption> {
 		public StartSectionEvent() {
 			super();
 		}
@@ -42,7 +47,7 @@ public interface DocumentHandler {
 			super(options);
 		}
 	}
-	class StartPageEvent extends OptionEvent<PageOption> {
+	class StartPageEvent extends BaseOptionEvent<PageOption> {
 		public StartPageEvent() {
 			super();
 		}
@@ -50,7 +55,7 @@ public interface DocumentHandler {
 			super(options);
 		}
 	}
-	class StartLineEvent extends OptionEvent<RowOption> {
+	class StartLineEvent extends BaseOptionEvent<RowOption> {
 		public StartLineEvent() {
 			super();
 		}
@@ -79,6 +84,9 @@ public interface DocumentHandler {
 	 *
 	 */
 	interface Option { }
+	interface ValueOption<T> {
+		public T getValue();
+	}
 	/** 
 	 * Interface to identify options which can apply to the document.
 	 * 
@@ -127,31 +135,31 @@ public interface DocumentHandler {
 			return getClass().hashCode();
 		}
 	}
-	abstract class BaseOptionValue<T> extends BaseOption {
+	abstract class BaseValueOption<T> extends BaseOption implements ValueOption<T> {
 		private final T value;
-		public BaseOptionValue(T value) {
+		public BaseValueOption(T value) {
 			this.value = value;
 		}
 		public T getValue() {
 			return value;
 		}
 	}
-	final class CellsPerLine extends BaseOptionValue<Integer> implements DocumentOption, VolumeOption, SectionOption, PageOption {
+	final class CellsPerLine extends BaseValueOption<Integer> implements DocumentOption, VolumeOption, SectionOption, PageOption {
 		public CellsPerLine(Integer value) {
 			super(value);
 		}
 	}
-	final class LinesPerPage extends BaseOptionValue<Integer> implements DocumentOption, VolumeOption, SectionOption, PageOption {
+	final class LinesPerPage extends BaseValueOption<Integer> implements DocumentOption, VolumeOption, SectionOption, PageOption {
 		public LinesPerPage(Integer value) {
 			super(value);
 		}
 	}
-	final class RowGap extends BaseOptionValue<Integer> implements DocumentOption, VolumeOption, SectionOption, RowOption {
+	final class RowGap extends BaseValueOption<Integer> implements DocumentOption, VolumeOption, SectionOption, RowOption {
 		public RowGap(Integer value) {
 			super(value);
 		}
 	}
-	final class Duplex extends BaseOptionValue<Boolean> implements DocumentOption, VolumeOption, SectionOption {
+	final class Duplex extends BaseValueOption<Boolean> implements DocumentOption, VolumeOption, SectionOption {
 		public Duplex(Boolean value) {
 			super(value);
 		}
