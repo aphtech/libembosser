@@ -54,6 +54,8 @@ public class DocumentParserTest {
 		final ImmutableList<DocumentEvent> multiLineDocumentEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("TEST Braille"), new EndLineEvent(), new StartLineEvent(), new BrailleEvent("SECOND L9E4"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		data.add(new Object[] {new ByteArrayInputStream("TEST Braille\r\nSECOND L9E4".getBytes(Charsets.US_ASCII)), multiLineDocumentEvents});
 		data.add(new Object[] {new ByteArrayInputStream("TEST Braille\nSECOND L9E4".getBytes(Charsets.US_ASCII)), multiLineDocumentEvents});
+		data.add(new Object[] {new ByteArrayInputStream("TEST Braille\nSECOND L9E4".concat(Strings.repeat("\n", 23)).getBytes(Charsets.US_ASCII)), multiLineDocumentEvents});
+		data.add(new Object[] {new ByteArrayInputStream(String.format("TEST Braille\nSECOND L9E4%s%s", Strings.repeat("\n", 23), "\f").getBytes(Charsets.US_ASCII)), multiLineDocumentEvents});
 		return data.iterator();
 	}
 	@Test(dataProvider="brfProvider")
