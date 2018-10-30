@@ -46,9 +46,14 @@ public class DocumentParserTest {
 		data.add(new Object[] {new ByteArrayInputStream(new byte[] {(byte)'\f'}), minimumDocumentEvents});
 		// Sometimes a blank page may just contain blank lines
 		data.add(new Object[] {new ByteArrayInputStream(Strings.repeat("\r\n", 24).concat("\f").getBytes(Charsets.US_ASCII)), minimumDocumentEvents});
+		data.add(new Object[] {new ByteArrayInputStream(Strings.repeat("\n", 24).concat("\f").getBytes(Charsets.US_ASCII)), minimumDocumentEvents});
 		// Braille character bytes should be copied to output
 		final ImmutableList<DocumentEvent> basicDocumentEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("TEST Braille"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		data.add(new Object[] {new ByteArrayInputStream("TEST Braille".getBytes(Charsets.US_ASCII)), basicDocumentEvents});
+		// Lines of characters should be separated by the correct start and end line events.
+		final ImmutableList<DocumentEvent> multiLineDocumentEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("TEST Braille"), new EndLineEvent(), new StartLineEvent(), new BrailleEvent("SECOND L9E4"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		data.add(new Object[] {new ByteArrayInputStream("TEST Braille\r\nSECOND L9E4".getBytes(Charsets.US_ASCII)), multiLineDocumentEvents});
+		data.add(new Object[] {new ByteArrayInputStream("TEST Braille\nSECOND L9E4".getBytes(Charsets.US_ASCII)), multiLineDocumentEvents});
 		return data.iterator();
 	}
 	@Test(dataProvider="brfProvider")
