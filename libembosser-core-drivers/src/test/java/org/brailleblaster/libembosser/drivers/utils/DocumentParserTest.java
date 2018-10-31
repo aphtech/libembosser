@@ -56,6 +56,12 @@ public class DocumentParserTest {
 		data.add(new Object[] {new ByteArrayInputStream("TEST Braille\nSECOND L9E4".getBytes(Charsets.US_ASCII)), multiLineDocumentEvents});
 		data.add(new Object[] {new ByteArrayInputStream("TEST Braille\nSECOND L9E4".concat(Strings.repeat("\n", 23)).getBytes(Charsets.US_ASCII)), multiLineDocumentEvents});
 		data.add(new Object[] {new ByteArrayInputStream(String.format("TEST Braille\nSECOND L9E4%s%s", Strings.repeat("\n", 23), "\f").getBytes(Charsets.US_ASCII)), multiLineDocumentEvents});
+		// Test blank lines between lines of Braille.
+		final ImmutableList<DocumentEvent> blankLinesDocumentEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("TEST Braille"), new EndLineEvent(), new StartLineEvent(), new EndLineEvent(), new StartLineEvent(), new EndLineEvent(), new StartLineEvent(), new BrailleEvent("SECOND L9E4"), new EndLineEvent(), new StartLineEvent(), new EndLineEvent(), new StartLineEvent(), new BrailleEvent("?IRD L9E4"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		data.add(new Object[] {new ByteArrayInputStream("TEST Braille\n\n\nSECOND L9E4\r\n\r\n?IRD L9E4".getBytes(Charsets.US_ASCII)), blankLinesDocumentEvents});
+		// Multipage tests
+		final ImmutableList<DocumentEvent> multiPageDocumentEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("TEST Braille"), new EndLineEvent(), new EndPageEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("SECOND PAGE4"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		data.add(new Object[] {new ByteArrayInputStream("TEST Braille\fSECOND PAGE4".getBytes(Charsets.US_ASCII)), multiPageDocumentEvents});
 		return data.iterator();
 	}
 	@Test(dataProvider="brfProvider")
