@@ -62,6 +62,14 @@ public class DocumentParserTest {
 		// Multipage tests
 		final ImmutableList<DocumentEvent> multiPageDocumentEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("TEST Braille"), new EndLineEvent(), new EndPageEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("SECOND PAGE4"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		data.add(new Object[] {new ByteArrayInputStream("TEST Braille\fSECOND PAGE4".getBytes(Charsets.US_ASCII)), multiPageDocumentEvents});
+		data.add(new Object[] {new ByteArrayInputStream(String.format("TEST Braille%s\fSECOND PAGE4", Strings.repeat("\n", 24)).getBytes(Charsets.US_ASCII)), multiPageDocumentEvents});
+		data.add(new Object[] {new ByteArrayInputStream(String.format("TEST Braille%s\fSECOND PAGE4", Strings.repeat("\r\n", 24)).getBytes(Charsets.US_ASCII)), multiPageDocumentEvents});
+		// Blank page test.
+		final ImmutableList<DocumentEvent> blankPageDocumentEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("TEST Braille"), new EndLineEvent(), new EndPageEvent(), new StartPageEvent(), new EndPageEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("SECOND PAGE4"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		data.add(new Object[] {new ByteArrayInputStream("TEST Braille\f\fSECOND PAGE4".getBytes(Charsets.US_ASCII)), blankPageDocumentEvents});
+		data.add(new Object[] {new ByteArrayInputStream(String.format("TEST Braille%s\f\fSECOND PAGE4", Strings.repeat("\n", 24)).getBytes(Charsets.US_ASCII)), blankPageDocumentEvents});
+		data.add(new Object[] {new ByteArrayInputStream(String.format("TEST Braille%s\f\fSECOND PAGE4", Strings.repeat("\r\n", 24)).getBytes(Charsets.US_ASCII)), blankPageDocumentEvents});
+		data.add(new Object[] {new ByteArrayInputStream(String.format("TEST Braille%s\f%s\fSECOND PAGE4", Strings.repeat("\n", 24), Strings.repeat("\n", 24)).getBytes(Charsets.US_ASCII)), blankPageDocumentEvents});
 		return data.iterator();
 	}
 	@Test(dataProvider="brfProvider")
