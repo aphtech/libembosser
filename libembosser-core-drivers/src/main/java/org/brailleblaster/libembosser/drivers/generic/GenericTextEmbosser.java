@@ -9,6 +9,7 @@ import javax.print.PrintService;
 
 import org.brailleblaster.libembosser.drivers.utils.BaseTextEmbosser;
 import org.brailleblaster.libembosser.drivers.utils.CopyInputStream;
+import org.brailleblaster.libembosser.drivers.utils.DocumentParser;
 import org.brailleblaster.libembosser.spi.BrlCell;
 import org.brailleblaster.libembosser.spi.DocumentFormat;
 import org.brailleblaster.libembosser.spi.EmbossException;
@@ -17,8 +18,6 @@ import org.brailleblaster.libembosser.spi.Margins;
 import org.brailleblaster.libembosser.spi.Rectangle;
 import org.brailleblaster.libembosser.spi.Version;
 import org.w3c.dom.Document;
-
-import com.google.common.io.FileBackedOutputStream;
 
 public class GenericTextEmbosser extends BaseTextEmbosser {
 	private final static Version API_VERSION = new Version(1, 0);
@@ -54,9 +53,11 @@ public class GenericTextEmbosser extends BaseTextEmbosser {
 				leftMargin = cell.getCellsForWidth(margins.getLeft());
 			} 
 		}
-		try (FileBackedOutputStream os = new FileBackedOutputStream(10485760)) {
-			copyContent(is, os, topMargin, leftMargin);
-			CopyInputStream embosserStream = new CopyInputStream(os.asByteSource(), embossProperties.getCopies());
+		GenericTextDocumentHandler handler = new GenericTextDocumentHandler.Builder().setTopMargin(topMargin).setLeftMargin(leftMargin).build();
+		DocumentParser parser = new DocumentParser();
+		try {
+			parser.parseBrf(is, handler);
+			CopyInputStream embosserStream = new CopyInputStream(handler.asByteSource(), embossProperties.getCopies());
 			return embossStream(embosserDevice, embosserStream);
 		} catch (IOException e) {
 			return false;

@@ -84,6 +84,9 @@ public class GenericTextDocumentHandler implements DocumentHandler {
 		private boolean interpoint = false;
 		private int leftMargin = 0;
 		private int topMargin = 0;
+		public Builder setCopies(int copies) {
+			return this;
+		}
 		public Builder setCellsPerLine(int cellsPerLine) {
 			this.cellsPerLine = cellsPerLine;
 			return this;
@@ -108,7 +111,6 @@ public class GenericTextDocumentHandler implements DocumentHandler {
 			return new GenericTextDocumentHandler(leftMargin, topMargin, cellsPerLine, linesPerPage, interpoint);
 		}
 	}
-	private int pageNum = 0;
 	private ByteArrayOutputStream output;
 	private final int initialBufferCapacity;
 	private final int defaultCellsPerLine;
@@ -145,7 +147,6 @@ public class GenericTextDocumentHandler implements DocumentHandler {
 	}
 	
 	public void startDocument(Set<DocumentOption> options) {
-		pageNum = 0;
 		output.reset();
 		// Reset the option stack, in case of previous failure.
 		optionStack.clear();
@@ -187,16 +188,10 @@ public class GenericTextDocumentHandler implements DocumentHandler {
 		// Get the linesPerPage
 		linesRemaining = optionStack.stream().flatMap(o -> o.stream()).filter(o -> o instanceof LinesPerPage).findFirst().map(o -> ((LinesPerPage)o).getValue()).orElse(defaultLinesPerPage) - 1;
 		cellsPerLine = optionStack.stream().flatMap(o -> o.stream()).filter(o -> o instanceof CellsPerLine).findFirst().map(o -> ((CellsPerLine)o).getValue()).orElse(defaultCellsPerLine);
-		// When at the start of the document we do not insert a form feed.
-		// Assume embosser is already on a new page due to starting a new job.
-		if (pageNum > 0) {
-			write(newPageBytes);
-		}
 		// Add the top margin
 		if (topMargin > 0) {
 			write(repeatedBytes(newLineBytes, topMargin));
 		}
-		pageNum++;
 		stateStack.push(HandlerStates.PAGE);
 	}
 	
@@ -205,6 +200,7 @@ public class GenericTextDocumentHandler implements DocumentHandler {
 		if (linesRemaining > 0) {
 			write(repeatedBytes(newLineBytes, linesRemaining));
 		}
+		write(newPageBytes);
 		optionStack.pop();
 		stateStack.pop();
 	}
