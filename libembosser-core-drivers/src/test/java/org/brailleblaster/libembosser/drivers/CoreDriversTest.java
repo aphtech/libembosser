@@ -37,7 +37,7 @@ public class CoreDriversTest {
 		String testBrf = "  ,\"h is \"s text4\n,text on a new l9e4\f";
 		List<Object[]> data = new ArrayList<>();
 		// Basic embossing
-		byte[] expectedOutput = "  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\f".getBytes(Charsets.US_ASCII);
+		byte[] expectedOutput = "  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f".getBytes(Charsets.US_ASCII);
 		EmbossProperties props = new EmbossProperties();
 		data.add(new Object[] {"libembosser.generic.text", testBrf, props, expectedOutput});
 		data.add(new Object[] {"libembosser.generic.text_with_margins", testBrf, props, expectedOutput});
@@ -51,12 +51,12 @@ public class CoreDriversTest {
 		// Interpoint with margins
 		props = new EmbossProperties().setSides(MultiSides.INTERPOINT).setMargins(new Margins(new BigDecimal("13"), BigDecimal.ZERO, BigDecimal.TEN, BigDecimal.ZERO));
 		data.add(new Object[] {"libembosser.generic.text", testBrf, props, expectedOutput});
-		expectedOutput = "\r\n    ,\"H IS \"S TEXT4\r\n  ,TEXT ON A NEW L9E4\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\f".getBytes(Charsets.US_ASCII);
+		expectedOutput = "\r\n    ,\"H IS \"S TEXT4\r\n  ,TEXT ON A NEW L9E4\f".getBytes(Charsets.US_ASCII);
 		data.add(new Object[] {"libembosser.generic.text_with_margins", testBrf, props, expectedOutput});
 				
 		// Multiple copies
 		props = new EmbossProperties().setCopies(2);
-		expectedOutput = Strings.repeat("  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\f", 2).getBytes(Charsets.US_ASCII);
+		expectedOutput = Strings.repeat("  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f", 2).getBytes(Charsets.US_ASCII);
 		data.add(new Object[] {"libembosser.generic.text", testBrf, props, expectedOutput});
 		data.add(new Object[] {"libembosser.generic.text_with_margins", testBrf, props, expectedOutput});
 		

@@ -87,6 +87,11 @@ public class GenericTextDocumentHandler implements DocumentHandler {
 		private int leftMargin = 0;
 		private int topMargin = 0;
 		private int copies = 1;
+		private boolean padWithBlanks = false;
+		public Builder padWithBlankLines(boolean pad) {
+			padWithBlanks = pad;
+			return this;
+		}
 		public Builder setCopies(int copies) {
 			this.copies = copies;
 			return this;
@@ -112,7 +117,7 @@ public class GenericTextDocumentHandler implements DocumentHandler {
 			return this;
 		}
 		public GenericTextDocumentHandler build() {
-			return new GenericTextDocumentHandler(leftMargin, topMargin, cellsPerLine, linesPerPage, copies, interpoint);
+			return new GenericTextDocumentHandler(leftMargin, topMargin, cellsPerLine, linesPerPage, copies, padWithBlanks, interpoint);
 		}
 	}
 	private ByteArrayOutputStream output;
@@ -131,10 +136,13 @@ public class GenericTextDocumentHandler implements DocumentHandler {
 	private final Deque<HandlerStates> stateStack = new LinkedList<>();
 	private final byte[] newLineBytes;
 	private byte[] newPageBytes;
+	private final boolean bottomPadding;
+	private int pendingLines;
 
-	private GenericTextDocumentHandler(int leftMargin, int topMargin, int cellsPerLine, int linesPerPage, int copies, boolean interpoint) {
+	private GenericTextDocumentHandler(int leftMargin, int topMargin, int cellsPerLine, int linesPerPage, int copies, boolean bottomPadding, boolean interpoint) {
 		defaultCellsPerLine = cellsPerLine;
 		this.copies = copies;
+		this.bottomPadding = bottomPadding;
 		this.cellsPerLine = defaultCellsPerLine;
 		defaultLinesPerPage = linesPerPage;
 		defaultInterpoint = interpoint;
@@ -195,16 +203,15 @@ public class GenericTextDocumentHandler implements DocumentHandler {
 		linesRemaining = optionStack.stream().flatMap(o -> o.stream()).filter(o -> o instanceof LinesPerPage).findFirst().map(o -> ((LinesPerPage)o).getValue()).orElse(defaultLinesPerPage) - 1;
 		cellsPerLine = optionStack.stream().flatMap(o -> o.stream()).filter(o -> o instanceof CellsPerLine).findFirst().map(o -> ((CellsPerLine)o).getValue()).orElse(defaultCellsPerLine);
 		// Add the top margin
-		if (topMargin > 0) {
-			write(repeatedBytes(newLineBytes, topMargin));
-		}
+		pendingLines = topMargin;
 		stateStack.push(HandlerStates.PAGE);
 	}
 	
 	public void endPage() {
-		// Pad the page with new lines to make it contain linesPerPage.
-		if (linesRemaining > 0) {
-			write(repeatedBytes(newLineBytes, linesRemaining));
+		pendingLines += Math.max(linesRemaining, 0);
+		if (bottomPadding && pendingLines > 0) {
+			// Pad the page with new lines to make it contain linesPerPage.
+			write(repeatedBytes(newLineBytes, pendingLines));
 		}
 		write(newPageBytes);
 		optionStack.pop();
@@ -221,6 +228,10 @@ public class GenericTextDocumentHandler implements DocumentHandler {
 
 	public void startLine(Set<RowOption> options) {
 		optionStack.push(options);
+		if (pendingLines > 0) {
+			write(repeatedBytes(newLineBytes, pendingLines));
+		}
+		pendingLines = 0;
 		if (leftMargin > 0) {
 			byte[] margin = new byte[leftMargin];
 			Arrays.fill(margin, (byte)' ');
@@ -232,10 +243,7 @@ public class GenericTextDocumentHandler implements DocumentHandler {
 
 	public void endLine() {
 		int rowGap = optionStack.stream().flatMap(o -> o.stream()).filter(o -> o instanceof RowGap).findFirst().map(o -> ((RowGap)o).getValue()).orElse(defaultRowGap) + 1;
-		int newLines = Math.min(linesRemaining, rowGap);
-		if (newLines > 0) {
-			write(repeatedBytes(newLineBytes, newLines));
-		}
+		pendingLines = Math.min(linesRemaining, rowGap);
 		linesRemaining -= rowGap;
 		optionStack.pop();
 		stateStack.pop();
