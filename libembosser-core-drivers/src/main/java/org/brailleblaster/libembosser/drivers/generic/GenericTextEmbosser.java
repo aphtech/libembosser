@@ -53,11 +53,11 @@ public class GenericTextEmbosser extends BaseTextEmbosser {
 				leftMargin = cell.getCellsForWidth(margins.getLeft());
 			} 
 		}
-		GenericTextDocumentHandler handler = new GenericTextDocumentHandler.Builder().setTopMargin(topMargin).setLeftMargin(leftMargin).build();
+		GenericTextDocumentHandler handler = new GenericTextDocumentHandler.Builder().setTopMargin(topMargin).setLeftMargin(leftMargin).setCopies(embossProperties.getCopies()).build();
 		DocumentParser parser = new DocumentParser();
 		try {
 			parser.parseBrf(is, handler);
-			CopyInputStream embosserStream = new CopyInputStream(handler.asByteSource(), embossProperties.getCopies());
+			InputStream embosserStream = handler.asByteSource().openStream();
 			return embossStream(embosserDevice, embosserStream);
 		} catch (IOException e) {
 			return false;

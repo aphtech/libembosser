@@ -63,6 +63,13 @@ public class GenericTextDocumentHandlerTest {
 		data.add(new Object[] {new GenericTextDocumentHandler.Builder().setLinesPerPage(30).build(), multiPageDocumentInput, String.join("\f", Arrays.stream(multiPageDocumentOutputStrings).map(s -> s.concat(Strings.repeat("\r\n", 29))).collect(Collectors.toList())).concat("\f").getBytes(Charsets.US_ASCII)});
 		// Tests for adding/padding margins
 		data.add(new Object[] {new GenericTextDocumentHandler.Builder().setLeftMargin(3).setTopMargin(2).build(), multiPageDocumentInput, String.join("\f", Arrays.stream(multiPageDocumentOutputStrings).map(s -> String.format("\r\n\r\n   %s%s", s, Strings.repeat("\r\n", 24))).collect(Collectors.toList())).concat("\f").getBytes(Charsets.US_ASCII)});
+		// Mutliple copy tests
+		data.add(new Object[] {new GenericTextDocumentHandler.Builder().setCopies(2).build(), multiPageDocumentInput, Strings.repeat(String.join("\f", Arrays.stream(multiPageDocumentOutputStrings).map(s -> s.concat(Strings.repeat("\r\n", 24))).collect(Collectors.toList())).concat("\f"), 2).getBytes(Charsets.US_ASCII)});
+		data.add(new Object[] {new GenericTextDocumentHandler.Builder().setCopies(2).setLinesPerPage(30).build(), multiPageDocumentInput, Strings.repeat(String.join("\f", Arrays.stream(multiPageDocumentOutputStrings).map(s -> s.concat(Strings.repeat("\r\n", 29))).collect(Collectors.toList())).concat("\f"), 2).getBytes(Charsets.US_ASCII)});
+		data.add(new Object[] {new GenericTextDocumentHandler.Builder().setCopies(4).build(), multiPageDocumentInput, Strings.repeat(String.join("\f", Arrays.stream(multiPageDocumentOutputStrings).map(s -> s.concat(Strings.repeat("\r\n", 24))).collect(Collectors.toList())).concat("\f"), 4).getBytes(Charsets.US_ASCII)});
+		data.add(new Object[] {new GenericTextDocumentHandler.Builder().setCopies(3).setLinesPerPage(30).build(), multiPageDocumentInput, Strings.repeat(String.join("\f", Arrays.stream(multiPageDocumentOutputStrings).map(s -> s.concat(Strings.repeat("\r\n", 29))).collect(Collectors.toList())).concat("\f"), 3).getBytes(Charsets.US_ASCII)});
+		// Tests for adding/padding margins
+		data.add(new Object[] {new GenericTextDocumentHandler.Builder().setCopies(11).setLeftMargin(3).setTopMargin(2).build(), multiPageDocumentInput, Strings.repeat(String.join("\f", Arrays.stream(multiPageDocumentOutputStrings).map(s -> String.format("\r\n\r\n   %s%s", s, Strings.repeat("\r\n", 24))).collect(Collectors.toList())).concat("\f"), 11).getBytes(Charsets.US_ASCII)});
 		return data.iterator();
 	}
 	@Test(dataProvider="handlerProvider")

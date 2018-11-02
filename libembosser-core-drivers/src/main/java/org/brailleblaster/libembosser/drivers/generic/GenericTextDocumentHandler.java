@@ -1,9 +1,11 @@
 package org.brailleblaster.libembosser.drivers.generic;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
@@ -84,7 +86,9 @@ public class GenericTextDocumentHandler implements DocumentHandler {
 		private boolean interpoint = false;
 		private int leftMargin = 0;
 		private int topMargin = 0;
+		private int copies = 1;
 		public Builder setCopies(int copies) {
+			this.copies = copies;
 			return this;
 		}
 		public Builder setCellsPerLine(int cellsPerLine) {
@@ -108,7 +112,7 @@ public class GenericTextDocumentHandler implements DocumentHandler {
 			return this;
 		}
 		public GenericTextDocumentHandler build() {
-			return new GenericTextDocumentHandler(leftMargin, topMargin, cellsPerLine, linesPerPage, interpoint);
+			return new GenericTextDocumentHandler(leftMargin, topMargin, cellsPerLine, linesPerPage, copies, interpoint);
 		}
 	}
 	private ByteArrayOutputStream output;
@@ -120,6 +124,7 @@ public class GenericTextDocumentHandler implements DocumentHandler {
 	private int leftMargin;
 	private int topMargin;
 	private int linesRemaining = 0;
+	private final int copies;
 	private int cellsPerLine;
 	private int cellsRemaining = 0;
 	private final Deque<Set<? extends Option>> optionStack = new LinkedList<>();
@@ -127,8 +132,9 @@ public class GenericTextDocumentHandler implements DocumentHandler {
 	private final byte[] newLineBytes;
 	private byte[] newPageBytes;
 
-	private GenericTextDocumentHandler(int leftMargin, int topMargin, int cellsPerLine, int linesPerPage, boolean interpoint) {
+	private GenericTextDocumentHandler(int leftMargin, int topMargin, int cellsPerLine, int linesPerPage, int copies, boolean interpoint) {
 		defaultCellsPerLine = cellsPerLine;
+		this.copies = copies;
 		this.cellsPerLine = defaultCellsPerLine;
 		defaultLinesPerPage = linesPerPage;
 		defaultInterpoint = interpoint;
@@ -246,6 +252,11 @@ public class GenericTextDocumentHandler implements DocumentHandler {
 		output.write(bytes, 0, bytes.length);
 	}
 	public ByteSource asByteSource() {
-		return ByteSource.wrap(output.toByteArray());
+		final byte[] outputBytes = output.toByteArray();
+		List<ByteSource> sources = new ArrayList<>();
+		for (int i = 0; i < copies; i++) {
+			sources.add(ByteSource.wrap(outputBytes));
+		}
+		return ByteSource.concat(sources);
 	}
 }
