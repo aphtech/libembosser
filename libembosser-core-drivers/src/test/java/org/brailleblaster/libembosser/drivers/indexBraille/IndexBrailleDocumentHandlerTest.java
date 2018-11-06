@@ -37,49 +37,48 @@ public class IndexBrailleDocumentHandlerTest {
 	@DataProvider(name="handlerProvider")
 	public Iterator<Object[]> handlerProvider() {
 		List<Object[]> data = new ArrayList<>();
-		final String basicHeader = "\u001bDMC1;";
+		final String basicHeader = "\u001bDMC1,TM%d,LP%d;";
 		final ImmutableList<DocumentEvent> minimalDocumentInput = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
-		final byte[] minimalDocumentOutput = basicHeader.concat("\f").getBytes(Charsets.US_ASCII);
-		data.add(new Object[] {createHandlerBuilder().build(), minimalDocumentInput, minimalDocumentOutput});
-		data.add(new Object[] {createHandlerBuilder().setLinesPerPage(30).build(), minimalDocumentInput, minimalDocumentOutput});
+		final String minimalDocumentOutput = basicHeader.concat("\f");
+		data.add(new Object[] {createHandlerBuilder().build(), minimalDocumentInput, String.format(minimalDocumentOutput, 0, 25)});
+		data.add(new Object[] {createHandlerBuilder().setLinesPerPage(30).build(), minimalDocumentInput, String.format(minimalDocumentOutput, 0, 30)});
 		final ImmutableList<DocumentEvent> basicDocumentInput = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(",a te/ docu;t4"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
-		final String basicDocumentOutputString = basicHeader.concat(",A TE/ DOCU;T4");
-		final byte[] basicDocumentOutput = basicDocumentOutputString.concat("\f").getBytes(Charsets.US_ASCII);
+		final String basicDocumentOutput = basicHeader.concat(",A TE/ DOCU;T4\f");
 		final ImmutableList<DocumentEvent> basicCapsDocumentInput = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(",A TE/ DOCU;T4"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		final ImmutableList<DocumentEvent> basicUnicodeDocumentInput = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2820\u2801\u2800\u281e\u2811\u280c\u2800\u2819\u2815\u2809\u2825\u2830\u281e\u2832"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
-		data.add(new Object[] {createHandlerBuilder().build(), basicDocumentInput, basicDocumentOutput});
-		data.add(new Object[] {createHandlerBuilder().build(), basicCapsDocumentInput, basicDocumentOutput});
-		data.add(new Object[] {createHandlerBuilder().build(), basicUnicodeDocumentInput, basicDocumentOutput});
-		data.add(new Object[] {createHandlerBuilder().setLinesPerPage(28).build(), basicDocumentInput, basicDocumentOutput});
+		data.add(new Object[] {createHandlerBuilder().build(), basicDocumentInput, String.format(basicDocumentOutput, 0, 25)});
+		data.add(new Object[] {createHandlerBuilder().build(), basicCapsDocumentInput, String.format(basicDocumentOutput, 0, 25)});
+		data.add(new Object[] {createHandlerBuilder().build(), basicUnicodeDocumentInput, String.format(basicDocumentOutput, 0, 25)});
+		data.add(new Object[] {createHandlerBuilder().setLinesPerPage(28).build(), basicDocumentInput, String.format(basicDocumentOutput, 0, 28)});
 		
 		final ImmutableList<DocumentEvent> multiLineDocumentInput = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(",! F/ L9E4"), new EndLineEvent(), new StartLineEvent(), new BrailleEvent(",second l9e4"), new EndLineEvent(), new StartLineEvent(), new BrailleEvent(",a ?ird l9e4"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		final String[] multiLineDocumentOutputString = new String[] {",! F/ L9E4", ",SECOND L9E4", ",A ?IRD L9E4"};
-		data.add(new Object[] {createHandlerBuilder().build(), multiLineDocumentInput, (basicHeader + String.join("\r\n", multiLineDocumentOutputString) + "\f").getBytes(Charsets.US_ASCII)});
-		data.add(new Object[] {createHandlerBuilder().setLinesPerPage(30).build(), multiLineDocumentInput, (basicHeader + String.join("\r\n", multiLineDocumentOutputString) + "\f").getBytes(Charsets.US_ASCII)});
-		data.add(new Object[] {createHandlerBuilder().setCellsPerLine(35).build(), multiLineDocumentInput, (basicHeader + String.join("\r\n", multiLineDocumentOutputString) + "\f").getBytes(Charsets.US_ASCII)});
-		data.add(new Object[] {createHandlerBuilder().setLinesPerPage(3).build(), multiLineDocumentInput, (basicHeader + String.join("\r\n", multiLineDocumentOutputString) + "\f").getBytes(Charsets.US_ASCII)});
+		data.add(new Object[] {createHandlerBuilder().build(), multiLineDocumentInput, String.format(basicHeader, 0, 25) + String.join("\r\n", multiLineDocumentOutputString) + "\f"});
+		data.add(new Object[] {createHandlerBuilder().setLinesPerPage(30).build(), multiLineDocumentInput, String.format(basicHeader, 0, 30) + String.join("\r\n", multiLineDocumentOutputString) + "\f"});
+		data.add(new Object[] {createHandlerBuilder().setCellsPerLine(35).build(), multiLineDocumentInput, String.format(basicHeader, 0, 25) + String.join("\r\n", multiLineDocumentOutputString) + "\f"});
+		data.add(new Object[] {createHandlerBuilder().setLinesPerPage(3).build(), multiLineDocumentInput, String.format(basicHeader, 0, 3) + String.join("\r\n", multiLineDocumentOutputString) + "\f"});
 		// Confirm Braille is truncated to fit page limits.
-		data.add(new Object[] {createHandlerBuilder().setLinesPerPage(2).build(), multiLineDocumentInput, (basicHeader + String.join("\r\n", multiLineDocumentOutputString[0], multiLineDocumentOutputString[1]) + "\f").getBytes(Charsets.US_ASCII)});
-		data.add(new Object[] {createHandlerBuilder().setCellsPerLine(6).build(), multiLineDocumentInput, (basicHeader + String.join("\r\n", Arrays.stream(multiLineDocumentOutputString).map(s -> s.substring(0, Math.min(s.length(), 6))).collect(Collectors.toUnmodifiableList())) + "\f").getBytes(Charsets.US_ASCII)});
+		data.add(new Object[] {createHandlerBuilder().setLinesPerPage(2).build(), multiLineDocumentInput, String.format(basicHeader, 0, 2) + String.join("\r\n", multiLineDocumentOutputString[0], multiLineDocumentOutputString[1]) + "\f"});
+		data.add(new Object[] {createHandlerBuilder().setCellsPerLine(6).build(), multiLineDocumentInput, String.format(basicHeader, 0, 25) + String.join("\r\n", Arrays.stream(multiLineDocumentOutputString).map(s -> s.substring(0, Math.min(s.length(), 6))).collect(Collectors.toUnmodifiableList())) + "\f"});
 		// Test that multiple pages work.
 		final ImmutableList<DocumentEvent> multiPageDocumentInput = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("f/ page"), new EndLineEvent(), new EndPageEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("second page"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		final String[] multiPageDocumentOutputStrings = new String[] {"F/ PAGE", "SECOND PAGE"};
-		data.add(new Object[] {createHandlerBuilder().build(), multiPageDocumentInput, (basicHeader + String.join("\f", multiPageDocumentOutputStrings) + "\f").getBytes(Charsets.US_ASCII)});
-		data.add(new Object[] {createHandlerBuilder().setLinesPerPage(30).build(), multiPageDocumentInput, (basicHeader + String.join("\f", multiPageDocumentOutputStrings) + "\f").getBytes(Charsets.US_ASCII)});
+		data.add(new Object[] {createHandlerBuilder().build(), multiPageDocumentInput, String.format(basicHeader, 0, 25) + String.join("\f", multiPageDocumentOutputStrings) + "\f"});
+		data.add(new Object[] {createHandlerBuilder().setLinesPerPage(30).build(), multiPageDocumentInput, String.format(basicHeader, 0, 30) + String.join("\f", multiPageDocumentOutputStrings) + "\f"});
 		// Tests for adding/padding margins
-		data.add(new Object[] {createHandlerBuilder().setLeftMargin(3).setTopMargin(2).build(), multiPageDocumentInput, (basicHeader + Arrays.stream(multiPageDocumentOutputStrings).map(s -> String.format("\r\n\r\n   %s%s", s, "\f")).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString()).getBytes(Charsets.US_ASCII)});
+		data.add(new Object[] {createHandlerBuilder().setLeftMargin(3).setTopMargin(2).build(), multiPageDocumentInput, String.format(basicHeader, 2, 25) + Arrays.stream(multiPageDocumentOutputStrings).map(s -> String.format("\r\n\r\n   %s%s", s, "\f")).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString()});
 		// Multiple copy tests
-		final String copiesHeader = "\u001bDMC%d;%s";
-		data.add(new Object[] {createHandlerBuilder().setCopies(2).build(), multiPageDocumentInput, String.format(copiesHeader, 2, Arrays.stream(multiPageDocumentOutputStrings).map(s -> s.concat("\f")).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString()).getBytes(Charsets.US_ASCII)});
-		data.add(new Object[] {createHandlerBuilder().setCopies(2).setLinesPerPage(30).build(), multiPageDocumentInput, String.format(copiesHeader, 2, Arrays.stream(multiPageDocumentOutputStrings).map(s -> s.concat("\f")).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString()).getBytes(Charsets.US_ASCII)});
-		data.add(new Object[] {createHandlerBuilder().setCopies(4).build(), multiPageDocumentInput, String.format(copiesHeader, 4, Arrays.stream(multiPageDocumentOutputStrings).map(s -> s.concat("\f")).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString()).getBytes(Charsets.US_ASCII)});
-		data.add(new Object[] {createHandlerBuilder().setCopies(3).setLinesPerPage(30).build(), multiPageDocumentInput, String.format(copiesHeader, 3, Arrays.stream(multiPageDocumentOutputStrings).map(s -> s.concat("\f")).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString()).getBytes(Charsets.US_ASCII)});
+		final String copiesHeader = "\u001bDMC%d,TM%d,LP%d;%s";
+		data.add(new Object[] {createHandlerBuilder().setCopies(2).build(), multiPageDocumentInput, String.format(copiesHeader, 2, 0, 25, Arrays.stream(multiPageDocumentOutputStrings).map(s -> s.concat("\f")).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString())});
+		data.add(new Object[] {createHandlerBuilder().setCopies(2).setLinesPerPage(30).build(), multiPageDocumentInput, String.format(copiesHeader, 2, 0, 30, Arrays.stream(multiPageDocumentOutputStrings).map(s -> s.concat("\f")).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString())});
+		data.add(new Object[] {createHandlerBuilder().setCopies(4).build(), multiPageDocumentInput, String.format(copiesHeader, 4, 0, 25, Arrays.stream(multiPageDocumentOutputStrings).map(s -> s.concat("\f")).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString())});
+		data.add(new Object[] {createHandlerBuilder().setCopies(3).setLinesPerPage(30).build(), multiPageDocumentInput, String.format(copiesHeader, 3, 0, 30, Arrays.stream(multiPageDocumentOutputStrings).map(s -> s.concat("\f")).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString())});
 		// Tests for adding/padding margins
-		data.add(new Object[] {createHandlerBuilder().setCopies(11).setLeftMargin(3).setTopMargin(2).build(), multiPageDocumentInput, String.format(copiesHeader, 11, Arrays.stream(multiPageDocumentOutputStrings).map(s -> String.format("\r\n\r\n   %s%s", s, "\f")).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString()).getBytes(Charsets.US_ASCII)});
+		data.add(new Object[] {createHandlerBuilder().setCopies(11).setLeftMargin(3).setTopMargin(2).build(), multiPageDocumentInput, String.format(copiesHeader, 11, 2, 25, Arrays.stream(multiPageDocumentOutputStrings).map(s -> String.format("\r\n\r\n   %s%s", s, "\f")).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString())});
 		return data.iterator();
 	}
 	@Test(dataProvider="handlerProvider")
-	public void testDocumentConversion(IndexBrailleDocumentHandler handler, List<DocumentEvent> events, byte[] expected) {
+	public void testDocumentConversion(IndexBrailleDocumentHandler handler, List<DocumentEvent> events, String expected) {
 		for (DocumentEvent event: events) {
 			handler.onEvent(event);
 		}
@@ -89,7 +88,7 @@ public class IndexBrailleDocumentHandlerTest {
 		} catch (IOException e) {
 			fail("Problem getting stream from handler");
 		}
-		assertEquals(actual, expected);
+		assertEquals(actual, expected.getBytes(Charsets.US_ASCII));
 	}
 	@DataProvider(name="invalidStateChangeProvider")
 	public Iterator<Object[]> invalidStateChangeProvider() {

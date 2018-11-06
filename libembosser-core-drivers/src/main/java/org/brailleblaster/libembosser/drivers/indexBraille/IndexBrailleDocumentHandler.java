@@ -39,15 +39,15 @@ public class IndexBrailleDocumentHandler implements DocumentHandler {
 	}
 	private final GenericTextDocumentHandler textHandler;
 	private final ByteSource header;
-	private IndexBrailleDocumentHandler(int leftMargin, int topMargin, int cellsPerLine, int linesperPage, int copies) {
+	private IndexBrailleDocumentHandler(int leftMargin, int topMargin, int cellsPerLine, int linesPerPage, int copies) {
 		this.textHandler = new GenericTextDocumentHandler.Builder()
 				.setLeftMargin(leftMargin)
 				.setTopMargin(topMargin)
 				.setCellsPerLine(cellsPerLine)
-				.setLinesPerPage(linesperPage)
+				.setLinesPerPage(linesPerPage)
 				.setCopies(1) // Our header will provide the copies escape sequence, so no data duplication needed.
 				.build();
-		String headerString = String.format("\u001bDMC%d;", copies);
+		String headerString = String.format("\u001bDMC%d,TM%d,LP%d;", copies, topMargin, linesPerPage);
 		header = ByteSource.wrap(headerString.getBytes(Charsets.US_ASCII));
 	}
 	@Override
