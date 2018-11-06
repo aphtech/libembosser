@@ -47,7 +47,7 @@ public class IndexBrailleDocumentHandler implements DocumentHandler {
 				.setLinesPerPage(linesPerPage)
 				.setCopies(1) // Our header will provide the copies escape sequence, so no data duplication needed.
 				.build();
-		String headerString = String.format("\u001bDMC%d,BI%d,CH%d,TM%d,LP%d,BI%d,CH%d;", copies, leftMargin, cellsPerLine, topMargin, linesPerPage);
+		String headerString = String.format("\u001bDBT0,MC%d,BI%d,CH%d,TM%d,LP%d;", copies, leftMargin, cellsPerLine, topMargin, linesPerPage);
 		header = ByteSource.wrap(headerString.getBytes(Charsets.US_ASCII));
 	}
 	@Override

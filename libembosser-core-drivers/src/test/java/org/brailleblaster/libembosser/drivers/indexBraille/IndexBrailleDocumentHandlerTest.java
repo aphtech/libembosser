@@ -37,7 +37,7 @@ public class IndexBrailleDocumentHandlerTest {
 	@DataProvider(name="handlerProvider")
 	public Iterator<Object[]> handlerProvider() {
 		List<Object[]> data = new ArrayList<>();
-		final String basicHeader = "\u001bDMC1,BI%d,CH%d,TM%d,LP%d;";
+		final String basicHeader = "\u001bDBT0,MC1,BI%d,CH%d,TM%d,LP%d;";
 		final ImmutableList<DocumentEvent> minimalDocumentInput = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		final String minimalDocumentOutput = basicHeader.concat("\f");
 		data.add(new Object[] {createHandlerBuilder().build(), minimalDocumentInput, String.format(minimalDocumentOutput, 0, 40, 0, 25)});
@@ -68,7 +68,7 @@ public class IndexBrailleDocumentHandlerTest {
 		// Tests for adding/padding margins
 		data.add(new Object[] {createHandlerBuilder().setLeftMargin(3).setTopMargin(2).build(), multiPageDocumentInput, String.format(basicHeader, 3, 40, 2, 25) + Arrays.stream(multiPageDocumentOutputStrings).map(s -> String.format("\r\n\r\n   %s%s", s, "\f")).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString()});
 		// Multiple copy tests
-		final String copiesHeader = "\u001bDMC%d,BI%d,CH%d,TM%d,LP%d;%s";
+		final String copiesHeader = "\u001bDBT0,MC%d,BI%d,CH%d,TM%d,LP%d;%s";
 		data.add(new Object[] {createHandlerBuilder().setCopies(2).build(), multiPageDocumentInput, String.format(copiesHeader, 2, 0, 40, 0, 25, Arrays.stream(multiPageDocumentOutputStrings).map(s -> s.concat("\f")).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString())});
 		data.add(new Object[] {createHandlerBuilder().setCopies(2).setLinesPerPage(30).build(), multiPageDocumentInput, String.format(copiesHeader, 2, 0, 40, 0, 30, Arrays.stream(multiPageDocumentOutputStrings).map(s -> s.concat("\f")).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString())});
 		data.add(new Object[] {createHandlerBuilder().setCopies(4).build(), multiPageDocumentInput, String.format(copiesHeader, 4, 0, 40, 0, 25, Arrays.stream(multiPageDocumentOutputStrings).map(s -> s.concat("\f")).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString())});
