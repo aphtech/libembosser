@@ -40,32 +40,36 @@ public class IndexBrailleDocumentHandler implements DocumentHandler {
 			this.copies = copies;
 			return this;
 		}
+		public Builder setPaperMode(int mode) {
+			this.paperMode = mode;
+			return this;
+		}
 		public Builder setPaperMode(MultiSides sides) {
 			switch(sides) {
 			case P1ONLY:
 			case P2ONLY:
-				paperMode = 1;
+				setPaperMode(1);
 				break;
 			case INTERPOINT:
-				paperMode = 2;
+				setPaperMode(2);
 				break;
 			case Z_FOLDING_DOUBLE_HORIZONTAL:
-				paperMode = 3;
+				setPaperMode(3);
 				break;
 			case SADDLE_STITCH_DOUBLE_SIDED:
-				paperMode = 4;
+				setPaperMode(4);
 				break;
 			case Z_FOLDING_SINGLE_HORIZONTAL:
-				paperMode = 5;
+				setPaperMode(5);
 				break;
 			case Z_FOLDING_DOUBLE_VERTICAL:
-				paperMode = 6;
+				setPaperMode(6);
 				break;
 			case Z_FOLDING_SINGLE_VERTICAL:
-				paperMode = 7;
+				setPaperMode(7);
 				break;
 			case SADDLE_STITCH_SINGLE_SIDED:
-				paperMode = 8;
+				setPaperMode(8);
 				break;
 			default:
 				throw new IllegalArgumentException(String.format("Index embossers do not support %s paper mode", sides.name()));

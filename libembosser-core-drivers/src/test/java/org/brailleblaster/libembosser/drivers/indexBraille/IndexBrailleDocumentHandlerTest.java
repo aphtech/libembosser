@@ -110,11 +110,27 @@ public class IndexBrailleDocumentHandlerTest {
 		data.add(new Object[] {createHandlerBuilder(), MultiSides.Z_FOLDING_DOUBLE_VERTICAL, basicDocumentInput, String.format(paperFormatHeader, 6, basicDocumentOutput)});
 		data.add(new Object[] {createHandlerBuilder(), MultiSides.Z_FOLDING_SINGLE_VERTICAL, basicDocumentInput, String.format(paperFormatHeader, 7, basicDocumentOutput)});
 		data.add(new Object[] {createHandlerBuilder(), MultiSides.SADDLE_STITCH_SINGLE_SIDED, basicDocumentInput, String.format(paperFormatHeader, 8, basicDocumentOutput)});
+		
+		data.add(new Object[] {createHandlerBuilder(), Integer.valueOf(1), basicDocumentInput, String.format(paperFormatHeader, 1, basicDocumentOutput)});
+		data.add(new Object[] {createHandlerBuilder(), Integer.valueOf(2), basicDocumentInput, String.format(paperFormatHeader, 2, basicDocumentOutput)});
+		data.add(new Object[] {createHandlerBuilder(), Integer.valueOf(3), basicDocumentInput, String.format(paperFormatHeader, 3, basicDocumentOutput)});
+		data.add(new Object[] {createHandlerBuilder(), Integer.valueOf(4), basicDocumentInput, String.format(paperFormatHeader, 4, basicDocumentOutput)});
+		data.add(new Object[] {createHandlerBuilder(), Integer.valueOf(5), basicDocumentInput, String.format(paperFormatHeader, 5, basicDocumentOutput)});
+		data.add(new Object[] {createHandlerBuilder(), Integer.valueOf(6), basicDocumentInput, String.format(paperFormatHeader, 6, basicDocumentOutput)});
+		data.add(new Object[] {createHandlerBuilder(), Integer.valueOf(7), basicDocumentInput, String.format(paperFormatHeader, 7, basicDocumentOutput)});
+		data.add(new Object[] {createHandlerBuilder(), Integer.valueOf(8), basicDocumentInput, String.format(paperFormatHeader, 8, basicDocumentOutput)});
 		return data.iterator();
 	}
 	@Test(dataProvider="paperModeProvider")
-	public void testPaperModeSetting(IndexBrailleDocumentHandler.Builder builder, MultiSides paperMode, List<DocumentEvent> eventsInput, String expected) {
-		IndexBrailleDocumentHandler handler = builder.setPaperMode(paperMode).build();
+	public void testPaperModeSetting(IndexBrailleDocumentHandler.Builder builder, Object paperMode, List<DocumentEvent> eventsInput, String expected) {
+		IndexBrailleDocumentHandler handler = null;
+		if (paperMode instanceof MultiSides) {
+			handler = builder.setPaperMode((MultiSides)paperMode).build();
+		} else if (paperMode instanceof Integer) {
+			handler = builder.setPaperMode(((Integer)paperMode).intValue()).build();
+		} else {
+			throw new IllegalArgumentException(String.format("Paper mode must either be int or MultiSides, got %s instead", paperMode.getClass().getName()));
+		}
 		for (DocumentEvent event: eventsInput) {
 			handler.onEvent(event);
 		}
