@@ -1,5 +1,9 @@
 package org.brailleblaster.libembosser.drivers.indexBraille;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.util.OptionalInt;
+
 import org.brailleblaster.libembosser.drivers.generic.GenericTextDocumentHandler;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler;
 import org.brailleblaster.libembosser.spi.MultiSides;
@@ -15,6 +19,7 @@ public class IndexBrailleDocumentHandler implements DocumentHandler {
 		private int linesPerPage = 25;
 		private int copies = 1;
 		private int paperMode = 1;
+		private OptionalInt paperSize = OptionalInt.empty();
 		public Builder setLeftMargin(int leftMargin) {
 			this.leftMargin = leftMargin;
 			return this;
@@ -67,13 +72,18 @@ public class IndexBrailleDocumentHandler implements DocumentHandler {
 			}
 			return this;
 		}
+		public Builder setPaper(OptionalInt paper) {
+			checkNotNull(paper);
+			this.paperSize = paper;
+			return this;
+		}
 		public IndexBrailleDocumentHandler build() {
-			return new IndexBrailleDocumentHandler(leftMargin, topMargin, cellsPerLine, linesPerPage, paperMode, copies);
+			return new IndexBrailleDocumentHandler(leftMargin, topMargin, cellsPerLine, linesPerPage, paperMode, paperSize, copies);
 		}
 	}
 	private final GenericTextDocumentHandler textHandler;
 	private final ByteSource header;
-	private IndexBrailleDocumentHandler(int leftMargin, int topMargin, int cellsPerLine, int linesPerPage, int paperMode, int copies) {
+	private IndexBrailleDocumentHandler(int leftMargin, int topMargin, int cellsPerLine, int linesPerPage, int paperMode, OptionalInt paperSize, int copies) {
 		this.textHandler = new GenericTextDocumentHandler.Builder()
 				.setLeftMargin(leftMargin)
 				.setTopMargin(topMargin)
@@ -81,7 +91,8 @@ public class IndexBrailleDocumentHandler implements DocumentHandler {
 				.setLinesPerPage(linesPerPage)
 				.setCopies(1) // Our header will provide the copies escape sequence, so no data duplication needed.
 				.build();
-		String headerString = String.format("\u001bDBT0,MC%d,DP%d,BI%d,CH%d,TM%d,LP%d;", copies, paperMode, leftMargin, cellsPerLine, topMargin, linesPerPage);
+		String paperParam = paperSize.stream().mapToObj(v -> String.format("PA%d,", v)).findFirst().orElse("");
+		String headerString = String.format("\u001bDBT0,MC%d,DP%d,%sBI%d,CH%d,TM%d,LP%d;", copies, paperMode, paperParam, leftMargin, cellsPerLine, topMargin, linesPerPage);
 		header = ByteSource.wrap(headerString.getBytes(Charsets.US_ASCII));
 	}
 	@Override

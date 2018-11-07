@@ -1,14 +1,15 @@
 package org.brailleblaster.libembosser.drivers.indexBraille;
 
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.expectThrows;
 import static org.testng.Assert.fail;
+import static org.testng.Assert.expectThrows;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.OptionalInt;
 import java.util.stream.Collectors;
 
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler;
@@ -124,6 +125,38 @@ public class IndexBrailleDocumentHandlerTest {
 			fail("Problem reading output from handler");
 		}
 		assertEquals(actual, expected.getBytes(Charsets.US_ASCII));
+	}
+	@DataProvider(name="paperSizeProvider")
+	public Iterator<Object[]> paperSizeProvider() {
+		List<Object[]> data = new ArrayList<>();
+		final ImmutableList<DocumentEvent> basicDocumentInput = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(",a te/ docu;t4"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		final String basicDocumentOutput = ",A TE/ DOCU;T4\f";
+		final String paperSizeHeader = "\u001bDBT0,MC1,DP1,%sBI0,CH40,TM0,LP25;%s";
+		data.add(new Object[] {createHandlerBuilder(), OptionalInt.empty(), basicDocumentInput, String.format(paperSizeHeader, "", basicDocumentOutput)});
+		data.add(new Object[] {createHandlerBuilder(), OptionalInt.of(0), basicDocumentInput, String.format(paperSizeHeader, "PA0,", basicDocumentOutput)});
+		data.add(new Object[] {createHandlerBuilder(), OptionalInt.of(1), basicDocumentInput, String.format(paperSizeHeader, "PA1,", basicDocumentOutput)});
+		data.add(new Object[] {createHandlerBuilder(), OptionalInt.of(2), basicDocumentInput, String.format(paperSizeHeader, "PA2,", basicDocumentOutput)});
+		data.add(new Object[] {createHandlerBuilder(), OptionalInt.of(3), basicDocumentInput, String.format(paperSizeHeader, "PA3,", basicDocumentOutput)});
+		return data.iterator();
+	}
+	@Test(dataProvider="paperSizeProvider")
+	public void testSettingPaperSize(IndexBrailleDocumentHandler.Builder builder, OptionalInt paperSize, List<DocumentEvent> inputEvents, String expected) {
+		IndexBrailleDocumentHandler handler = builder.setPaper(paperSize).build();
+		for (DocumentEvent event: inputEvents) {
+			handler.onEvent(event);
+		}
+		byte[] actual = null;
+		try {
+			actual = handler.asByteSource().read();
+		} catch (IOException e) {
+			fail("Problem reading data from handler");
+		}
+		assertEquals(actual, expected.getBytes(Charsets.US_ASCII));
+	}
+	@Test
+	public void testPaperSizeRejectNull() {
+		IndexBrailleDocumentHandler.Builder builder = createHandlerBuilder();
+		expectThrows(NullPointerException.class, () -> builder.setPaper(null));
 	}
 	@DataProvider(name="invalidStateChangeProvider")
 	public Iterator<Object[]> invalidStateChangeProvider() {
