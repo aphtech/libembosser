@@ -6,13 +6,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.EnumSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
+import java.util.OptionalInt;
 
 import javax.print.PrintService;
 
 import org.brailleblaster.libembosser.drivers.utils.BaseTextEmbosser;
+import org.brailleblaster.libembosser.drivers.utils.DocumentParser;
 import org.brailleblaster.libembosser.spi.BrlCell;
 import org.brailleblaster.libembosser.spi.DocumentFormat;
 import org.brailleblaster.libembosser.spi.EmbossException;
@@ -22,9 +22,7 @@ import org.brailleblaster.libembosser.spi.MultiSides;
 import org.brailleblaster.libembosser.spi.Rectangle;
 import org.brailleblaster.libembosser.spi.Version;
 
-import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.io.FileBackedOutputStream;
 
 public class IndexBrailleEmbosser extends BaseTextEmbosser {
 	private final int maxCellsPerLine;
@@ -105,36 +103,21 @@ public class IndexBrailleEmbosser extends BaseTextEmbosser {
 		int linesPerPage = BrlCell.NLS.getLinesForHeight(paper.getHeight().subtract(topMargin).subtract(bottomMargin));
 		// Find the int value used for the page layout.
 		int embossPageFormat = getDuplexValue(embossProperties.getSides());
-		try (FileBackedOutputStream	os = new FileBackedOutputStream(10485760)) {
-			os.write(new byte[] {0x1B, 0x44});
-			List<String> params = new LinkedList<>();
-			// Set Braille table
-			params.add("BT0");
-			// Set multiple copies
-			params.add("MC" + Integer.toString(embossProperties.getCopies()));
-			// Set the page format
-			params.add("DP" + Integer.toString(embossPageFormat));
-			// If there were a paper size add the PA command
-			if (paperSizeValue != null) {
-				params.add("PA" + paperSizeValue.toString());
-			}
-			// Left margin and cells per line
-			// The Index protocol requires both or none to be given.
-			params.add("BI" + Integer.toString(bindingMargin));
-			params.add("CH" + Integer.toString(cellsPerLine));
-			// Give top margin and lines per page
-			// Remember Index protocol requires both or none.
-			params.add("TM" + Integer.toString(topLines));
-			params.add("LP" + Integer.toString(linesPerPage));
-			// Write params to buffer.
-			os.write(String.join(",", params).getBytes(Charsets.US_ASCII));
-			// End document formatting params
-			os.write((byte)';');
-			// Now copy the document content.
-			copyContent(is, os, 0, 0);
-			return embossStream(embosserDevice, os.asByteSource().openBufferedStream());
+		IndexBrailleDocumentHandler handler = new IndexBrailleDocumentHandler.Builder()
+				.setLeftMargin(bindingMargin)
+				.setCellsPerLine(cellsPerLine)
+				.setTopMargin(topLines)
+				.setLinesPerPage(linesPerPage)
+				.setPaperMode(embossPageFormat)
+				.setCopies(embossProperties.getCopies())
+				.setPaper(paperSizeValue != null? OptionalInt.of(paperSizeValue) : OptionalInt.empty())
+				.build();
+		DocumentParser parser = new DocumentParser();
+		try {
+			parser.parseBrf(is, handler);
+			return embossStream(embosserDevice, handler.asByteSource().openBufferedStream());
 		} catch (IOException e) {
-			throw new EmbossException("There was a problem when embossing", e);
+			throw new RuntimeException("Problem when embossing document", e);
 		}
 	}
 	/**

@@ -89,8 +89,8 @@ public class IndexBrailleDocumentHandler implements DocumentHandler {
 	private final ByteSource header;
 	private IndexBrailleDocumentHandler(int leftMargin, int topMargin, int cellsPerLine, int linesPerPage, int paperMode, OptionalInt paperSize, int copies) {
 		this.textHandler = new GenericTextDocumentHandler.Builder()
-				.setLeftMargin(leftMargin)
-				.setTopMargin(topMargin)
+				.setLeftMargin(0) // Left margin is handled by the escape sequences and needs no padding
+				.setTopMargin(0) // Top margin handled by escape sequence and need not be padded.
 				.setCellsPerLine(cellsPerLine)
 				.setLinesPerPage(linesPerPage)
 				.setCopies(1) // Our header will provide the copies escape sequence, so no data duplication needed.

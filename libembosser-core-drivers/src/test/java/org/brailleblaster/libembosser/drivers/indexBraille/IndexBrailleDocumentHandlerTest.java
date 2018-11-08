@@ -68,8 +68,8 @@ public class IndexBrailleDocumentHandlerTest {
 		final String[] multiPageDocumentOutputStrings = new String[] {"F/ PAGE", "SECOND PAGE"};
 		data.add(new Object[] {createHandlerBuilder().build(), multiPageDocumentInput, String.format(basicHeader, 0, 40, 0, 25) + String.join("\f", multiPageDocumentOutputStrings) + "\f"});
 		data.add(new Object[] {createHandlerBuilder().setLinesPerPage(30).build(), multiPageDocumentInput, String.format(basicHeader, 0, 40, 0, 30) + String.join("\f", multiPageDocumentOutputStrings) + "\f"});
-		// Tests for adding/padding margins
-		data.add(new Object[] {createHandlerBuilder().setLeftMargin(3).setTopMargin(2).build(), multiPageDocumentInput, String.format(basicHeader, 3, 40, 2, 25) + Arrays.stream(multiPageDocumentOutputStrings).map(s -> String.format("\r\n\r\n   %s%s", s, "\f")).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString()});
+		// Tests for margins
+		data.add(new Object[] {createHandlerBuilder().setLeftMargin(3).setTopMargin(2).build(), multiPageDocumentInput, String.format(basicHeader, 3, 40, 2, 25) + Arrays.stream(multiPageDocumentOutputStrings).map(s -> String.format("%s%s", s, "\f")).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString()});
 		// Multiple copy tests
 		final String copiesHeader = "\u001bDBT0,MC%d,DP1,BI%d,CH%d,TM%d,LP%d;%s";
 		data.add(new Object[] {createHandlerBuilder().setCopies(2).build(), multiPageDocumentInput, String.format(copiesHeader, 2, 0, 40, 0, 25, Arrays.stream(multiPageDocumentOutputStrings).map(s -> s.concat("\f")).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString())});
@@ -77,7 +77,7 @@ public class IndexBrailleDocumentHandlerTest {
 		data.add(new Object[] {createHandlerBuilder().setCopies(4).build(), multiPageDocumentInput, String.format(copiesHeader, 4, 0, 40, 0, 25, Arrays.stream(multiPageDocumentOutputStrings).map(s -> s.concat("\f")).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString())});
 		data.add(new Object[] {createHandlerBuilder().setCopies(3).setLinesPerPage(30).build(), multiPageDocumentInput, String.format(copiesHeader, 3, 0, 40, 0, 30, Arrays.stream(multiPageDocumentOutputStrings).map(s -> s.concat("\f")).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString())});
 		// Tests for adding/padding margins
-		data.add(new Object[] {createHandlerBuilder().setCopies(11).setLeftMargin(3).setTopMargin(2).build(), multiPageDocumentInput, String.format(copiesHeader, 11, 3, 40, 2, 25, Arrays.stream(multiPageDocumentOutputStrings).map(s -> String.format("\r\n\r\n   %s%s", s, "\f")).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString())});
+		data.add(new Object[] {createHandlerBuilder().setCopies(11).setLeftMargin(3).setTopMargin(2).build(), multiPageDocumentInput, String.format(copiesHeader, 11, 3, 40, 2, 25, Arrays.stream(multiPageDocumentOutputStrings).map(s -> String.format("%s%s", s, "\f")).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString())});
 		
 		return data.iterator();
 	}
