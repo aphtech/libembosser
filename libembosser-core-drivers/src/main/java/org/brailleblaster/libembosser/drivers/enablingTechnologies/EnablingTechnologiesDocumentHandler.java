@@ -1,9 +1,12 @@
 package org.brailleblaster.libembosser.drivers.enablingTechnologies;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import org.brailleblaster.libembosser.drivers.generic.GenericTextDocumentHandler;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler;
 
+import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteSource;
+import com.google.common.io.ByteStreams;
 
 public class EnablingTechnologiesDocumentHandler implements DocumentHandler {
 	public static class Builder {
@@ -18,6 +21,7 @@ public class EnablingTechnologiesDocumentHandler implements DocumentHandler {
 		}
 
 		public Builder setCellsPerLine(int cellsPerLine) {
+			checkNumberArgument(cellsPerLine);
 			this.cellsPerLine = cellsPerLine;
 			return this;
 		}
@@ -28,16 +32,37 @@ public class EnablingTechnologiesDocumentHandler implements DocumentHandler {
 		}
 
 		public Builder setLeftMargin(int leftMargin) {
+			checkNumberArgument(leftMargin);
 			this.leftMargin = leftMargin;
 			return this;
 		}
 
 		public Builder setLinesPerPage(int linesPerPage) {
+			checkNumberArgument(linesPerPage);
 			this.linesPerPage = linesPerPage;
+			return this;
+		}
+		
+		public Builder setTopMargin(int topMargin) {
+			checkNumberArgument(topMargin);
+			this.topMargin = topMargin;
 			return this;
 		}
 	}
 	
+	private static final byte[] NUMBER_MAPPING = new byte[] { '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
+			'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '[', '\\', ']', '^', '_', '`', 'a',
+			'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
+			'w', 'x', 'y', 'z', '{' };
+	private static boolean isNumberArgValid(int value) {
+		return value >= 0 && value < NUMBER_MAPPING.length;
+	}
+	
+	private static void checkNumberArgument(int cellsPerLine) {
+		checkArgument(isNumberArgValid(cellsPerLine), "Argument not in valid range, must be between {} and {} but is {}", 0, NUMBER_MAPPING.length - 1, cellsPerLine);
+	}
+
+	private ByteSource headerSource;
 	private GenericTextDocumentHandler handler;
 	private EnablingTechnologiesDocumentHandler(int leftMargin, int cellsPerLine, int topMargin, int linesPerPage, int copies) {
 		this.handler = new GenericTextDocumentHandler.Builder()
@@ -47,6 +72,17 @@ public class EnablingTechnologiesDocumentHandler implements DocumentHandler {
 				.setLinesPerPage(linesPerPage)
 				.setCopies(copies)
 				.build();
+		// Build the header
+		ByteArrayDataOutput headerOutput = ByteStreams.newDataOutput(100);
+		headerOutput.write(new byte[] {0x1b, '@'}); // Reset
+		headerOutput.write(new byte[] {0x1b, 'A', '@', '@'}); // Set Braille tables
+		headerOutput.write(new byte[] {0x1b, 'K', '@'}); // Set 6-dot mode
+		headerOutput.write(new byte[] {0x1b, 'W', '@'}); // Line wrapping
+		headerOutput.write(new byte[] {0x1b, 'i', '@'}); // Interpoint mode
+		headerOutput.write(new byte[] {0x1b, 's', '@'}); // Braille cell type
+		headerOutput.write(new byte[] {0x1b, 'L', NUMBER_MAPPING[leftMargin]}); // Set left margin
+		headerOutput.write(new byte[] {0x1b, 'R', NUMBER_MAPPING[cellsPerLine]}); // Set cells per line
+		this.headerSource = ByteSource.wrap(headerOutput.toByteArray());
 	}
 
 	@Override
@@ -55,7 +91,7 @@ public class EnablingTechnologiesDocumentHandler implements DocumentHandler {
 	}
 	
 	public ByteSource asByteSource() {
-		return handler.asByteSource();
+		return ByteSource.concat(headerSource, handler.asByteSource());
 	}
 
 }
