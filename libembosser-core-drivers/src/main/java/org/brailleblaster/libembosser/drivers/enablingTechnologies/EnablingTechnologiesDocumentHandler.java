@@ -15,9 +15,10 @@ public class EnablingTechnologiesDocumentHandler implements DocumentHandler {
 		private int topMargin = 0;
 		private int linesPerPage = 25;
 		private int copies = 1;
+		private int pageLength = 11;
 		
 		public EnablingTechnologiesDocumentHandler build() {
-			return new EnablingTechnologiesDocumentHandler(leftMargin, cellsPerLine, topMargin, linesPerPage, copies);
+			return new EnablingTechnologiesDocumentHandler(leftMargin, cellsPerLine, topMargin, pageLength, linesPerPage, copies);
 		}
 
 		public Builder setCellsPerLine(int cellsPerLine) {
@@ -48,6 +49,11 @@ public class EnablingTechnologiesDocumentHandler implements DocumentHandler {
 			this.topMargin = topMargin;
 			return this;
 		}
+
+		public Builder setPageLength(int inches) {
+			this.pageLength = inches;
+			return this;
+		}
 	}
 	
 	private static final byte[] NUMBER_MAPPING = new byte[] { '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
@@ -64,7 +70,7 @@ public class EnablingTechnologiesDocumentHandler implements DocumentHandler {
 
 	private ByteSource headerSource;
 	private GenericTextDocumentHandler handler;
-	private EnablingTechnologiesDocumentHandler(int leftMargin, int cellsPerLine, int topMargin, int linesPerPage, int copies) {
+	private EnablingTechnologiesDocumentHandler(int leftMargin, int cellsPerLine, int topMargin, int pageLength, int linesPerPage, int copies) {
 		this.handler = new GenericTextDocumentHandler.Builder()
 				.setLeftMargin(0)
 				.setCellsPerLine(cellsPerLine)
@@ -82,6 +88,7 @@ public class EnablingTechnologiesDocumentHandler implements DocumentHandler {
 		headerOutput.write(new byte[] {0x1b, 's', '@'}); // Braille cell type
 		headerOutput.write(new byte[] {0x1b, 'L', NUMBER_MAPPING[leftMargin]}); // Set left margin
 		headerOutput.write(new byte[] {0x1b, 'R', NUMBER_MAPPING[cellsPerLine]}); // Set cells per line
+		headerOutput.write(new byte[] {0x1b, 'T', NUMBER_MAPPING[pageLength]});
 		headerOutput.write(new byte[] {0x1b, 'Q', NUMBER_MAPPING[topMargin + linesPerPage]}); // Set lines per page, include top margin as this needs padding
 		this.headerSource = ByteSource.wrap(headerOutput.toByteArray());
 	}
