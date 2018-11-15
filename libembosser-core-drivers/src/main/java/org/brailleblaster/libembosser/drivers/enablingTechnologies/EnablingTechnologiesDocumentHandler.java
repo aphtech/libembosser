@@ -51,6 +51,7 @@ public class EnablingTechnologiesDocumentHandler implements DocumentHandler {
 		}
 
 		public Builder setPageLength(int inches) {
+			checkNumberArgument(inches);
 			this.pageLength = inches;
 			return this;
 		}

@@ -178,12 +178,46 @@ public class EnablingTechnologiesDocumentHandlerTest {
 	public Iterator<Object[]> invalidNumberArgProvider() {
 		Builder b = createHandlerBuilder();
 		Random r = new Random(System.currentTimeMillis());
-		List<IntFunction<Builder>> funcs = ImmutableList.of(b::setLeftMargin, b::setTopMargin, b::setCellsPerLine, b::setLinesPerPage);
-		List<Object[]> data = Streams.mapWithIndex(r.ints().filter(i -> i < 0 || i > 59), (value, index) -> new Object[] {funcs.get((int)(index % funcs.size())), value}).limit(100).collect(Collectors.toUnmodifiableList());
-		return data.iterator();
+		List<IntFunction<Builder>> funcs = ImmutableList.of(b::setLeftMargin, b::setTopMargin, b::setCellsPerLine, b::setLinesPerPage, b::setPageLength);
+		return Streams.mapWithIndex(r.ints().filter(i -> i < 0 || i > 59), (value, index) -> new Object[] {funcs.get((int)(index % funcs.size())), value}).limit(100).iterator();
 	}
 	@Test(dataProvider="invalidNumberArgProvider")
 	public void testInvalidNumberArgThrowsException(IntFunction<Builder> m, int arg) {
 		expectThrows(IllegalArgumentException.class, () -> m.apply(arg));
+	}
+	private final static char[] NUMBER_MAPPINGS = new char[] {
+			'@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I',
+			'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
+			'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '[', '\\', ']',
+			'^', '_', '`', 'a', 'b', 'c', 'd', 'e', 'f', 'g',
+			'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
+			'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{'
+	};
+	@DataProvider(name="intPropertyProvider")
+	public Iterator<Object[]> intPropertyProvider() {
+		List<Object[]> data = new ArrayList<>();
+		for (int i = 0; i < NUMBER_MAPPINGS.length; ++i) {
+			data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder()::setLeftMargin), i, String.format("\u001b@\u001bA@@\u001bK@\u001bW@\u001bi@\u001bs@\u001bL%s\u001bRh\u001bTK\u001bQY\f", NUMBER_MAPPINGS[i])});
+			data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder()::setCellsPerLine), i, String.format("\u001b@\u001bA@@\u001bK@\u001bW@\u001bi@\u001bs@\u001bL@\u001bR%s\u001bTK\u001bQY\f", NUMBER_MAPPINGS[i])});
+			data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder().setTopMargin(0).setPageLength(59)::setLinesPerPage), i, String.format("\u001b@\u001bA@@\u001bK@\u001bW@\u001bi@\u001bs@\u001bL@\u001bRh\u001bT{\u001bQ%s\f", NUMBER_MAPPINGS[i])});
+			data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder().setTopMargin(59 - i).setPageLength(59)::setLinesPerPage), i, String.format("\u001b@\u001bA@@\u001bK@\u001bW@\u001bi@\u001bs@\u001bL@\u001bRh\u001bT{\u001bQ%s\f", NUMBER_MAPPINGS[59])});
+			data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder().setTopMargin(0).setLinesPerPage(0)::setPageLength), i, String.format("\u001b@\u001bA@@\u001bK@\u001bW@\u001bi@\u001bs@\u001bL@\u001bRh\u001bT%s\u001bQ@\f", NUMBER_MAPPINGS[i])});
+		}
+		return data.iterator();
+	}
+	@Test(dataProvider="intPropertyProvider")
+	public void testSetIntProperty(IntFunction<Builder> func, int value, String expected) {
+		EnablingTechnologiesDocumentHandler handler = func.apply(value).build();
+		List<DocumentEvent> events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		for (DocumentEvent event: events) {
+			handler.onEvent(event);
+		}
+		String actual = null;
+		try {
+			actual = new String(handler.asByteSource().read(), Charsets.US_ASCII);
+		} catch (IOException e) {
+			fail("Problem reading data from handler");
+		}
+		assertEquals(actual, expected);
 	}
 }
