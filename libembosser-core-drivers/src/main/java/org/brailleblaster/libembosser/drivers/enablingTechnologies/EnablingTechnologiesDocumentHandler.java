@@ -68,7 +68,7 @@ public class EnablingTechnologiesDocumentHandler implements DocumentHandler {
 		this.handler = new GenericTextDocumentHandler.Builder()
 				.setLeftMargin(0)
 				.setCellsPerLine(cellsPerLine)
-				.setTopMargin(0)
+				.setTopMargin(topMargin)
 				.setLinesPerPage(linesPerPage)
 				.setCopies(copies)
 				.build();
@@ -82,6 +82,7 @@ public class EnablingTechnologiesDocumentHandler implements DocumentHandler {
 		headerOutput.write(new byte[] {0x1b, 's', '@'}); // Braille cell type
 		headerOutput.write(new byte[] {0x1b, 'L', NUMBER_MAPPING[leftMargin]}); // Set left margin
 		headerOutput.write(new byte[] {0x1b, 'R', NUMBER_MAPPING[cellsPerLine]}); // Set cells per line
+		headerOutput.write(new byte[] {0x1b, 'Q', NUMBER_MAPPING[topMargin + linesPerPage]}); // Set lines per page, include top margin as this needs padding
 		this.headerSource = ByteSource.wrap(headerOutput.toByteArray());
 	}
 
