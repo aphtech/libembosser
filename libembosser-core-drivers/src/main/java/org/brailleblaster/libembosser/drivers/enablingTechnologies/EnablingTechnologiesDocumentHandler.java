@@ -1,6 +1,7 @@
 package org.brailleblaster.libembosser.drivers.enablingTechnologies;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
 import org.brailleblaster.libembosser.drivers.generic.GenericTextDocumentHandler;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler;
 
@@ -66,12 +67,14 @@ public class EnablingTechnologiesDocumentHandler implements DocumentHandler {
 	}
 	
 	private static void checkNumberArgument(int cellsPerLine) {
-		checkArgument(isNumberArgValid(cellsPerLine), "Argument not in valid range, must be between {} and {} but is {}", 0, NUMBER_MAPPING.length - 1, cellsPerLine);
+		checkArgument(isNumberArgValid(cellsPerLine), "Argument not in valid range, must be between %s and %s but is %s", 0, NUMBER_MAPPING.length - 1, cellsPerLine);
 	}
 
 	private ByteSource headerSource;
 	private GenericTextDocumentHandler handler;
 	private EnablingTechnologiesDocumentHandler(int leftMargin, int cellsPerLine, int topMargin, int pageLength, int linesPerPage, int copies) {
+		final int totalLines = topMargin + linesPerPage;
+		checkState(isNumberArgValid(totalLines), "The sum of top margin and lines per page must be less than 60, topMargin=^s, linesPerPage=%s, total=%s", topMargin, linesPerPage, totalLines);
 		this.handler = new GenericTextDocumentHandler.Builder()
 				.setLeftMargin(0)
 				.setCellsPerLine(cellsPerLine)
@@ -90,7 +93,7 @@ public class EnablingTechnologiesDocumentHandler implements DocumentHandler {
 		headerOutput.write(new byte[] {0x1b, 'L', NUMBER_MAPPING[leftMargin]}); // Set left margin
 		headerOutput.write(new byte[] {0x1b, 'R', NUMBER_MAPPING[cellsPerLine]}); // Set cells per line
 		headerOutput.write(new byte[] {0x1b, 'T', NUMBER_MAPPING[pageLength]});
-		headerOutput.write(new byte[] {0x1b, 'Q', NUMBER_MAPPING[topMargin + linesPerPage]}); // Set lines per page, include top margin as this needs padding
+		headerOutput.write(new byte[] {0x1b, 'Q', NUMBER_MAPPING[totalLines]}); // Set lines per page, include top margin as this needs padding
 		this.headerSource = ByteSource.wrap(headerOutput.toByteArray());
 	}
 

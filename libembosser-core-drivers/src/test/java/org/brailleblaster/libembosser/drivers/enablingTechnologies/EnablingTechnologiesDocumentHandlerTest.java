@@ -220,4 +220,20 @@ public class EnablingTechnologiesDocumentHandlerTest {
 		}
 		assertEquals(actual, expected);
 	}
+	@DataProvider(name="invalidTopMarginAndLinesProvider")
+	public Iterator<Object[]> invalidTopMarginAndLinesProvider() {
+		List<Object[]> data = new ArrayList<>();
+		Random r = new Random(System.currentTimeMillis());
+		for (int i = 0; i < 100; ++i) {
+			int topMargin = r.nextInt(60);
+			int linesPerPage = 59 - r.nextInt(topMargin);
+			data.add(new Object[] {topMargin, linesPerPage});
+		}
+		return data.iterator();
+	}
+	@Test(dataProvider="invalidTopMarginAndLinesProvider")
+	public void testPreventInvalidTopMarginAndLines(int topMargin, int lines) {
+		Builder builder = createHandlerBuilder().setPageLength(59).setTopMargin(topMargin).setLinesPerPage(lines);
+		expectThrows(IllegalStateException.class, () -> builder.build());
+	}
 }
