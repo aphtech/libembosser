@@ -2,8 +2,12 @@ package org.brailleblaster.libembosser.drivers.enablingTechnologies;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
+
+import java.math.BigDecimal;
+
 import org.brailleblaster.libembosser.drivers.generic.GenericTextDocumentHandler;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler;
+import org.brailleblaster.libembosser.spi.BrlCell;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteSource;
@@ -70,11 +74,13 @@ public class EnablingTechnologiesDocumentHandler implements DocumentHandler {
 		checkArgument(isNumberArgValid(cellsPerLine), "Argument not in valid range, must be between %s and %s but is %s", 0, NUMBER_MAPPING.length - 1, cellsPerLine);
 	}
 
+	private BrlCell cell = BrlCell.NLS;
 	private ByteSource headerSource;
 	private GenericTextDocumentHandler handler;
 	private EnablingTechnologiesDocumentHandler(int leftMargin, int cellsPerLine, int topMargin, int pageLength, int linesPerPage, int copies) {
 		final int totalLines = topMargin + linesPerPage;
-		checkState(isNumberArgValid(totalLines), "The sum of top margin and lines per page must be less than 60, topMargin=^s, linesPerPage=%s, total=%s", topMargin, linesPerPage, totalLines);
+		final int maxLines = cell.getLinesForHeight(new BigDecimal(pageLength).multiply(new BigDecimal("25.4")));
+		checkState(isNumberArgValid(totalLines) && totalLines <= maxLines, "The sum of top margin and lines per page must be less than %s which is the maximum for page length %s, topMargin=^s, linesPerPage=%s, total=%s", maxLines, pageLength, topMargin, linesPerPage, totalLines);
 		this.handler = new GenericTextDocumentHandler.Builder()
 				.setLeftMargin(0)
 				.setCellsPerLine(cellsPerLine)

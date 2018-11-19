@@ -5,6 +5,7 @@ import static org.testng.Assert.expectThrows;
 import static org.testng.Assert.fail;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -27,6 +28,7 @@ import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartLineEve
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartPageEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartSectionEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartVolumeEvent;
+import org.brailleblaster.libembosser.spi.BrlCell;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -46,7 +48,7 @@ public class EnablingTechnologiesDocumentHandlerTest {
 		final ImmutableList<DocumentEvent> minimalDocumentInput = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		data.add(new Object[] {createHandlerBuilder().build(), minimalDocumentInput, String.format(headerString, "@", "h", "K", "Y") + "\f"});
 		data.add(new Object[] {createHandlerBuilder().setLinesPerPage(30).setPageLength(13).build(), minimalDocumentInput, String.format(headerString, "@", "h", "M", "^") + "\f"});
-		data.add(new Object[] {createHandlerBuilder().setLinesPerPage(30).setTopMargin(2).setPageLength(13).build(), minimalDocumentInput, String.format(headerString, "@", "h", "M", "`") + "\f"});
+		data.add(new Object[] {createHandlerBuilder().setLinesPerPage(30).setTopMargin(2).setPageLength(14).build(), minimalDocumentInput, String.format(headerString, "@", "h", "N", "`") + "\f"});
 		data.add(new Object[] {createHandlerBuilder().setLeftMargin(2).build(), minimalDocumentInput, String.format(headerString, "B", "h", "K", "Y") + "\f"});
 		data.add(new Object[] {createHandlerBuilder().setLinesPerPage(30).setPageLength(12).setCellsPerLine(30).build(), minimalDocumentInput, String.format(headerString, "@", "^", "L", "^") + "\f"});
 		final ImmutableList<DocumentEvent> basicDocumentInput = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(",a te/ docu;t4"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
@@ -57,7 +59,7 @@ public class EnablingTechnologiesDocumentHandlerTest {
 		data.add(new Object[] {createHandlerBuilder().build(), basicDocumentInput, String.format(headerString, "@", "h", "K", "Y") + basicDocumentOutput});
 		data.add(new Object[] {createHandlerBuilder().build(), basicCapsDocumentInput, String.format(headerString, "@", "h", "K", "Y") + basicDocumentOutput});
 		data.add(new Object[] {createHandlerBuilder().build(), basicUnicodeDocumentInput, String.format(headerString, "@", "h", "K", "Y") + basicDocumentOutput});
-		data.add(new Object[] {createHandlerBuilder().setLinesPerPage(28).build(), basicDocumentInput, String.format(headerString, "@", "h", "K", "\\") + basicDocumentOutput});
+		data.add(new Object[] {createHandlerBuilder().setLinesPerPage(28).setPageLength(12).build(), basicDocumentInput, String.format(headerString, "@", "h", "L", "\\") + basicDocumentOutput});
 		
 		final ImmutableList<DocumentEvent> multiLineDocumentInput = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(",! F/ L9E4"), new EndLineEvent(), new StartLineEvent(), new BrailleEvent(",second l9e4"), new EndLineEvent(), new StartLineEvent(), new BrailleEvent(",a ?ird l9e4"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		final String[] multiLineDocumentOutputString = new String[] {",! F/ L9E4", ",SECOND L9E4", ",A ?IRD L9E4"};
@@ -225,7 +227,7 @@ public class EnablingTechnologiesDocumentHandlerTest {
 		List<Object[]> data = new ArrayList<>();
 		Random r = new Random(System.currentTimeMillis());
 		for (int i = 0; i < 100; ++i) {
-			int topMargin = r.nextInt(60);
+			int topMargin = r.nextInt(59) + 1;
 			int linesPerPage = 59 - r.nextInt(topMargin);
 			data.add(new Object[] {topMargin, linesPerPage});
 		}
@@ -234,6 +236,26 @@ public class EnablingTechnologiesDocumentHandlerTest {
 	@Test(dataProvider="invalidTopMarginAndLinesProvider")
 	public void testPreventInvalidTopMarginAndLines(int topMargin, int lines) {
 		Builder builder = createHandlerBuilder().setPageLength(59).setTopMargin(topMargin).setLinesPerPage(lines);
+		expectThrows(IllegalStateException.class, () -> builder.build());
+	}
+	@DataProvider(name="invalidPageLengthAndTopMarginAndLinesProvider")
+	public Iterator<Object[]> invalidPageLengthAndTopMarginAndLinesProvider() {
+		List<Object[]> data = new ArrayList<>();
+		Random r = new Random(System.currentTimeMillis());
+		BrlCell cell = BrlCell.NLS;
+		for (int i = 0; i < 100; ++i) {
+			int pageLength = r.nextInt(59) + 1; // We don't want a page length of 0
+			int maxLines = Math.min(cell.getLinesForHeight(new BigDecimal(pageLength).multiply(new BigDecimal("25.4"))), 58);
+			int topMargin = r.nextInt(maxLines) + 1;
+			int linesPerPage = maxLines - r.nextInt(topMargin) + 1;
+			data.add(new Object[] {pageLength, topMargin, linesPerPage});
+		}
+		return data.iterator();
+	}
+	@Test(dataProvider="invalidPageLengthAndTopMarginAndLinesProvider")
+	public void testRestrictTopMarginAndLinesToPageLength(int pageLength, int topMargin, int lines) {
+		Builder builder = createHandlerBuilder().setTopMargin(topMargin).setLinesPerPage(lines)
+				.setPageLength(pageLength);
 		expectThrows(IllegalStateException.class, () -> builder.build());
 	}
 }
