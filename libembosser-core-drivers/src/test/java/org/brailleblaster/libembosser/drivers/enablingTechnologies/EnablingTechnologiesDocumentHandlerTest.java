@@ -29,6 +29,7 @@ import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartPageEve
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartSectionEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartVolumeEvent;
 import org.brailleblaster.libembosser.spi.BrlCell;
+import org.brailleblaster.libembosser.spi.MultiSides;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -257,5 +258,39 @@ public class EnablingTechnologiesDocumentHandlerTest {
 		Builder builder = createHandlerBuilder().setTopMargin(topMargin).setLinesPerPage(lines)
 				.setPageLength(pageLength);
 		expectThrows(IllegalStateException.class, () -> builder.build());
+	}
+	@DataProvider(name="duplexModeProvider")
+	public Iterator<Object[]> duplexModeProvider() {
+		List<Object[]> data = new ArrayList<>();
+		List<DocumentEvent> inputEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(",TE/ DOCU;T"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		String outputTemplate = "\u001b@\u001bA@@\u001bK@\u001bW@\u001bi%s\u001bs@\u001bL@\u001bRh\u001bTK\u001bQY,TE/ DOCU;T\f";
+		data.add(new Object[] {createHandlerBuilder(), MultiSides.INTERPOINT, inputEvents, String.format(outputTemplate, "@")});
+		data.add(new Object[] {createHandlerBuilder(), MultiSides.P1ONLY, inputEvents, String.format(outputTemplate, "A")});
+		data.add(new Object[] {createHandlerBuilder(), MultiSides.P2ONLY, inputEvents, String.format(outputTemplate, "B")});
+		return data.iterator();
+	}
+	@Test(dataProvider="duplexModeProvider")
+	public void testDuplexMode(Builder builder, MultiSides sides, List<DocumentEvent> events, String expected) {
+		EnablingTechnologiesDocumentHandler handler = builder.setDuplex(sides).build();
+		for (DocumentEvent event: events) {
+			handler.onEvent(event);
+		}
+		String actual = null;
+		try {
+			actual = handler.asByteSource().asCharSource(Charsets.US_ASCII).read();
+		} catch(IOException e) {
+			fail("Problem reading from handler");
+		}
+		assertEquals(actual, expected);
+	}
+	@DataProvider(name="invalidDuplexModeProvider")
+	public Iterator<Object[]> invalidDuplexModeProvider() {
+		Builder builder = createHandlerBuilder();
+		List<MultiSides> excludeSides = ImmutableList.of(MultiSides.INTERPOINT, MultiSides.P1ONLY, MultiSides.P2ONLY);
+		return Arrays.stream(MultiSides.values()).filter(s -> !excludeSides.contains(s)).map(s -> new Object[] {builder, s}).iterator();
+	}
+	@Test(dataProvider="invalidDuplexModeProvider")
+	public void testInvalidDuplexModeThrowsException(Builder builder, MultiSides sides) {
+		expectThrows(IllegalArgumentException.class, () -> builder.setDuplex(sides));
 	}
 }

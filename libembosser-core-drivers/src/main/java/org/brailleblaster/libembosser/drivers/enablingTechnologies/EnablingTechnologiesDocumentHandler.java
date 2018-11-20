@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import org.brailleblaster.libembosser.drivers.generic.GenericTextDocumentHandler;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler;
 import org.brailleblaster.libembosser.spi.BrlCell;
+import org.brailleblaster.libembosser.spi.MultiSides;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteSource;
@@ -21,9 +22,10 @@ public class EnablingTechnologiesDocumentHandler implements DocumentHandler {
 		private int linesPerPage = 25;
 		private int copies = 1;
 		private int pageLength = 11;
+		private char duplex = '@';
 		
 		public EnablingTechnologiesDocumentHandler build() {
-			return new EnablingTechnologiesDocumentHandler(leftMargin, cellsPerLine, topMargin, pageLength, linesPerPage, copies);
+			return new EnablingTechnologiesDocumentHandler(leftMargin, cellsPerLine, topMargin, pageLength, linesPerPage, (byte)duplex, copies);
 		}
 
 		public Builder setCellsPerLine(int cellsPerLine) {
@@ -60,6 +62,23 @@ public class EnablingTechnologiesDocumentHandler implements DocumentHandler {
 			this.pageLength = inches;
 			return this;
 		}
+
+		public Builder setDuplex(MultiSides sides) {
+			switch(sides) {
+			case INTERPOINT:
+				this.duplex = '@';
+				break;
+			case P1ONLY:
+				this.duplex = 'A';
+				break;
+			case P2ONLY:
+				this.duplex = 'B';
+				break;
+			default:
+				throw new IllegalArgumentException("Side must be one of INTERPOINT, P1ONLY or P2ONLY but was " + sides);
+			}
+			return this;
+		}
 	}
 	
 	private static final byte[] NUMBER_MAPPING = new byte[] { '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
@@ -77,7 +96,7 @@ public class EnablingTechnologiesDocumentHandler implements DocumentHandler {
 	private BrlCell cell = BrlCell.NLS;
 	private ByteSource headerSource;
 	private GenericTextDocumentHandler handler;
-	private EnablingTechnologiesDocumentHandler(int leftMargin, int cellsPerLine, int topMargin, int pageLength, int linesPerPage, int copies) {
+	private EnablingTechnologiesDocumentHandler(int leftMargin, int cellsPerLine, int topMargin, int pageLength, int linesPerPage, byte duplex, int copies) {
 		final int totalLines = topMargin + linesPerPage;
 		final int maxLines = cell.getLinesForHeight(new BigDecimal(pageLength).multiply(new BigDecimal("25.4")));
 		checkState(isNumberArgValid(totalLines) && totalLines <= maxLines, "The sum of top margin and lines per page must be less than %s which is the maximum for page length %s, topMargin=^s, linesPerPage=%s, total=%s", maxLines, pageLength, topMargin, linesPerPage, totalLines);
@@ -94,7 +113,7 @@ public class EnablingTechnologiesDocumentHandler implements DocumentHandler {
 		headerOutput.write(new byte[] {0x1b, 'A', '@', '@'}); // Set Braille tables
 		headerOutput.write(new byte[] {0x1b, 'K', '@'}); // Set 6-dot mode
 		headerOutput.write(new byte[] {0x1b, 'W', '@'}); // Line wrapping
-		headerOutput.write(new byte[] {0x1b, 'i', '@'}); // Interpoint mode
+		headerOutput.write(new byte[] {0x1b, 'i', duplex}); // Interpoint mode
 		headerOutput.write(new byte[] {0x1b, 's', '@'}); // Braille cell type
 		headerOutput.write(new byte[] {0x1b, 'L', NUMBER_MAPPING[leftMargin]}); // Set left margin
 		headerOutput.write(new byte[] {0x1b, 'R', NUMBER_MAPPING[cellsPerLine]}); // Set cells per line
