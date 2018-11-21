@@ -8,7 +8,7 @@ import java.util.EnumSet;
 import javax.print.PrintService;
 
 import org.brailleblaster.libembosser.drivers.utils.BaseTextEmbosser;
-import org.brailleblaster.libembosser.drivers.utils.CopyInputStream;
+import org.brailleblaster.libembosser.drivers.utils.DocumentParser;
 import org.brailleblaster.libembosser.spi.BrlCell;
 import org.brailleblaster.libembosser.spi.DocumentFormat;
 import org.brailleblaster.libembosser.spi.EmbossException;
@@ -18,8 +18,6 @@ import org.brailleblaster.libembosser.spi.MultiSides;
 import org.brailleblaster.libembosser.spi.Rectangle;
 import org.brailleblaster.libembosser.spi.Version;
 import org.w3c.dom.Document;
-
-import com.google.common.io.FileBackedOutputStream;
 
 public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 	// When a number is needed as a argument, rather than sending the number in
@@ -108,30 +106,6 @@ public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 	private final static Version API_VERSION = new Version(1, 0);
 	private boolean interpoint;
 
-	private static Command getCellCommand(BrlCell cell) {
-		Command cmd;
-		switch (cell) {
-		case UK:
-		case AUSTRALIAN:
-		case MARBURG_MEDIUM:
-			cmd = Command.CELL_MARBURG_MEDIUM;
-			break;
-		case CALIFORNIA_SIGN:
-			cmd = Command.CELL_CALIFORNIA_SIGN;
-			break;
-		case JUMBO:
-			cmd = Command.CELL_JUMBO;
-			break;
-		case SMALL_ENGLISH:
-			cmd = Command.CELL_PETITE;
-			break;
-		default:
-			cmd = Command.CELL_LIBRARY_OF_CONGRESS;
-			break;
-		}
-		return cmd;
-	}
-
 	public EnablingTechnologiesEmbosser(String id, String model, Rectangle maxPaper, Rectangle minPaper, boolean interpoint) {
 		super(id, "Enabling Technologies", model, maxPaper, minPaper);
 		this.interpoint = interpoint;
@@ -163,9 +137,8 @@ public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 		BigDecimal[] heightInInches = paper.getHeight().divideAndRemainder(new BigDecimal("25.4"));
 		// The enabling Technologies embossers need paper height in whole inches
 		// To ensure all lines fit, it must be rounded up if there is any fractional part
-		// Allow a tolerance of 0.5mm
+		// Due to possible errors in conversion between mm and inches, allow 0.5mm
 		int paperHeight = heightInInches[1].compareTo(new BigDecimal("0.5")) > 0 ? heightInInches[0].intValue() + 1 : heightInInches[0].intValue();
-		int linesPerPage = cell.getLinesForHeight(paper.getHeight());
 		
 		// Calculate the margins
 		Margins margins = props.getMargins();
@@ -178,36 +151,21 @@ public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 		if (BigDecimal.ZERO.compareTo(margins.getTop()) < 0) {
 			topMargin = cell.getLinesForHeight(margins.getTop());
 		}
+		int linesPerPage = cell.getLinesForHeight(paper.getHeight().subtract(margins.getTop()).subtract(margins.getBottom()));
 		MultiSides sides = props.getSides();
-		Command interpointCmd;
-		switch(sides) {
-		case INTERPOINT:
-			interpointCmd = Command.INTERPOINT_ON;
-			break;
-		case P1ONLY:
-			interpointCmd = Command.INTERPOINT_P1;
-			break;
-		case P2ONLY:
-			interpointCmd = Command.INTERPOINT_P2;
-			break;
-			default:
-				// Question what should really the default be when we do not recognise the value
-				interpointCmd = Command.INTERPOINT_ON;
+		EnablingTechnologiesDocumentHandler.Builder builder = new EnablingTechnologiesDocumentHandler.Builder().setLeftMargin(leftMargin).setCellsPerLine(rightMargin).setPageLength(paperHeight).setLinesPerPage(linesPerPage).setTopMargin(topMargin).setCopies(props.getCopies());
+		if (EnablingTechnologiesDocumentHandler.supportedDuplexModes().contains(sides)) {
+			builder.setDuplex(sides);
 		}
+		if (EnablingTechnologiesDocumentHandler.supportedCellTypes().contains(cell)) {
+			builder.setCell(cell);
+		}
+		EnablingTechnologiesDocumentHandler handler = builder.build();
+		DocumentParser parser = new DocumentParser();
 		// Max memory buffer of 10MB, otherwise fallback to file.
-		try(FileBackedOutputStream os = new FileBackedOutputStream(10485760)) {
-			os.write(Command.RESTART_EMBOSSER.getBytes());
-			os.write(Command.CHARSET.getBytes(0, 0));
-			os.write(Command.DOTS_MODE_6.getBytes());
-			os.write(Command.LINE_WRAP_OFF.getBytes());
-			os.write(interpointCmd.getBytes());
-			os.write(getCellCommand(cell).getBytes());
-			os.write(Command.LEFT_MARGIN.getBytes(leftMargin));
-			os.write(Command.RIGHT_MARGIN.getBytes(rightMargin));
-			os.write(Command.PAGE_LENGTH.getBytes(paperHeight));
-			os.write(Command.LINES_PER_PAGE.getBytes(linesPerPage));
-			copyContent(is, os, topMargin, 0);
-			CopyInputStream embosserStream = new CopyInputStream(os.asByteSource(), props.getCopies());
+		try {
+			parser.parseBrf(is, handler);
+			InputStream embosserStream = handler.asByteSource().openBufferedStream();
 			return embossStream(embosserDevice, embosserStream);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

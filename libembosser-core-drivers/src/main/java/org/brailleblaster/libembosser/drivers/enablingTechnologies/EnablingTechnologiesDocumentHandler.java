@@ -11,6 +11,7 @@ import org.brailleblaster.libembosser.spi.BrlCell;
 import org.brailleblaster.libembosser.spi.MultiSides;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.io.ByteArrayDataOutput;
@@ -103,13 +104,20 @@ public class EnablingTechnologiesDocumentHandler implements DocumentHandler {
 	private static void checkNumberArgument(int cellsPerLine) {
 		checkArgument(isNumberArgValid(cellsPerLine), "Argument not in valid range, must be between %s and %s but is %s", 0, NUMBER_MAPPING.length - 1, cellsPerLine);
 	}
+	
+	public static ImmutableSet<MultiSides> supportedDuplexModes() {
+		return DUPLEX_MAPPING.keySet();
+	}
+	public static ImmutableSet<BrlCell> supportedCellTypes() {
+		return CELL_MAPPING.keySet();
+	}
 
 	private ByteSource headerSource;
 	private GenericTextDocumentHandler handler;
 	private EnablingTechnologiesDocumentHandler(int leftMargin, int cellsPerLine, int topMargin, int pageLength, int linesPerPage, BrlCell cell, MultiSides duplex, int copies) {
 		final int totalLines = topMargin + linesPerPage;
 		final int maxLines = cell.getLinesForHeight(new BigDecimal(pageLength).multiply(new BigDecimal("25.4")));
-		checkState(isNumberArgValid(totalLines) && totalLines <= maxLines, "The sum of top margin and lines per page must be less than %s which is the maximum for page length %s, topMargin=^s, linesPerPage=%s, total=%s", maxLines, pageLength, topMargin, linesPerPage, totalLines);
+		checkState(isNumberArgValid(totalLines) && totalLines <= maxLines, "The sum of top margin and lines per page must be less than %s which is the maximum for page length %s, topMargin=%s, linesPerPage=%s, total=%s", maxLines, pageLength, topMargin, linesPerPage, totalLines);
 		this.handler = new GenericTextDocumentHandler.Builder()
 				.setLeftMargin(0)
 				.setCellsPerLine(cellsPerLine)
