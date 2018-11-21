@@ -288,7 +288,7 @@ public class EnablingTechnologiesDocumentHandlerTest {
 	@DataProvider(name="invalidDuplexModeProvider")
 	public Iterator<Object[]> invalidDuplexModeProvider() {
 		Builder builder = createHandlerBuilder();
-		List<MultiSides> excludeSides = ImmutableList.of(MultiSides.INTERPOINT, MultiSides.P1ONLY, MultiSides.P2ONLY);
+		ImmutableSet<MultiSides> excludeSides = Sets.immutableEnumSet(MultiSides.INTERPOINT, MultiSides.P1ONLY, MultiSides.P2ONLY);
 		return Arrays.stream(MultiSides.values()).filter(s -> !excludeSides.contains(s)).map(s -> new Object[] {builder, s}).iterator();
 	}
 	@Test(dataProvider="invalidDuplexModeProvider")
