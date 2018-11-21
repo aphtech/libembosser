@@ -36,6 +36,8 @@ import org.testng.annotations.Test;
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
 
 public class EnablingTechnologiesDocumentHandlerTest {
@@ -292,5 +294,41 @@ public class EnablingTechnologiesDocumentHandlerTest {
 	@Test(dataProvider="invalidDuplexModeProvider")
 	public void testInvalidDuplexModeThrowsException(Builder builder, MultiSides sides) {
 		expectThrows(IllegalArgumentException.class, () -> builder.setDuplex(sides));
+	}
+	@DataProvider(name="cellTypeProvider")
+	public Iterator<Object[]> cellTypeProvider() {
+		List<Object[]> data = new ArrayList<>();
+		List<DocumentEvent> inputEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(",TE/ DOCU;T"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		String outputTemplate = "\u001b@\u001bA@@\u001bK@\u001bW@\u001bi@\u001bs%s\u001bL@\u001bRh\u001bTT\u001bQY,TE/ DOCU;T\f";
+		data.add(new Object[] {createHandlerBuilder().setPageLength(20), BrlCell.NLS, inputEvents, String.format(outputTemplate, "@")});
+		data.add(new Object[] {createHandlerBuilder().setPageLength(20), BrlCell.CALIFORNIA_SIGN, inputEvents, String.format(outputTemplate, "A")});
+		data.add(new Object[] {createHandlerBuilder().setPageLength(20), BrlCell.JUMBO, inputEvents, String.format(outputTemplate, "B")});
+		data.add(new Object[] {createHandlerBuilder().setPageLength(20), BrlCell.ENHANCED_LINE_SPACING, inputEvents, String.format(outputTemplate, "C")});
+		data.add(new Object[] {createHandlerBuilder().setPageLength(20), BrlCell.MARBURG_MEDIUM, inputEvents, String.format(outputTemplate, "H")});
+		return data.iterator();
+	}
+	@Test(dataProvider="cellTypeProvider")
+	public void testSetCellType(Builder builder, BrlCell cell, List<DocumentEvent> events, String expected) {
+		EnablingTechnologiesDocumentHandler handler = builder.setCell(cell).build();
+		for (DocumentEvent event: events) {
+			handler.onEvent(event);
+		}
+		String actual = null;
+		try {
+			actual = handler.asByteSource().asCharSource(Charsets.US_ASCII).read();
+		} catch(IOException e) {
+			fail("Problem reading from handler");
+		}
+		assertEquals(actual, expected);
+	}
+	@DataProvider(name="invalidCellTypeProvider")
+	public Iterator<Object[]> invalidCellTypeProvider() {
+		Builder builder = createHandlerBuilder();
+		ImmutableSet<BrlCell> excludeCells = Sets.immutableEnumSet(BrlCell.NLS, BrlCell.CALIFORNIA_SIGN, BrlCell.JUMBO, BrlCell.ENHANCED_LINE_SPACING, BrlCell.MARBURG_MEDIUM);
+		return Arrays.stream(BrlCell.values()).filter(c -> !excludeCells.contains(c)).map(c -> new Object[] {builder, c}).iterator();
+	}
+	@Test(dataProvider="invalidCellTypeProvider")
+	public void testInvalidCellTypeThrowsException(Builder builder, BrlCell cell) {
+		expectThrows(IllegalArgumentException.class, () -> builder.setCell(cell));
 	}
 }
