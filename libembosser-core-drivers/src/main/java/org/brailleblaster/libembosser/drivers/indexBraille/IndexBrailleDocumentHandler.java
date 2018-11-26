@@ -9,6 +9,7 @@ import org.brailleblaster.libembosser.drivers.utils.DocumentHandler;
 import org.brailleblaster.libembosser.spi.MultiSides;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.Streams;
 import com.google.common.io.ByteSource;
 
 public class IndexBrailleDocumentHandler implements DocumentHandler {
@@ -95,7 +96,7 @@ public class IndexBrailleDocumentHandler implements DocumentHandler {
 				.setLinesPerPage(linesPerPage)
 				.setCopies(1) // Our header will provide the copies escape sequence, so no data duplication needed.
 				.build();
-		String paperParam = paperSize.stream().mapToObj(v -> String.format("PA%d,", v)).findFirst().orElse("");
+		String paperParam = Streams.stream(paperSize).mapToObj(v -> String.format("PA%d,", v)).findFirst().orElse("");
 		String headerString = String.format("\u001bDBT0,MC%d,DP%d,%sBI%d,CH%d,TM%d,LP%d;", copies, paperMode, paperParam, leftMargin, cellsPerLine, topMargin, linesPerPage);
 		header = ByteSource.wrap(headerString.getBytes(Charsets.US_ASCII));
 	}
