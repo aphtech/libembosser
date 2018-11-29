@@ -124,6 +124,9 @@ public class DocumentParserTest {
 		expectedEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2820\u281e\u2811\u280c\u2800\u2819\u2815\u2809"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		input = this.getClass().getResourceAsStream("basic_document.pef");
 		data.add(new Object[] {input, expectedEvents});
+		expectedEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2820\u281e\u2811\u280c\u2800\u2819\u2815\u2809"), new EndLineEvent(), new StartLineEvent(), new BrailleEvent("\u2800\u280e\u2811\u2809\u2815\u281d\u2819\u2800\u2807\u2814\u2811"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		input = this.getClass().getResourceAsStream("multi_line.pef");
+		data.add(new Object[] {input, expectedEvents});
 		return data.iterator();
 	}
 	@Test(dataProvider="pefProvider")
