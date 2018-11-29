@@ -13,6 +13,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.BrailleEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.DocumentEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndDocumentEvent;
@@ -30,12 +34,39 @@ import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartVolumeE
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.ValueOption;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 
 public class DocumentParserTest {
+	private void assertEqualEvents(List<DocumentEvent> expectedEvents, final List<DocumentEvent> actualEvents) {
+		assertEquals(actualEvents.size(), expectedEvents.size(), "Not got the expected number of events");
+		for (int i = 0; i < expectedEvents.size(); ++i) {
+			DocumentEvent expectedEvent = expectedEvents.get(i);
+			DocumentEvent actualEvent = actualEvents.get(i);
+			// Are the events the same type
+			assertEquals(actualEvent.getClass(), expectedEvent.getClass(), "Not expected event type");
+			if (expectedEvent instanceof OptionEvent) {
+				// Check the event has same options
+				Set<? extends Option> actualOptions = ((OptionEvent)actualEvent).getOptions();
+				Set<? extends Option> expectedOptions = ((OptionEvent)expectedEvent).getOptions();
+				assertEquals(actualOptions.size(), expectedOptions.size(), "Not got the expected number of options on the event");
+				for (Option expectedOption: expectedOptions) {
+					// Check there is an option of the same type
+					Optional<? extends Option> actualOption = actualOptions.stream().filter(o -> o.getClass().equals(expectedOption.getClass())).findFirst();
+					assertTrue(actualOption.isPresent());
+					if (expectedOption instanceof ValueOption) {
+						assertEquals(((ValueOption<?>)actualOption.get()).getValue(), ((ValueOption<?>)expectedOption).getValue());
+					}
+				}
+			} else if (expectedEvent instanceof BrailleEvent) {
+				assertEquals(((BrailleEvent)actualEvent).getBraille(), ((BrailleEvent)expectedEvent).getBraille(), "Braille is not expected Braille.");
+			}
+		}
+	}
 	@DataProvider(name="brfProvider")
 	public Iterator<Object[]> brfProvider() {
 		List<Object[]> data = new ArrayList<>();
@@ -81,28 +112,49 @@ public class DocumentParserTest {
 		} catch (IOException e) {
 			fail("Problem parsing the BRF", e);
 		}
-		assertEquals(actualEvents.size(), expectedEvents.size(), "Not got the expected number of events");
-		for (int i = 0; i < expectedEvents.size(); ++i) {
-			DocumentEvent expectedEvent = expectedEvents.get(i);
-			DocumentEvent actualEvent = actualEvents.get(i);
-			// Are the events the same type
-			assertEquals(actualEvent.getClass(), expectedEvent.getClass(), "Not expected event type");
-			if (expectedEvent instanceof OptionEvent) {
-				// Check the event has same options
-				Set<? extends Option> actualOptions = ((OptionEvent)actualEvent).getOptions();
-				Set<? extends Option> expectedOptions = ((OptionEvent)expectedEvent).getOptions();
-				assertEquals(actualOptions.size(), expectedOptions.size(), "Not got the expected number of options on the event");
-				for (Option expectedOption: expectedOptions) {
-					// Check there is an option of the same type
-					Optional<? extends Option> actualOption = actualOptions.stream().filter(o -> o.getClass().equals(expectedOption.getClass())).findFirst();
-					assertTrue(actualOption.isPresent());
-					if (expectedOption instanceof ValueOption) {
-						assertEquals(((ValueOption<?>)actualOption.get()).getValue(), ((ValueOption<?>)expectedOption).getValue());
-					}
-				}
-			} else if (expectedEvent instanceof BrailleEvent) {
-				assertEquals(((BrailleEvent)actualEvent).getBraille(), ((BrailleEvent)expectedEvent).getBraille(), "Braille is not expected Braille.");
-			}
+		assertEqualEvents(expectedEvents, actualEvents);
+	}
+	
+	@DataProvider(name="pefProvider")
+	public Iterator<Object[]> pefProvider() {
+		List<Object[]> data = new ArrayList<>();
+		ImmutableList<DocumentEvent> expectedEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		InputStream input = this.getClass().getResourceAsStream("minimal.pef");
+		data.add(new Object[] {input, expectedEvents});
+		expectedEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2820\u281e\u2811\u280c\u2800\u2819\u2815\u2809"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		input = this.getClass().getResourceAsStream("basic_document.pef");
+		data.add(new Object[] {input, expectedEvents});
+		return data.iterator();
+	}
+	@Test(dataProvider="pefProvider")
+	public void testParsePef(InputStream input, List<DocumentEvent> expectedEvents) {
+		DocumentParser parser = new DocumentParser();
+		final List<DocumentEvent> actualEvents = new ArrayList<>();
+		try {
+			parser.parsePef(input, e -> actualEvents.add(e));
+		} catch (IOException | SAXException e) {
+			fail("Problem reading the PEF", e);
 		}
+		assertEqualEvents(expectedEvents, actualEvents);
+	}
+	
+	@Test(dataProvider="pefProvider")
+	public void testParsePefDom(InputStream input, List<DocumentEvent> expectedEvents) {
+		DocumentParser parser = new DocumentParser();
+		final List<DocumentEvent> actualEvents = new ArrayList<>();
+		try {
+			final DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+			docBuilderFactory.setNamespaceAware(true);
+			DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
+			Document inputDoc = docBuilder.parse(input);
+			parser.parsePef(inputDoc, e -> actualEvents.add(e));
+		} catch (IOException e) {
+			fail("Problem reading the PEF", e);
+		} catch (SAXException e) {
+			fail("Problem parsing XML", e);
+		} catch (ParserConfigurationException e) {
+			fail("Problem creating XML parser", e);
+		}
+		assertEqualEvents(expectedEvents, actualEvents);
 	}
 }
