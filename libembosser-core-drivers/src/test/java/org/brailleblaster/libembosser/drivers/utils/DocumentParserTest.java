@@ -130,6 +130,12 @@ public class DocumentParserTest {
 		expectedEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2820\u281e\u2811\u280c\u2800\u2819\u2815\u2809"), new EndLineEvent(), new StartLineEvent(), new BrailleEvent("\u2800\u280e\u2811\u2809\u2815\u281d\u2819\u2800\u2807\u2814\u2811"), new EndLineEvent(), new EndPageEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2820\u2801\u281d\u2815\u282e\u2817\u2800\u280f\u2801\u281b\u2811"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		input = this.getClass().getResourceAsStream("multi_page.pef");
 		data.add(new Object[] {input, expectedEvents});
+		expectedEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2820\u281e\u2811\u280c\u2800\u2819\u2815\u2809"), new EndLineEvent(), new StartLineEvent(), new BrailleEvent("\u2800\u280e\u2811\u2809\u2815\u281d\u2819\u2800\u2807\u2814\u2811"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2820\u2801\u281d\u2815\u282e\u2817\u2800\u280f\u2801\u281b\u2811"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		input = this.getClass().getResourceAsStream("multi_section.pef");
+		data.add(new Object[] {input, expectedEvents});
+		expectedEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2820\u281e\u2811\u280c\u2800\u2819\u2815\u2809"), new EndLineEvent(), new StartLineEvent(), new BrailleEvent("\u2800\u280e\u2811\u2809\u2815\u281d\u2819\u2800\u2807\u2814\u2811"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2820\u2801\u281d\u2815\u282e\u2817\u2800\u280f\u2801\u281b\u2811"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		input = this.getClass().getResourceAsStream("multi_volume.pef");
+		data.add(new Object[] {input, expectedEvents});
 		return data.iterator();
 	}
 	@Test(dataProvider="pefProvider")
