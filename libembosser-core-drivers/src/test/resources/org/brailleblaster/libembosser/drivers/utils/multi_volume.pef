@@ -17,7 +17,7 @@
 				</page>
 			</section>
 		</volume>
-		<volume cols="38" duplex="false" rowgap="0" rows="24">
+		<volume cols="38" duplex="true" rowgap="0" rows="24">
 			<section>
 				<page>
 					<row>&#x2820;&#x2801;&#x281d;&#x2815;&#x282e;&#x2817;&#x2800;&#x280f;&#x2801;&#x281b;&#x2811;</row>

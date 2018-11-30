@@ -8,6 +8,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -33,6 +35,8 @@ import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.Streams;
+import com.google.common.primitives.Ints;
 
 public class DocumentParser {
 	
@@ -163,7 +167,10 @@ public class DocumentParser {
 					handler.onEvent(new StartDocumentEvent());
 					break;
 				case VOLUME:
-					handler.onEvent(new StartVolumeEvent());
+					Optional<DocumentHandler.CellsPerLine>cols = Optional.ofNullable(((Element) node).getAttribute("cols")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new DocumentHandler.CellsPerLine(v));
+					Optional<DocumentHandler.Duplex> duplex = Optional.ofNullable(((Element) node).getAttribute("duplex")).map(v -> v.toLowerCase()).flatMap(v -> v.equals("true")? Optional.of(new DocumentHandler.Duplex(true)) : v.equals("false")? Optional.of(new DocumentHandler.Duplex(false)) : Optional.empty());
+					Set<DocumentHandler.VolumeOption> options = Streams.concat(Streams.stream(cols), Streams.stream(duplex)).collect(Collectors.toSet());
+					handler.onEvent(new StartVolumeEvent(options));
 					break;
 				case SECTION:
 					handler.onEvent(new StartSectionEvent());;
