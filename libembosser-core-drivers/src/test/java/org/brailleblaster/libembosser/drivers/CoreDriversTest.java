@@ -18,7 +18,6 @@ import javax.print.StreamPrintService;
 import javax.print.StreamPrintServiceFactory;
 
 import org.brailleblaster.libembosser.EmbosserService;
-import org.brailleblaster.libembosser.spi.DocumentFormat;
 import org.brailleblaster.libembosser.spi.EmbossException;
 import org.brailleblaster.libembosser.spi.EmbossProperties;
 import org.brailleblaster.libembosser.spi.IEmbosser;
@@ -172,7 +171,7 @@ public class CoreDriversTest {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		StreamPrintService sps = factory.getPrintService(out);
 		try(InputStream in = new ByteArrayInputStream(input.getBytes(Charsets.US_ASCII))) {
-			embosser.emboss(sps, in, DocumentFormat.BRF, props);
+			embosser.embossBrf(sps, in, props);
 		} catch (EmbossException e) {
 			fail("Unexpected exception whilst embossing", e);
 		} catch (IOException e) {

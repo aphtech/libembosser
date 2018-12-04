@@ -5,14 +5,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.OptionalInt;
 
 import org.brailleblaster.libembosser.drivers.generic.GenericTextDocumentHandler;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler;
+import org.brailleblaster.libembosser.drivers.utils.DocumentToByteSourceHandler;
 import org.brailleblaster.libembosser.spi.MultiSides;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Streams;
 import com.google.common.io.ByteSource;
 
-public class IndexBrailleDocumentHandler implements DocumentHandler {
+public class IndexBrailleDocumentHandler implements DocumentToByteSourceHandler {
 	public static class Builder {
 		private int leftMargin = 0;
 		private int topMargin = 0;
@@ -104,6 +104,7 @@ public class IndexBrailleDocumentHandler implements DocumentHandler {
 	public void onEvent(DocumentEvent event) {
 		textHandler.onEvent(event);
 	}
+	@Override
 	public ByteSource asByteSource() {
 		return ByteSource.concat(header, textHandler.asByteSource());
 	}

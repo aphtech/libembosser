@@ -39,6 +39,24 @@ import com.google.common.collect.Streams;
 import com.google.common.primitives.Ints;
 
 public class DocumentParser {
+	public static class ParseException extends Exception {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -2233072119599883441L;
+		public ParseException() {
+			super();
+		}
+		public ParseException(String msg) {
+			super(msg);
+		}
+		public ParseException(Throwable cause) {
+			super(cause);
+		}
+		public ParseException(String msg, Throwable cause) {
+			super(msg, cause);
+		}
+	}
 	
 	private final static DocumentBuilder docBuilder;
 	static {
@@ -55,9 +73,9 @@ public class DocumentParser {
 	 * 
 	 * @param input The InputStream of the BRF.
 	 * @param handler The handler to recieve document events.
-	 * @throws IOException Thrown when there is a problem reading the input stream. Should this happen then the handler probably will not be in the READY state and so cannot be reused without being reset.
+	 * @throws ParseException Thrown when there is a problem reading the input stream. Should this happen then the handler probably will not be in the READY state and so cannot be reused without being reset.
 	 */
-	public void parseBrf(InputStream input, DocumentHandler handler) throws IOException {
+	public void parseBrf(InputStream input, DocumentHandler handler) throws ParseException {
 		InputStream bufferedInput = new BufferedInputStream(input);
 		ByteArrayOutputStream lineBuffer = new ByteArrayOutputStream(100);
 		int newLines = 0;
@@ -68,40 +86,44 @@ public class DocumentParser {
 		handler.onEvent(new StartSectionEvent());;
 		handler.onEvent(new StartPageEvent());;
 		int readByte;
-		while ((readByte = bufferedInput.read()) >= 0) {
-			switch(readByte) {
-			case '\f':
-				newLines =0;
-				++newPages;
-				createLineEvents(handler, lineBuffer);
-				break;
-			case '\n':
-				if (prevByte != '\r') {
+		try {
+			while ((readByte = bufferedInput.read()) >= 0) {
+				switch(readByte) {
+				case '\f':
+					newLines =0;
+					++newPages;
+					createLineEvents(handler, lineBuffer);
+					break;
+				case '\n':
+					if (prevByte != '\r') {
+						++newLines;
+						createLineEvents(handler, lineBuffer);
+					}
+					break;
+				case '\r':
 					++newLines;
 					createLineEvents(handler, lineBuffer);
+					break;
+				default:
+					while (newPages > 0) {
+						handler.onEvent(new EndPageEvent());
+						handler.onEvent(new StartPageEvent());
+						--newPages;
+					}
+					while (newLines > 1) {
+						handler.onEvent(new StartLineEvent());
+						handler.onEvent(new EndLineEvent());
+						--newLines;
+					}
+					newLines = 0;
+					lineBuffer.write(readByte);
 				}
-				break;
-			case '\r':
-				++newLines;
-				createLineEvents(handler, lineBuffer);
-				break;
-			default:
-				while (newPages > 0) {
-					handler.onEvent(new EndPageEvent());
-					handler.onEvent(new StartPageEvent());
-					--newPages;
-				}
-				while (newLines > 1) {
-					handler.onEvent(new StartLineEvent());
-					handler.onEvent(new EndLineEvent());
-					--newLines;
-				}
-				newLines = 0;
-				lineBuffer.write(readByte);
+				prevByte = readByte;
 			}
-			prevByte = readByte;
+			createLineEvents(handler, lineBuffer);
+		} catch (IOException e) {
+			throw new ParseException(e);
 		}
-		createLineEvents(handler, lineBuffer);
 		handler.onEvent(new EndPageEvent());;
 		handler.onEvent(new EndSectionEvent());;
 		handler.onEvent(new EndVolumeEvent());;
@@ -118,8 +140,12 @@ public class DocumentParser {
 		lineBuffer.reset();
 	}
 
-	public void parsePef(InputStream input, DocumentHandler handler) throws IOException, SAXException {
-		parsePef(docBuilder.parse(input), handler);
+	public void parsePef(InputStream input, DocumentHandler handler) throws ParseException {
+		try {
+			parsePef(docBuilder.parse(input), handler);
+		} catch (SAXException | IOException e) {
+			throw new ParseException(e);
+		}
 	}
 
 	public void parsePef(Document inputDoc, DocumentHandler handler) {
@@ -169,7 +195,9 @@ public class DocumentParser {
 				case VOLUME:
 					Optional<DocumentHandler.CellsPerLine>cols = Optional.ofNullable(((Element) node).getAttribute("cols")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new DocumentHandler.CellsPerLine(v));
 					Optional<DocumentHandler.Duplex> duplex = Optional.ofNullable(((Element) node).getAttribute("duplex")).map(v -> v.toLowerCase()).flatMap(v -> v.equals("true")? Optional.of(new DocumentHandler.Duplex(true)) : v.equals("false")? Optional.of(new DocumentHandler.Duplex(false)) : Optional.empty());
-					Set<DocumentHandler.VolumeOption> options = Streams.concat(Streams.stream(cols), Streams.stream(duplex)).collect(Collectors.toSet());
+					Optional<DocumentHandler.RowGap>rowGap = Optional.ofNullable(((Element) node).getAttribute("rowgap")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new DocumentHandler.RowGap(v));
+					Optional<DocumentHandler.LinesPerPage>rows = Optional.ofNullable(((Element) node).getAttribute("rows")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new DocumentHandler.LinesPerPage(v));
+					Set<DocumentHandler.VolumeOption> options = Streams.concat(Streams.stream(cols), Streams.stream(duplex), Streams.stream(rowGap),  Streams.stream(rows)).collect(Collectors.toSet());
 					handler.onEvent(new StartVolumeEvent(options));
 					break;
 				case SECTION:

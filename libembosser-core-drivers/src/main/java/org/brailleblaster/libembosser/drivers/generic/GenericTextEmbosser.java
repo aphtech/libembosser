@@ -1,16 +1,13 @@
 package org.brailleblaster.libembosser.drivers.generic;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
-import java.util.EnumSet;
 
 import javax.print.PrintService;
 
 import org.brailleblaster.libembosser.drivers.utils.BaseTextEmbosser;
 import org.brailleblaster.libembosser.drivers.utils.DocumentParser;
 import org.brailleblaster.libembosser.spi.BrlCell;
-import org.brailleblaster.libembosser.spi.DocumentFormat;
 import org.brailleblaster.libembosser.spi.EmbossException;
 import org.brailleblaster.libembosser.spi.EmbossProperties;
 import org.brailleblaster.libembosser.spi.Margins;
@@ -33,11 +30,8 @@ public class GenericTextEmbosser extends BaseTextEmbosser {
 		return API_VERSION;
 	}
 
-	@Override
-	public boolean emboss(PrintService embosserDevice, InputStream is, DocumentFormat format, EmbossProperties embossProperties) throws EmbossException {
-		if (!getSupportedDocumentFormats().contains(format)) {
-			throw new EmbossException("Driver does not support the document format");
-		}
+	
+	private GenericTextDocumentHandler createHandler(EmbossProperties embossProperties) {
 		BrlCell cell = embossProperties.getCellType();
 		Rectangle paper = embossProperties.getPaper();
 		if (paper == null) {
@@ -59,20 +53,9 @@ public class GenericTextEmbosser extends BaseTextEmbosser {
 			leftMarginCells = cell.getCellsForWidth(leftMargin);
 		}
 		GenericTextDocumentHandler handler = new GenericTextDocumentHandler.Builder().setTopMargin(topMarginCells).setLeftMargin(leftMarginCells).setCopies(embossProperties.getCopies()).setCellsPerLine(cellsPerLine).setLinesPerPage(linesPerPage).build();
-		DocumentParser parser = new DocumentParser();
-		try {
-			parser.parseBrf(is, handler);
-			InputStream embosserStream = handler.asByteSource().openStream();
-			return embossStream(embosserDevice, embosserStream);
-		} catch (IOException e) {
-			return false;
-		}
+		return handler;
 	}
 
-	@Override
-	public EnumSet<DocumentFormat> getSupportedDocumentFormats() {
-		return EnumSet.of(DocumentFormat.BRF);
-	}
 	@Override
 	public boolean supportsInterpoint() {
 		// For now just say all generic embossers do not support interpoint.
@@ -80,11 +63,23 @@ public class GenericTextEmbosser extends BaseTextEmbosser {
 		return false;
 	}
 	@Override
-	public boolean emboss(PrintService printer, Document pef, EmbossProperties props) throws EmbossException {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean embossPef(PrintService embosserDevice, Document pef, EmbossProperties props) throws EmbossException {
+		DocumentParser parser = new DocumentParser();
+		return emboss(embosserDevice, pef, parser::parsePef, createHandler(props));
 	}
 	private BigDecimal getValidMargin(BigDecimal margin) {
 		return BigDecimal.ZERO.compareTo(margin) < 0 ? margin : BigDecimal.ZERO;
+	}
+	@Override
+	public boolean embossPef(PrintService embosserDevice, InputStream pef, EmbossProperties embossProperties)
+			throws EmbossException {
+		DocumentParser parser = new DocumentParser();
+		return emboss(embosserDevice, pef, parser::parsePef, createHandler(embossProperties));
+	}
+	@Override
+	public boolean embossBrf(PrintService embosserDevice, InputStream brf, EmbossProperties embossProperties)
+			throws EmbossException {
+		DocumentParser parser = new DocumentParser();
+		return emboss(embosserDevice, brf, parser::parseBrf, createHandler(embossProperties));
 	}
 }

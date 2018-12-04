@@ -2,7 +2,6 @@ package org.brailleblaster.libembosser.drivers.indexBraille;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.EnumSet;
@@ -14,13 +13,13 @@ import javax.print.PrintService;
 import org.brailleblaster.libembosser.drivers.utils.BaseTextEmbosser;
 import org.brailleblaster.libembosser.drivers.utils.DocumentParser;
 import org.brailleblaster.libembosser.spi.BrlCell;
-import org.brailleblaster.libembosser.spi.DocumentFormat;
 import org.brailleblaster.libembosser.spi.EmbossException;
 import org.brailleblaster.libembosser.spi.EmbossProperties;
 import org.brailleblaster.libembosser.spi.Margins;
 import org.brailleblaster.libembosser.spi.MultiSides;
 import org.brailleblaster.libembosser.spi.Rectangle;
 import org.brailleblaster.libembosser.spi.Version;
+import org.w3c.dom.Document;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -46,19 +45,11 @@ public class IndexBrailleEmbosser extends BaseTextEmbosser {
 		return API_VERSION;
 	}
 	@Override
-	public EnumSet<DocumentFormat> getSupportedDocumentFormats() {
-		return EnumSet.of(DocumentFormat.BRF);
-	}
-	@Override
 	public boolean supportsInterpoint() {
 		return supportedSides.stream().anyMatch(e -> e.isDoubleSide());
 	}
-	@Override
-	public boolean emboss(PrintService embosserDevice, InputStream is, DocumentFormat format,
-			EmbossProperties embossProperties) throws EmbossException {
-		if (!getSupportedDocumentFormats().contains(format)) {
-			throw new EmbossException("Unsupported document format.");
-		}
+	
+	private IndexBrailleDocumentHandler createHandler(EmbossProperties embossProperties) {
 		Margins margins = embossProperties.getMargins();
 		if (margins == null) {
 			margins = Margins.NO_MARGINS;
@@ -112,13 +103,7 @@ public class IndexBrailleEmbosser extends BaseTextEmbosser {
 				.setCopies(embossProperties.getCopies())
 				.setPaper(paperSizeValue != null? OptionalInt.of(paperSizeValue) : OptionalInt.empty())
 				.build();
-		DocumentParser parser = new DocumentParser();
-		try {
-			parser.parseBrf(is, handler);
-			return embossStream(embosserDevice, handler.asByteSource().openBufferedStream());
-		} catch (IOException e) {
-			throw new RuntimeException("Problem when embossing document", e);
-		}
+		return handler;
 	}
 	/**
 	 * Get the numeric value of the sides mode.
@@ -167,8 +152,20 @@ public class IndexBrailleEmbosser extends BaseTextEmbosser {
 		return MultiSides.P1ONLY;
 	}
 	@Override
-	public boolean emboss(PrintService printer, org.w3c.dom.Document pef, EmbossProperties props) throws EmbossException {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean embossPef(PrintService embosserDevice, Document pef, EmbossProperties embossProperties) throws EmbossException {
+		DocumentParser parser = new DocumentParser();
+		return emboss(embosserDevice, pef, parser::parsePef, createHandler(embossProperties));
+	}
+	@Override
+	public boolean embossPef(PrintService embosserDevice, InputStream pef, EmbossProperties embossProperties)
+			throws EmbossException {
+		DocumentParser parser = new DocumentParser();
+		return emboss(embosserDevice, pef, parser::parsePef, createHandler(embossProperties));
+	}
+	@Override
+	public boolean embossBrf(PrintService embosserDevice, InputStream brf, EmbossProperties embossProperties)
+			throws EmbossException {
+		DocumentParser parser = new DocumentParser();
+		return emboss(embosserDevice, brf, parser::parseBrf, createHandler(embossProperties));
 	}
 }

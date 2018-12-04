@@ -9,13 +9,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler;
+import org.brailleblaster.libembosser.drivers.utils.DocumentToByteSourceHandler;
 import org.brailleblaster.libembosser.utils.BrailleMapper;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.ByteSource;
 
-public class GenericTextDocumentHandler implements DocumentHandler {
+public class GenericTextDocumentHandler implements DocumentToByteSourceHandler {
 	private static void throwInvalidStateException(DocumentEvent event, String state) {
 		throw new IllegalStateException(String.format("Invalid event %s for state %s", event.getClass().getName(), state));
 	}
@@ -259,6 +259,7 @@ public class GenericTextDocumentHandler implements DocumentHandler {
 	private void write(byte[] bytes) {
 		output.write(bytes, 0, bytes.length);
 	}
+	@Override
 	public ByteSource asByteSource() {
 		final byte[] outputBytes = output.toByteArray();
 		List<ByteSource> sources = new ArrayList<>();

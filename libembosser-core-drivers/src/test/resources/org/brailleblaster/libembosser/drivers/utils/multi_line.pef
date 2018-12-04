@@ -7,7 +7,7 @@
 		</meta>
 	</head>
 	<body>
-		<volume cols="40" duplex="false" rowgap="0" rows="25">
+		<volume cols="40" duplex="false" rowgap="2" rows="25">
 			<section>
 				<page>
 					<row>&#x2820;&#x281e;&#x2811;&#x280c;&#x2800;&#x2819;&#x2815;&#x2809;</row>

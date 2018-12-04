@@ -6,7 +6,7 @@ import static com.google.common.base.Preconditions.checkState;
 import java.math.BigDecimal;
 
 import org.brailleblaster.libembosser.drivers.generic.GenericTextDocumentHandler;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler;
+import org.brailleblaster.libembosser.drivers.utils.DocumentToByteSourceHandler;
 import org.brailleblaster.libembosser.spi.BrlCell;
 import org.brailleblaster.libembosser.spi.MultiSides;
 
@@ -18,7 +18,7 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteSource;
 import com.google.common.io.ByteStreams;
 
-public class EnablingTechnologiesDocumentHandler implements DocumentHandler {
+public class EnablingTechnologiesDocumentHandler implements DocumentToByteSourceHandler {
 	public static class Builder {
 		private int leftMargin = 0;
 		private int cellsPerLine = 40;
@@ -145,6 +145,7 @@ public class EnablingTechnologiesDocumentHandler implements DocumentHandler {
 		handler.onEvent(event);
 	}
 	
+	@Override
 	public ByteSource asByteSource() {
 		return ByteSource.concat(headerSource, handler.asByteSource());
 	}

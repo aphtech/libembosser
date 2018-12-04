@@ -68,10 +68,12 @@ public interface IEmbosser {
 	 * 
 	 * @return An enum set of the document formats this embosser driver can emboss.
 	 */
-	public EnumSet<DocumentFormat> getSupportedDocumentFormats();
+	@Deprecated
+	public default EnumSet<DocumentFormat> getSupportedDocumentFormats() {
+		return EnumSet.of(DocumentFormat.BRF, DocumentFormat.PEF);
+	}
 	/**
 	 * Emboss a PEF document.
-	 * 
 	 * 
 	 * @param printer The printer device for the embosser.
 	 * @param pef The PEF document to emboss.
@@ -79,10 +81,33 @@ public interface IEmbosser {
 	 * @return Whether the document was successfully embossed.
 	 * @throws EmbossException When there is a problem embossing.
 	 */
-	public boolean emboss(PrintService printer, Document pef, EmbossProperties props) throws EmbossException;
+	public boolean embossPef(PrintService embosserDevice, Document pef, EmbossProperties embossProperties) throws EmbossException;
+	
+	/**
+	 * Emboss a PEF document.
+	 * 
+	 * @param printer The printer device for the embosser.
+	 * @param pef The PEF document to emboss.
+	 * @param props The emboss properties such as number of copies, etc.
+	 * @return Whether the document was successfully embossed.
+	 * @throws EmbossException When there is a problem embossing.
+	 */
+	public boolean embossPef(PrintService embosserDevice, InputStream pef, EmbossProperties embossProperties) throws EmbossException;
+	/**
+	 * Emboss a BRF document.
+	 * 
+	 * @param embosserDevice The printer device representing the embosser.
+	 * @param brf The BRF to emboss.
+	 * @param embossProperties Additional properties for the emboss job.
+	 * @return Whether the document was successfully embossed.
+	 * @throws EmbossException When there is a problem embossing the document.
+	 */
+	public boolean embossBrf(PrintService embosserDevice, InputStream brf, EmbossProperties embossProperties) throws EmbossException;
 
 	/**
-	 * Emboss a BRF using this driver.
+	 * Emboss a document using this driver.
+	 * 
+	 * Applications should now prefer the embossPef and embossBrf methods instead.
 	 * 
 	 * @param embosserDevice
 	 *            The print service which will send data to the embosser.
@@ -95,8 +120,17 @@ public interface IEmbosser {
 	 * @return Whether the document was successfully embossed.
 	 * @throws EmbossException when there is a problem embossing.
 	 */
-	public boolean emboss(PrintService embosserDevice, InputStream is, DocumentFormat format,
-			EmbossProperties embossProperties) throws EmbossException;
+	@Deprecated
+	public default boolean emboss(PrintService embosserDevice, InputStream is, DocumentFormat format, EmbossProperties embossProperties) throws EmbossException {
+		boolean result = false;
+		switch(format) {
+		case BRF:
+			result = embossBrf(embosserDevice, is, embossProperties);
+		case PEF:
+			result = embossPef(embosserDevice, is, embossProperties);
+		}
+		return result;
+	}
 
 	/**
 	 * Get the maximum paper which can be handled by the embosser.

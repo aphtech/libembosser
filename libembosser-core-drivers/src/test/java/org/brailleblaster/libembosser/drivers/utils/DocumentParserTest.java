@@ -32,6 +32,7 @@ import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartPageEve
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartSectionEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartVolumeEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.ValueOption;
+import org.brailleblaster.libembosser.drivers.utils.DocumentParser.ParseException;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
@@ -110,7 +111,7 @@ public class DocumentParserTest {
 		final List<DocumentEvent> actualEvents = new ArrayList<>();
 		try {
 			parser.parseBrf(input, e -> actualEvents.add(e));
-		} catch (IOException e) {
+		} catch (ParseException e) {
 			fail("Problem parsing the BRF", e);
 		}
 		assertEqualEvents(expectedEvents, actualEvents);
@@ -119,22 +120,22 @@ public class DocumentParserTest {
 	@DataProvider(name="pefProvider")
 	public Iterator<Object[]> pefProvider() {
 		List<Object[]> data = new ArrayList<>();
-		ImmutableList<DocumentEvent> expectedEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(ImmutableSet.of(new DocumentHandler.CellsPerLine(40), new DocumentHandler.Duplex(false))), new StartSectionEvent(), new StartPageEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		ImmutableList<DocumentEvent> expectedEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(ImmutableSet.of(new DocumentHandler.CellsPerLine(40), new DocumentHandler.Duplex(false), new DocumentHandler.RowGap(0), new DocumentHandler.LinesPerPage(25))), new StartSectionEvent(), new StartPageEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		InputStream input = this.getClass().getResourceAsStream("minimal.pef");
 		data.add(new Object[] {input, expectedEvents});
-		expectedEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(ImmutableSet.of(new DocumentHandler.CellsPerLine(40), new DocumentHandler.Duplex(false))), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2820\u281e\u2811\u280c\u2800\u2819\u2815\u2809"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		expectedEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(ImmutableSet.of(new DocumentHandler.CellsPerLine(40), new DocumentHandler.Duplex(false), new DocumentHandler.RowGap(0), new DocumentHandler.LinesPerPage(25))), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2820\u281e\u2811\u280c\u2800\u2819\u2815\u2809"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		input = this.getClass().getResourceAsStream("basic_document.pef");
 		data.add(new Object[] {input, expectedEvents});
-		expectedEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(ImmutableSet.of(new DocumentHandler.CellsPerLine(40), new DocumentHandler.Duplex(false))), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2820\u281e\u2811\u280c\u2800\u2819\u2815\u2809"), new EndLineEvent(), new StartLineEvent(), new BrailleEvent("\u2800\u280e\u2811\u2809\u2815\u281d\u2819\u2800\u2807\u2814\u2811"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		expectedEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(ImmutableSet.of(new DocumentHandler.CellsPerLine(40), new DocumentHandler.Duplex(false), new DocumentHandler.RowGap(2), new DocumentHandler.LinesPerPage(25))), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2820\u281e\u2811\u280c\u2800\u2819\u2815\u2809"), new EndLineEvent(), new StartLineEvent(), new BrailleEvent("\u2800\u280e\u2811\u2809\u2815\u281d\u2819\u2800\u2807\u2814\u2811"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		input = this.getClass().getResourceAsStream("multi_line.pef");
 		data.add(new Object[] {input, expectedEvents});
-		expectedEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(ImmutableSet.of(new DocumentHandler.CellsPerLine(40), new DocumentHandler.Duplex(false))), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2820\u281e\u2811\u280c\u2800\u2819\u2815\u2809"), new EndLineEvent(), new StartLineEvent(), new BrailleEvent("\u2800\u280e\u2811\u2809\u2815\u281d\u2819\u2800\u2807\u2814\u2811"), new EndLineEvent(), new EndPageEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2820\u2801\u281d\u2815\u282e\u2817\u2800\u280f\u2801\u281b\u2811"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		expectedEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(ImmutableSet.of(new DocumentHandler.CellsPerLine(40), new DocumentHandler.Duplex(false), new DocumentHandler.RowGap(0), new DocumentHandler.LinesPerPage(25))), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2820\u281e\u2811\u280c\u2800\u2819\u2815\u2809"), new EndLineEvent(), new StartLineEvent(), new BrailleEvent("\u2800\u280e\u2811\u2809\u2815\u281d\u2819\u2800\u2807\u2814\u2811"), new EndLineEvent(), new EndPageEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2820\u2801\u281d\u2815\u282e\u2817\u2800\u280f\u2801\u281b\u2811"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		input = this.getClass().getResourceAsStream("multi_page.pef");
 		data.add(new Object[] {input, expectedEvents});
-		expectedEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(ImmutableSet.of(new DocumentHandler.CellsPerLine(40), new DocumentHandler.Duplex(false))), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2820\u281e\u2811\u280c\u2800\u2819\u2815\u2809"), new EndLineEvent(), new StartLineEvent(), new BrailleEvent("\u2800\u280e\u2811\u2809\u2815\u281d\u2819\u2800\u2807\u2814\u2811"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2820\u2801\u281d\u2815\u282e\u2817\u2800\u280f\u2801\u281b\u2811"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		expectedEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(ImmutableSet.of(new DocumentHandler.CellsPerLine(40), new DocumentHandler.Duplex(false), new DocumentHandler.RowGap(0), new DocumentHandler.LinesPerPage(25))), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2820\u281e\u2811\u280c\u2800\u2819\u2815\u2809"), new EndLineEvent(), new StartLineEvent(), new BrailleEvent("\u2800\u280e\u2811\u2809\u2815\u281d\u2819\u2800\u2807\u2814\u2811"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2820\u2801\u281d\u2815\u282e\u2817\u2800\u280f\u2801\u281b\u2811"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		input = this.getClass().getResourceAsStream("multi_section.pef");
 		data.add(new Object[] {input, expectedEvents});
-		expectedEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(ImmutableSet.of(new DocumentHandler.CellsPerLine(40), new DocumentHandler.Duplex(false))), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2820\u281e\u2811\u280c\u2800\u2819\u2815\u2809"), new EndLineEvent(), new StartLineEvent(), new BrailleEvent("\u2800\u280e\u2811\u2809\u2815\u281d\u2819\u2800\u2807\u2814\u2811"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new StartVolumeEvent(ImmutableSet.of(new DocumentHandler.CellsPerLine(38), new DocumentHandler.Duplex(true))), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2820\u2801\u281d\u2815\u282e\u2817\u2800\u280f\u2801\u281b\u2811"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		expectedEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(ImmutableSet.of(new DocumentHandler.CellsPerLine(40), new DocumentHandler.Duplex(false), new DocumentHandler.RowGap(0), new DocumentHandler.LinesPerPage(25))), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2820\u281e\u2811\u280c\u2800\u2819\u2815\u2809"), new EndLineEvent(), new StartLineEvent(), new BrailleEvent("\u2800\u280e\u2811\u2809\u2815\u281d\u2819\u2800\u2807\u2814\u2811"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new StartVolumeEvent(ImmutableSet.of(new DocumentHandler.CellsPerLine(38), new DocumentHandler.Duplex(true), new DocumentHandler.RowGap(0), new DocumentHandler.LinesPerPage(24))), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2820\u2801\u281d\u2815\u282e\u2817\u2800\u280f\u2801\u281b\u2811"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		input = this.getClass().getResourceAsStream("multi_volume.pef");
 		data.add(new Object[] {input, expectedEvents});
 		return data.iterator();
@@ -145,7 +146,7 @@ public class DocumentParserTest {
 		final List<DocumentEvent> actualEvents = new ArrayList<>();
 		try {
 			parser.parsePef(input, e -> actualEvents.add(e));
-		} catch (IOException | SAXException e) {
+		} catch (ParseException e) {
 			fail("Problem reading the PEF", e);
 		}
 		assertEqualEvents(expectedEvents, actualEvents);
