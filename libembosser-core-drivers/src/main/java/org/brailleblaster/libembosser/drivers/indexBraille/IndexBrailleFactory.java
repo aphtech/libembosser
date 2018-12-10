@@ -7,7 +7,7 @@ import java.util.Locale;
 
 import org.brailleblaster.libembosser.spi.IEmbosser;
 import org.brailleblaster.libembosser.spi.IEmbosserFactory;
-import org.brailleblaster.libembosser.spi.MultiSides;
+import org.brailleblaster.libembosser.spi.Layout;
 import org.brailleblaster.libembosser.spi.PaperSize;
 import org.brailleblaster.libembosser.spi.Rectangle;
 
@@ -15,11 +15,11 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 public class IndexBrailleFactory implements IEmbosserFactory {
-	private static final EnumSet<MultiSides> BASIC_D_SIDES = EnumSet.of(MultiSides.INTERPOINT, MultiSides.P1ONLY, MultiSides.Z_FOLDING_DOUBLE_HORIZONTAL, MultiSides.Z_FOLDING_SINGLE_HORIZONTAL, MultiSides.Z_FOLDING_DOUBLE_VERTICAL, MultiSides.Z_FOLDING_SINGLE_VERTICAL);
-	private static final EnumSet<MultiSides> EVEREST_SIDES = EnumSet.of(MultiSides.INTERPOINT, MultiSides.P1ONLY, MultiSides.SADDLE_STITCH_DOUBLE_SIDED, MultiSides.SADDLE_STITCH_SINGLE_SIDED);
-	private static final EnumSet<MultiSides> BRAILLEBOX_SIDES = EVEREST_SIDES;
-	private static final EnumSet<MultiSides> FANFOLD_SIDES = BASIC_D_SIDES;
-	private static final EnumSet<MultiSides> ENABLING_SIDES = EnumSet.of(MultiSides.INTERPOINT, MultiSides.P1ONLY, MultiSides.Z_FOLDING_DOUBLE_VERTICAL, MultiSides.Z_FOLDING_SINGLE_VERTICAL, MultiSides.Z_FOLDING_DOUBLE_HORIZONTAL, MultiSides.Z_FOLDING_SINGLE_HORIZONTAL);
+	private static final EnumSet<Layout> BASIC_D_SIDES = EnumSet.of(Layout.INTERPOINT, Layout.P1ONLY, Layout.Z_FOLDING_DOUBLE_HORIZONTAL, Layout.Z_FOLDING_SINGLE_HORIZONTAL, Layout.Z_FOLDING_DOUBLE_VERTICAL, Layout.Z_FOLDING_SINGLE_VERTICAL);
+	private static final EnumSet<Layout> EVEREST_SIDES = EnumSet.of(Layout.INTERPOINT, Layout.P1ONLY, Layout.SADDLE_STITCH_DOUBLE_SIDED, Layout.SADDLE_STITCH_SINGLE_SIDED);
+	private static final EnumSet<Layout> BRAILLEBOX_SIDES = EVEREST_SIDES;
+	private static final EnumSet<Layout> FANFOLD_SIDES = BASIC_D_SIDES;
+	private static final EnumSet<Layout> ENABLING_SIDES = EnumSet.of(Layout.INTERPOINT, Layout.P1ONLY, Layout.Z_FOLDING_DOUBLE_VERTICAL, Layout.Z_FOLDING_SINGLE_VERTICAL, Layout.Z_FOLDING_DOUBLE_HORIZONTAL, Layout.Z_FOLDING_SINGLE_HORIZONTAL);
 	private static final Rectangle FOUR_BY_THREE_PAPER = new Rectangle(new BigDecimal("101.6"), new BigDecimal("76.2"));
 	private static final Rectangle TWELVE_AND_HALF_BY_TWENTY_FOUR_PAPER = new Rectangle(new BigDecimal("317.5"), new BigDecimal("609.6"));
 	private static final Rectangle ELEVEN_AND_HALF_BY_ELEVEN_PAPER = PaperSize.BRAILLE_11_5X11.getSize();

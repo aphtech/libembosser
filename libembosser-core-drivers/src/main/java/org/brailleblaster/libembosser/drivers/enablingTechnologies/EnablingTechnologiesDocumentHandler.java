@@ -8,8 +8,7 @@ import java.math.BigDecimal;
 import org.brailleblaster.libembosser.drivers.generic.GenericTextDocumentHandler;
 import org.brailleblaster.libembosser.drivers.utils.DocumentToByteSourceHandler;
 import org.brailleblaster.libembosser.spi.BrlCell;
-import org.brailleblaster.libembosser.spi.MultiSides;
-
+import org.brailleblaster.libembosser.spi.Layout;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -26,7 +25,7 @@ public class EnablingTechnologiesDocumentHandler implements DocumentToByteSource
 		private int linesPerPage = 25;
 		private int copies = 1;
 		private int pageLength = 11;
-		private MultiSides duplex = MultiSides.INTERPOINT;
+		private Layout duplex = Layout.INTERPOINT;
 		private BrlCell cell = BrlCell.NLS;
 		
 		public EnablingTechnologiesDocumentHandler build() {
@@ -68,7 +67,7 @@ public class EnablingTechnologiesDocumentHandler implements DocumentToByteSource
 			return this;
 		}
 
-		public Builder setDuplex(MultiSides sides) {
+		public Builder setDuplex(Layout sides) {
 			if (DUPLEX_MAPPING.containsKey(sides)) {
 				this.duplex = sides;
 			} else {
@@ -91,8 +90,8 @@ public class EnablingTechnologiesDocumentHandler implements DocumentToByteSource
 			BrlCell.NLS, (byte)'@', BrlCell.CALIFORNIA_SIGN, (byte)'A',
 			BrlCell.JUMBO, (byte)'B', BrlCell.ENHANCED_LINE_SPACING, (byte)'C',
 			BrlCell.MARBURG_MEDIUM, (byte)'H'));
-	private static final ImmutableMap<MultiSides, Byte> DUPLEX_MAPPING = Maps.immutableEnumMap(ImmutableMap.of(
-			MultiSides.INTERPOINT, (byte)'@', MultiSides.P1ONLY, (byte)'A', MultiSides.P2ONLY, (byte)'B'));
+	private static final ImmutableMap<Layout, Byte> DUPLEX_MAPPING = Maps.immutableEnumMap(ImmutableMap.of(
+			Layout.INTERPOINT, (byte)'@', Layout.P1ONLY, (byte)'A', Layout.P2ONLY, (byte)'B'));
 	private static final byte[] NUMBER_MAPPING = new byte[] { '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
 			'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '[', '\\', ']', '^', '_', '`', 'a',
 			'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
@@ -105,7 +104,7 @@ public class EnablingTechnologiesDocumentHandler implements DocumentToByteSource
 		checkArgument(isNumberArgValid(cellsPerLine), "Argument not in valid range, must be between %s and %s but is %s", 0, NUMBER_MAPPING.length - 1, cellsPerLine);
 	}
 	
-	public static ImmutableSet<MultiSides> supportedDuplexModes() {
+	public static ImmutableSet<Layout> supportedDuplexModes() {
 		return DUPLEX_MAPPING.keySet();
 	}
 	public static ImmutableSet<BrlCell> supportedCellTypes() {
@@ -114,7 +113,7 @@ public class EnablingTechnologiesDocumentHandler implements DocumentToByteSource
 
 	private ByteSource headerSource;
 	private GenericTextDocumentHandler handler;
-	private EnablingTechnologiesDocumentHandler(int leftMargin, int cellsPerLine, int topMargin, int pageLength, int linesPerPage, BrlCell cell, MultiSides duplex, int copies) {
+	private EnablingTechnologiesDocumentHandler(int leftMargin, int cellsPerLine, int topMargin, int pageLength, int linesPerPage, BrlCell cell, Layout duplex, int copies) {
 		final int totalLines = topMargin + linesPerPage;
 		final int maxLines = cell.getLinesForHeight(new BigDecimal(pageLength).multiply(new BigDecimal("25.4")));
 		checkState(isNumberArgValid(totalLines) && totalLines <= maxLines, "The sum of top margin and lines per page must be less than %s which is the maximum for page length %s, topMargin=%s, linesPerPage=%s, total=%s", maxLines, pageLength, topMargin, linesPerPage, totalLines);

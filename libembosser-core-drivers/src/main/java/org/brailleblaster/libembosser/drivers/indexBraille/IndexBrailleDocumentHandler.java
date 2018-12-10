@@ -6,8 +6,7 @@ import java.util.OptionalInt;
 
 import org.brailleblaster.libembosser.drivers.generic.GenericTextDocumentHandler;
 import org.brailleblaster.libembosser.drivers.utils.DocumentToByteSourceHandler;
-import org.brailleblaster.libembosser.spi.MultiSides;
-
+import org.brailleblaster.libembosser.spi.Layout;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Streams;
 import com.google.common.io.ByteSource;
@@ -45,7 +44,7 @@ public class IndexBrailleDocumentHandler implements DocumentToByteSourceHandler 
 			this.paperMode = mode;
 			return this;
 		}
-		public Builder setPaperMode(MultiSides sides) {
+		public Builder setPaperMode(Layout sides) {
 			switch(sides) {
 			case P1ONLY:
 			case P2ONLY:

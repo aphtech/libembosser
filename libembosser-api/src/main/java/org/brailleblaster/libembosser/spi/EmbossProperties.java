@@ -1,5 +1,13 @@
 package org.brailleblaster.libembosser.spi;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import org.brailleblaster.libembosser.embossing.attribute.BrailleCellType;
+import org.brailleblaster.libembosser.embossing.attribute.Copies;
+import org.brailleblaster.libembosser.embossing.attribute.PaperLayout;
+import org.brailleblaster.libembosser.embossing.attribute.PaperMargins;
+import org.brailleblaster.libembosser.embossing.attribute.PaperSize;
+
 /**
  * Properties for emboss jobs.
  * 
@@ -8,6 +16,7 @@ package org.brailleblaster.libembosser.spi;
  * @author Michael Whapples
  *
  */
+@Deprecated
 public final class EmbossProperties {
 	private final int copies;
 	private final MultiSides sides;
@@ -23,9 +32,9 @@ public final class EmbossProperties {
 	public EmbossProperties(Rectangle paper, Margins margins, BrlCell cellType, int copies, MultiSides sides) {
 		this.paper = paper;
 		this.margins = margins;
-		this.cellType = cellType;
+		this.cellType = checkNotNull(cellType);
 		this.copies = copies;
-		this.sides = sides;
+		this.sides = checkNotNull(sides);
 	}
 	public EmbossProperties copy() {
 		return copy(null, null);
@@ -146,5 +155,18 @@ public final class EmbossProperties {
 		if (sides != other.sides)
 			return false;
 		return true;
+	}
+	public EmbossingAttributeSet toAttributeSet() {
+		EmbossingAttributeSet attributes = new EmbossingAttributeSet();
+		attributes.add(new Copies(getCopies()));
+		attributes.add(new BrailleCellType(getCellType()));
+		attributes.add(new PaperLayout(Layout.valueOf(getSides().name())));
+		if (paper != null) {
+			attributes.add(new PaperSize(paper));
+		}
+		if (margins != null) {
+			attributes.add(new PaperMargins(margins));
+		}
+		return attributes;
 	}
 }

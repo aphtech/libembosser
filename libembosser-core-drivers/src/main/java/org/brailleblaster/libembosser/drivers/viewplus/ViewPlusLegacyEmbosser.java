@@ -7,7 +7,7 @@ import javax.print.PrintService;
 import org.brailleblaster.libembosser.drivers.generic.GenericTextEmbosser;
 import org.brailleblaster.libembosser.drivers.utils.BaseTextEmbosser;
 import org.brailleblaster.libembosser.spi.EmbossException;
-import org.brailleblaster.libembosser.spi.EmbossProperties;
+import org.brailleblaster.libembosser.spi.EmbossingAttributeSet;
 import org.brailleblaster.libembosser.spi.Rectangle;
 import org.brailleblaster.libembosser.spi.Version;
 import org.w3c.dom.Document;
@@ -38,17 +38,17 @@ public class ViewPlusLegacyEmbosser extends BaseTextEmbosser {
 		return false;
 	}
 	@Override
-	public boolean embossPef(PrintService printer, Document pef, EmbossProperties props) throws EmbossException {
-		return delegate.embossPef(printer, pef, props);
+	public void embossPef(PrintService printer, Document pef, EmbossingAttributeSet attributes) throws EmbossException {
+		delegate.embossPef(printer, pef, attributes);
 	}
 	@Override
-	public boolean embossPef(PrintService embosserDevice, InputStream pef, EmbossProperties embossProperties)
+	public void embossPef(PrintService embosserDevice, InputStream pef, EmbossingAttributeSet attributes)
 			throws EmbossException {
-		return delegate.embossPef(embosserDevice, pef, embossProperties);
+		delegate.embossPef(embosserDevice, pef, attributes);
 	}
 	@Override
-	public boolean embossBrf(PrintService embosserDevice, InputStream brf, EmbossProperties embossProperties)
+	public void embossBrf(PrintService embosserDevice, InputStream brf, EmbossingAttributeSet attributes)
 			throws EmbossException {
-		return delegate.embossBrf(embosserDevice, brf, embossProperties);
+		delegate.embossBrf(embosserDevice, brf, attributes);
 	}
 }

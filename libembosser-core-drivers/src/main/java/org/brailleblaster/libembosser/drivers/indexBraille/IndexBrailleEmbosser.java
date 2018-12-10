@@ -6,17 +6,22 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.EnumSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.OptionalInt;
 
 import javax.print.PrintService;
 
 import org.brailleblaster.libembosser.drivers.utils.BaseTextEmbosser;
 import org.brailleblaster.libembosser.drivers.utils.DocumentParser;
+import org.brailleblaster.libembosser.embossing.attribute.Copies;
+import org.brailleblaster.libembosser.embossing.attribute.PaperLayout;
+import org.brailleblaster.libembosser.embossing.attribute.PaperMargins;
+import org.brailleblaster.libembosser.embossing.attribute.PaperSize;
 import org.brailleblaster.libembosser.spi.BrlCell;
 import org.brailleblaster.libembosser.spi.EmbossException;
-import org.brailleblaster.libembosser.spi.EmbossProperties;
+import org.brailleblaster.libembosser.spi.EmbossingAttributeSet;
+import org.brailleblaster.libembosser.spi.Layout;
 import org.brailleblaster.libembosser.spi.Margins;
-import org.brailleblaster.libembosser.spi.MultiSides;
 import org.brailleblaster.libembosser.spi.Rectangle;
 import org.brailleblaster.libembosser.spi.Version;
 import org.w3c.dom.Document;
@@ -25,15 +30,15 @@ import com.google.common.collect.ImmutableMap;
 
 public class IndexBrailleEmbosser extends BaseTextEmbosser {
 	private final int maxCellsPerLine;
-	private final EnumSet<MultiSides> supportedSides;
+	private final EnumSet<Layout> supportedSides;
 	private final Map<Rectangle, Integer> paperSizes;
-	public IndexBrailleEmbosser(String id, String manufacturer, String model, Rectangle maxPaper, Rectangle minPaper, EnumSet<MultiSides> sides) {
+	public IndexBrailleEmbosser(String id, String manufacturer, String model, Rectangle maxPaper, Rectangle minPaper, EnumSet<Layout> sides) {
 		this(id, manufacturer, model, maxPaper, minPaper, 49, sides);
 	}
-	public IndexBrailleEmbosser(String id, String manufacturer, String model, Rectangle maxPaper, Rectangle minPaper, int maxCellsPerLine, EnumSet<MultiSides> sides) {
+	public IndexBrailleEmbosser(String id, String manufacturer, String model, Rectangle maxPaper, Rectangle minPaper, int maxCellsPerLine, EnumSet<Layout> sides) {
 		this(id, manufacturer, model, maxPaper, minPaper, 49, sides, ImmutableMap.of());
 	}
-	public IndexBrailleEmbosser(String id, String manufacturer, String model, Rectangle maxPaper, Rectangle minPaper, int maxCellsPerLine, EnumSet<MultiSides> sides, Map<Rectangle, Integer> paperSizes) {
+	public IndexBrailleEmbosser(String id, String manufacturer, String model, Rectangle maxPaper, Rectangle minPaper, int maxCellsPerLine, EnumSet<Layout> sides, Map<Rectangle, Integer> paperSizes) {
 		super(id, manufacturer, model, maxPaper, minPaper);
 		this.maxCellsPerLine = maxCellsPerLine;
 		supportedSides = sides;
@@ -49,19 +54,12 @@ public class IndexBrailleEmbosser extends BaseTextEmbosser {
 		return supportedSides.stream().anyMatch(e -> e.isDoubleSide());
 	}
 	
-	private IndexBrailleDocumentHandler createHandler(EmbossProperties embossProperties) {
-		Margins margins = embossProperties.getMargins();
-		if (margins == null) {
-			margins = Margins.NO_MARGINS;
-		}
-		Rectangle paper = embossProperties.getPaper();
-		Rectangle maxPaper = getMaximumPaper();
-		// Index V5 embossers allow sending the paper size to the embosser with the PA command
-		// Use null if there is no matching paper size in the predefined list.
-		Integer paperSizeValue = paperSizes.getOrDefault(paper, null);
-		if (paper == null || paper.getWidth().compareTo(maxPaper.getWidth()) > 0 || paper.getHeight().compareTo(maxPaper.getHeight()) > 0) {
-			paper = maxPaper;
-		}
+	private IndexBrailleDocumentHandler createHandler(EmbossingAttributeSet attributes) {
+		// For now assume NLS Braille cell type.
+		BrlCell cell = BrlCell.NLS;
+		Optional<Rectangle> paperOption = Optional.ofNullable(attributes.get(PaperSize.class)).map(v -> ((PaperSize)v).getValue());
+		Margins margins = Optional.ofNullable(attributes.get(PaperMargins.class)).map(v -> ((PaperMargins)v).getValue()).orElse(Margins.NO_MARGINS);
+		Rectangle paper = paperOption.orElse(getMaximumPaper());
 		
 		// Now handle margins
 		BigDecimal leftMargin = margins.getLeft();
@@ -86,24 +84,21 @@ public class IndexBrailleEmbosser extends BaseTextEmbosser {
 		int bindingMargin = BrlCell.NLS.getCellsForWidth(leftMargin);
 		// Get the number of cells per line
 		int cellsPerLine = Math.min(
-				BrlCell.NLS.getCellsForWidth(paper.getWidth().subtract(leftMargin).subtract(rightMargin)),
+				cell.getCellsForWidth(paper.getWidth().subtract(leftMargin).subtract(rightMargin)),
 				maxCellsPerLine);
 		// Index protocol takes top margin in number of lines.
-		int topLines = BrlCell.NLS.getLinesForHeight(topMargin);
+		int topLines = cell.getLinesForHeight(topMargin);
 		// Index protocol requires lines per page to be specified if giving top margin
-		int linesPerPage = BrlCell.NLS.getLinesForHeight(paper.getHeight().subtract(topMargin).subtract(bottomMargin));
-		// Find the int value used for the page layout.
-		int embossPageFormat = getDuplexValue(embossProperties.getSides());
-		IndexBrailleDocumentHandler handler = new IndexBrailleDocumentHandler.Builder()
-				.setLeftMargin(bindingMargin)
+		int linesPerPage = cell.getLinesForHeight(paper.getHeight().subtract(topMargin).subtract(bottomMargin));
+		IndexBrailleDocumentHandler.Builder builder = new IndexBrailleDocumentHandler.Builder();
+		builder.setLeftMargin(bindingMargin)
 				.setCellsPerLine(cellsPerLine)
 				.setTopMargin(topLines)
-				.setLinesPerPage(linesPerPage)
-				.setPaperMode(embossPageFormat)
-				.setCopies(embossProperties.getCopies())
-				.setPaper(paperSizeValue != null? OptionalInt.of(paperSizeValue) : OptionalInt.empty())
-				.build();
-		return handler;
+				.setLinesPerPage(linesPerPage);
+		Optional.ofNullable(attributes.get(PaperLayout.class)).map(v -> ((PaperLayout)v).getValue()).ifPresent(v -> builder.setPaperMode(getDuplexValue(v)));
+		paperOption.map(p -> paperSizes.getOrDefault(paper, null)).ifPresent(p -> builder.setPaper(OptionalInt.of(p)));
+		Optional.ofNullable(attributes.get(Copies.class)).ifPresent(v -> builder.setCopies(((Copies)v).getValue()));
+		return builder.build();
 	}
 	/**
 	 * Get the numeric value of the sides mode.
@@ -111,7 +106,7 @@ public class IndexBrailleEmbosser extends BaseTextEmbosser {
 	 * @param sides The enum value of how to emboss.
 	 * @return The numeric value to pass to the embosser in the dp escape sequence.
 	 */
-	private int getDuplexValue(MultiSides sides) {
+	private int getDuplexValue(Layout sides) {
 		switch(findNearestSupportedSides(sides)) {
 		case INTERPOINT:
 			return 2;
@@ -141,31 +136,31 @@ public class IndexBrailleEmbosser extends BaseTextEmbosser {
 	 * @param sides The requested sides.
 	 * @return The nearest match supported by the embosser.
 	 */
-	private MultiSides findNearestSupportedSides(MultiSides sides) {
+	private Layout findNearestSupportedSides(Layout sides) {
 		if (supportedSides.contains(sides)) {
 			return sides;
 		}
-		if (sides.isDoubleSide() && supportedSides.contains(MultiSides.INTERPOINT)) {
-			return MultiSides.INTERPOINT;
+		if (sides.isDoubleSide() && supportedSides.contains(Layout.INTERPOINT)) {
+			return Layout.INTERPOINT;
 		}
 		// All Index Braille embossers should support P1ONLY, single side
-		return MultiSides.P1ONLY;
+		return Layout.P1ONLY;
 	}
 	@Override
-	public boolean embossPef(PrintService embosserDevice, Document pef, EmbossProperties embossProperties) throws EmbossException {
+	public void embossPef(PrintService embosserDevice, Document pef, EmbossingAttributeSet attributes) throws EmbossException {
 		DocumentParser parser = new DocumentParser();
-		return emboss(embosserDevice, pef, parser::parsePef, createHandler(embossProperties));
+		emboss(embosserDevice, pef, parser::parsePef, createHandler(attributes));
 	}
 	@Override
-	public boolean embossPef(PrintService embosserDevice, InputStream pef, EmbossProperties embossProperties)
+	public void embossPef(PrintService embosserDevice, InputStream pef, EmbossingAttributeSet attributes)
 			throws EmbossException {
 		DocumentParser parser = new DocumentParser();
-		return emboss(embosserDevice, pef, parser::parsePef, createHandler(embossProperties));
+		emboss(embosserDevice, pef, parser::parsePef, createHandler(attributes));
 	}
 	@Override
-	public boolean embossBrf(PrintService embosserDevice, InputStream brf, EmbossProperties embossProperties)
+	public void embossBrf(PrintService embosserDevice, InputStream brf, EmbossingAttributeSet attributes)
 			throws EmbossException {
 		DocumentParser parser = new DocumentParser();
-		return emboss(embosserDevice, brf, parser::parseBrf, createHandler(embossProperties));
+		emboss(embosserDevice, brf, parser::parseBrf, createHandler(attributes));
 	}
 }

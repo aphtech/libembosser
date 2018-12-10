@@ -81,8 +81,22 @@ public interface IEmbosser {
 	 * @return Whether the document was successfully embossed.
 	 * @throws EmbossException When there is a problem embossing.
 	 */
-	public boolean embossPef(PrintService embosserDevice, Document pef, EmbossProperties embossProperties) throws EmbossException;
-	
+	@Deprecated
+	public default boolean embossPef(PrintService embosserDevice, Document pef, EmbossProperties embossProperties) throws EmbossException {
+		EmbossingAttributeSet attributes = embossProperties.toAttributeSet();
+		embossPef(embosserDevice, pef, attributes);
+		// If here then successful.
+		return true;
+	}
+	/**
+	 * Emboss a PEF document.
+	 * 
+	 * @param embosserDevice The printer device of the embosser.
+	 * @param pef The PEF document to emboss.
+	 * @param attributes Additional information about how to emboss the document.
+	 * @throws EmbossException When there is a problem embossing the document.
+	 */
+	public void embossPef(PrintService embosserDevice, Document pef, EmbossingAttributeSet attributes) throws EmbossException;
 	/**
 	 * Emboss a PEF document.
 	 * 
@@ -92,7 +106,22 @@ public interface IEmbosser {
 	 * @return Whether the document was successfully embossed.
 	 * @throws EmbossException When there is a problem embossing.
 	 */
-	public boolean embossPef(PrintService embosserDevice, InputStream pef, EmbossProperties embossProperties) throws EmbossException;
+	@Deprecated
+	public default boolean embossPef(PrintService embosserDevice, InputStream pef, EmbossProperties embossProperties) throws EmbossException {
+		EmbossingAttributeSet attributes = embossProperties.toAttributeSet();
+		embossPef(embosserDevice, pef, attributes);
+		// If here then successful.
+		return true;
+	}
+	/**
+	 * Emboss a PEF document.
+	 * 
+	 * @param embosserDevice The printer device of the embosser.
+	 * @param pef The PEF document to emboss.
+	 * @param attributes Additional information about how to emboss the document.
+	 * @throws EmbossException When there is a problem embossing the document.
+	 */
+	public void embossPef(PrintService embosserDevice, InputStream pef, EmbossingAttributeSet attributes) throws EmbossException;
 	/**
 	 * Emboss a BRF document.
 	 * 
@@ -102,7 +131,22 @@ public interface IEmbosser {
 	 * @return Whether the document was successfully embossed.
 	 * @throws EmbossException When there is a problem embossing the document.
 	 */
-	public boolean embossBrf(PrintService embosserDevice, InputStream brf, EmbossProperties embossProperties) throws EmbossException;
+	@Deprecated
+	public default boolean embossBrf(PrintService embosserDevice, InputStream brf, EmbossProperties embossProperties) throws EmbossException {
+		EmbossingAttributeSet attributes = embossProperties.toAttributeSet();
+		embossBrf(embosserDevice, brf, attributes);
+		// If we get here then must be successful.
+		return true;
+	}
+	/**
+	 * Emboss a BRF document.
+	 * 
+	 * @param embosserDevice The embosser printer device.
+	 * @param brf The BRF to be embossed.
+	 * @param attributes Additional information about how to emboss the document.
+	 * @throws EmbossException When there is a problem embossing the document.
+	 */
+	public void embossBrf(PrintService embosserDevice, InputStream brf, EmbossingAttributeSet attributes) throws EmbossException;
 
 	/**
 	 * Emboss a document using this driver.

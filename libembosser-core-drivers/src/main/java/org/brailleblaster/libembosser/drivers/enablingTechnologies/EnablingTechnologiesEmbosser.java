@@ -2,16 +2,22 @@ package org.brailleblaster.libembosser.drivers.enablingTechnologies;
 
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.util.Optional;
 
 import javax.print.PrintService;
 
 import org.brailleblaster.libembosser.drivers.utils.BaseTextEmbosser;
 import org.brailleblaster.libembosser.drivers.utils.DocumentParser;
+import org.brailleblaster.libembosser.embossing.attribute.BrailleCellType;
+import org.brailleblaster.libembosser.embossing.attribute.Copies;
+import org.brailleblaster.libembosser.embossing.attribute.PaperLayout;
+import org.brailleblaster.libembosser.embossing.attribute.PaperMargins;
+import org.brailleblaster.libembosser.embossing.attribute.PaperSize;
 import org.brailleblaster.libembosser.spi.BrlCell;
 import org.brailleblaster.libembosser.spi.EmbossException;
-import org.brailleblaster.libembosser.spi.EmbossProperties;
+import org.brailleblaster.libembosser.spi.EmbossingAttributeSet;
+import org.brailleblaster.libembosser.spi.Layout;
 import org.brailleblaster.libembosser.spi.Margins;
-import org.brailleblaster.libembosser.spi.MultiSides;
 import org.brailleblaster.libembosser.spi.Rectangle;
 import org.brailleblaster.libembosser.spi.Version;
 import org.w3c.dom.Document;
@@ -30,13 +36,10 @@ public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 		return API_VERSION;
 	}
 
-	private EnablingTechnologiesDocumentHandler createHandler(EmbossProperties props) {
-		// Prepare from embossProperties
-		BrlCell cell = props.getCellType();
-		Rectangle paper = props.getPaper();
-		if (paper == null) {
-			paper = getMaximumPaper();
-		}
+	private EnablingTechnologiesDocumentHandler createHandler(EmbossingAttributeSet attributes) {
+		BrlCell cell = Optional.ofNullable(attributes.get(BrailleCellType.class)).map(v -> ((BrailleCellType)v).getValue()).orElse(BrlCell.NLS);
+		Rectangle paper = Optional.ofNullable(attributes.get(PaperSize.class)).map(v -> ((PaperSize)v).getValue()).orElse(getMaximumPaper());
+		Margins margins = Optional.ofNullable(attributes.get(PaperMargins.class)).map(v -> ((PaperMargins)v).getValue()).orElse(Margins.NO_MARGINS);
 		// Calculate paper height and lines per page.
 		BigDecimal[] heightInInches = paper.getHeight().divideAndRemainder(new BigDecimal("25.4"));
 		// The enabling Technologies embossers need paper height in whole inches
@@ -45,10 +48,6 @@ public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 		int paperHeight = heightInInches[1].compareTo(new BigDecimal("0.5")) > 0 ? heightInInches[0].intValue() + 1 : heightInInches[0].intValue();
 		
 		// Calculate the margins
-		Margins margins = props.getMargins();
-		if (margins == null) {
-			margins = Margins.NO_MARGINS;
-		}
 		int leftMargin = cell.getCellsForWidth(margins.getLeft());
 		int rightMargin = cell.getCellsForWidth(paper.getWidth().subtract(margins.getRight()));
 		int topMargin = 0;
@@ -56,11 +55,10 @@ public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 			topMargin = cell.getLinesForHeight(margins.getTop());
 		}
 		int linesPerPage = cell.getLinesForHeight(paper.getHeight().subtract(margins.getTop()).subtract(margins.getBottom()));
-		MultiSides sides = props.getSides();
-		EnablingTechnologiesDocumentHandler.Builder builder = new EnablingTechnologiesDocumentHandler.Builder().setLeftMargin(leftMargin).setCellsPerLine(rightMargin).setPageLength(paperHeight).setLinesPerPage(linesPerPage).setTopMargin(topMargin).setCopies(props.getCopies());
-		if (EnablingTechnologiesDocumentHandler.supportedDuplexModes().contains(sides)) {
-			builder.setDuplex(sides);
-		}
+		EnablingTechnologiesDocumentHandler.Builder builder = new EnablingTechnologiesDocumentHandler.Builder();
+		Optional.ofNullable(attributes.get(Copies.class)).ifPresent(v -> builder.setCopies(((Copies)v).getValue()));
+		builder.setLeftMargin(leftMargin).setCellsPerLine(rightMargin).setPageLength(paperHeight).setLinesPerPage(linesPerPage).setTopMargin(topMargin);
+		builder.setDuplex(Optional.ofNullable(attributes.get(PaperLayout.class)).map(v -> ((PaperLayout)v).getValue()).filter(EnablingTechnologiesDocumentHandler.supportedDuplexModes()::contains).orElse(Layout.P1ONLY));
 		if (EnablingTechnologiesDocumentHandler.supportedCellTypes().contains(cell)) {
 			builder.setCell(cell);
 		}
@@ -74,23 +72,23 @@ public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 	}
 
 	@Override
-	public boolean embossPef(PrintService embosserDevice, Document pef, EmbossProperties embossProperties) throws EmbossException {
+	public void embossPef(PrintService embosserDevice, Document pef, EmbossingAttributeSet attributes) throws EmbossException {
 		DocumentParser parser = new DocumentParser();
-		return emboss(embosserDevice, pef, parser::parsePef, createHandler(embossProperties));
+		emboss(embosserDevice, pef, parser::parsePef, createHandler(attributes));
 	}
 
 	@Override
-	public boolean embossPef(PrintService embosserDevice, InputStream pef, EmbossProperties embossProperties)
+	public void embossPef(PrintService embosserDevice, InputStream pef, EmbossingAttributeSet attributes)
 			throws EmbossException {
 		DocumentParser parser = new DocumentParser();
-		return emboss(embosserDevice, pef, parser::parsePef, createHandler(embossProperties));
+		emboss(embosserDevice, pef, parser::parsePef, createHandler(attributes));
 	}
 
 	@Override
-	public boolean embossBrf(PrintService embosserDevice, InputStream brf, EmbossProperties embossProperties)
+	public void embossBrf(PrintService embosserDevice, InputStream brf, EmbossingAttributeSet attributes)
 			throws EmbossException {
 		DocumentParser parser = new DocumentParser();
-		return emboss(embosserDevice, brf, parser::parseBrf, createHandler(embossProperties));
+		emboss(embosserDevice, brf, parser::parseBrf, createHandler(attributes));
 	}
 	
 }

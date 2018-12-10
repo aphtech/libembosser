@@ -1,8 +1,8 @@
 package org.brailleblaster.libembosser.drivers.indexBraille;
 
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.fail;
 import static org.testng.Assert.expectThrows;
+import static org.testng.Assert.fail;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartLineEve
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartPageEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartSectionEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartVolumeEvent;
-import org.brailleblaster.libembosser.spi.MultiSides;
+import org.brailleblaster.libembosser.spi.Layout;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -101,15 +101,15 @@ public class IndexBrailleDocumentHandlerTest {
 		// Test the paper format
 		final String basicDocumentOutput = ",A TE/ DOCU;T4\f";
 		final String paperFormatHeader = "\u001bDBT0,MC1,DP%d,BI0,CH40,TM0,LP25;%s";
-		data.add(new Object[] {createHandlerBuilder(), MultiSides.P1ONLY, basicDocumentInput, String.format(paperFormatHeader, 1, basicDocumentOutput)});
-		data.add(new Object[] {createHandlerBuilder(), MultiSides.P2ONLY, basicDocumentInput, String.format(paperFormatHeader, 1, basicDocumentOutput)});
-		data.add(new Object[] {createHandlerBuilder(), MultiSides.INTERPOINT, basicDocumentInput, String.format(paperFormatHeader, 2, basicDocumentOutput)});
-		data.add(new Object[] {createHandlerBuilder(), MultiSides.Z_FOLDING_DOUBLE_HORIZONTAL, basicDocumentInput, String.format(paperFormatHeader, 3, basicDocumentOutput)});
-		data.add(new Object[] {createHandlerBuilder(), MultiSides.SADDLE_STITCH_DOUBLE_SIDED, basicDocumentInput, String.format(paperFormatHeader, 4, basicDocumentOutput)});
-		data.add(new Object[] {createHandlerBuilder(), MultiSides.Z_FOLDING_SINGLE_HORIZONTAL, basicDocumentInput, String.format(paperFormatHeader, 5, basicDocumentOutput)});
-		data.add(new Object[] {createHandlerBuilder(), MultiSides.Z_FOLDING_DOUBLE_VERTICAL, basicDocumentInput, String.format(paperFormatHeader, 6, basicDocumentOutput)});
-		data.add(new Object[] {createHandlerBuilder(), MultiSides.Z_FOLDING_SINGLE_VERTICAL, basicDocumentInput, String.format(paperFormatHeader, 7, basicDocumentOutput)});
-		data.add(new Object[] {createHandlerBuilder(), MultiSides.SADDLE_STITCH_SINGLE_SIDED, basicDocumentInput, String.format(paperFormatHeader, 8, basicDocumentOutput)});
+		data.add(new Object[] {createHandlerBuilder(), Layout.P1ONLY, basicDocumentInput, String.format(paperFormatHeader, 1, basicDocumentOutput)});
+		data.add(new Object[] {createHandlerBuilder(), Layout.P2ONLY, basicDocumentInput, String.format(paperFormatHeader, 1, basicDocumentOutput)});
+		data.add(new Object[] {createHandlerBuilder(), Layout.INTERPOINT, basicDocumentInput, String.format(paperFormatHeader, 2, basicDocumentOutput)});
+		data.add(new Object[] {createHandlerBuilder(), Layout.Z_FOLDING_DOUBLE_HORIZONTAL, basicDocumentInput, String.format(paperFormatHeader, 3, basicDocumentOutput)});
+		data.add(new Object[] {createHandlerBuilder(), Layout.SADDLE_STITCH_DOUBLE_SIDED, basicDocumentInput, String.format(paperFormatHeader, 4, basicDocumentOutput)});
+		data.add(new Object[] {createHandlerBuilder(), Layout.Z_FOLDING_SINGLE_HORIZONTAL, basicDocumentInput, String.format(paperFormatHeader, 5, basicDocumentOutput)});
+		data.add(new Object[] {createHandlerBuilder(), Layout.Z_FOLDING_DOUBLE_VERTICAL, basicDocumentInput, String.format(paperFormatHeader, 6, basicDocumentOutput)});
+		data.add(new Object[] {createHandlerBuilder(), Layout.Z_FOLDING_SINGLE_VERTICAL, basicDocumentInput, String.format(paperFormatHeader, 7, basicDocumentOutput)});
+		data.add(new Object[] {createHandlerBuilder(), Layout.SADDLE_STITCH_SINGLE_SIDED, basicDocumentInput, String.format(paperFormatHeader, 8, basicDocumentOutput)});
 		
 		data.add(new Object[] {createHandlerBuilder(), Integer.valueOf(1), basicDocumentInput, String.format(paperFormatHeader, 1, basicDocumentOutput)});
 		data.add(new Object[] {createHandlerBuilder(), Integer.valueOf(2), basicDocumentInput, String.format(paperFormatHeader, 2, basicDocumentOutput)});
@@ -124,8 +124,8 @@ public class IndexBrailleDocumentHandlerTest {
 	@Test(dataProvider="paperModeProvider")
 	public void testPaperModeSetting(IndexBrailleDocumentHandler.Builder builder, Object paperMode, List<DocumentEvent> eventsInput, String expected) {
 		IndexBrailleDocumentHandler handler = null;
-		if (paperMode instanceof MultiSides) {
-			handler = builder.setPaperMode((MultiSides)paperMode).build();
+		if (paperMode instanceof Layout) {
+			handler = builder.setPaperMode((Layout)paperMode).build();
 		} else if (paperMode instanceof Integer) {
 			handler = builder.setPaperMode(((Integer)paperMode).intValue()).build();
 		} else {
