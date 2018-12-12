@@ -8,8 +8,10 @@ import javax.print.PrintService;
 
 import org.brailleblaster.libembosser.drivers.utils.BaseTextEmbosser;
 import org.brailleblaster.libembosser.drivers.utils.DocumentParser;
+import org.brailleblaster.libembosser.drivers.utils.PageFilterByteSourceHandler;
 import org.brailleblaster.libembosser.embossing.attribute.BrailleCellType;
 import org.brailleblaster.libembosser.embossing.attribute.Copies;
+import org.brailleblaster.libembosser.embossing.attribute.PageRanges;
 import org.brailleblaster.libembosser.embossing.attribute.PaperLayout;
 import org.brailleblaster.libembosser.embossing.attribute.PaperMargins;
 import org.brailleblaster.libembosser.embossing.attribute.PaperSize;
@@ -36,7 +38,7 @@ public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 		return API_VERSION;
 	}
 
-	private EnablingTechnologiesDocumentHandler createHandler(EmbossingAttributeSet attributes) {
+	private PageFilterByteSourceHandler createHandler(EmbossingAttributeSet attributes) {
 		BrlCell cell = Optional.ofNullable(attributes.get(BrailleCellType.class)).map(v -> ((BrailleCellType)v).getValue()).orElse(BrlCell.NLS);
 		Rectangle paper = Optional.ofNullable(attributes.get(PaperSize.class)).map(v -> ((PaperSize)v).getValue()).orElse(getMaximumPaper());
 		Margins margins = Optional.ofNullable(attributes.get(PaperMargins.class)).map(v -> ((PaperMargins)v).getValue()).orElse(Margins.NO_MARGINS);
@@ -63,7 +65,8 @@ public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 			builder.setCell(cell);
 		}
 		EnablingTechnologiesDocumentHandler handler = builder.build();
-		return handler;
+		PageRanges pages = Optional.ofNullable((PageRanges)(attributes.get(PageRanges.class))).orElseGet(() -> new PageRanges());
+		return new PageFilterByteSourceHandler(handler, pages);
 	}
 
 	@Override

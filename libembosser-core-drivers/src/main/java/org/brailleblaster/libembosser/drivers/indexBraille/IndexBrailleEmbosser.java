@@ -13,7 +13,9 @@ import javax.print.PrintService;
 
 import org.brailleblaster.libembosser.drivers.utils.BaseTextEmbosser;
 import org.brailleblaster.libembosser.drivers.utils.DocumentParser;
+import org.brailleblaster.libembosser.drivers.utils.PageFilterByteSourceHandler;
 import org.brailleblaster.libembosser.embossing.attribute.Copies;
+import org.brailleblaster.libembosser.embossing.attribute.PageRanges;
 import org.brailleblaster.libembosser.embossing.attribute.PaperLayout;
 import org.brailleblaster.libembosser.embossing.attribute.PaperMargins;
 import org.brailleblaster.libembosser.embossing.attribute.PaperSize;
@@ -54,7 +56,7 @@ public class IndexBrailleEmbosser extends BaseTextEmbosser {
 		return supportedSides.stream().anyMatch(e -> e.isDoubleSide());
 	}
 	
-	private IndexBrailleDocumentHandler createHandler(EmbossingAttributeSet attributes) {
+	private PageFilterByteSourceHandler createHandler(EmbossingAttributeSet attributes) {
 		// For now assume NLS Braille cell type.
 		BrlCell cell = BrlCell.NLS;
 		Optional<Rectangle> paperOption = Optional.ofNullable(attributes.get(PaperSize.class)).map(v -> ((PaperSize)v).getValue());
@@ -98,7 +100,9 @@ public class IndexBrailleEmbosser extends BaseTextEmbosser {
 		Optional.ofNullable(attributes.get(PaperLayout.class)).map(v -> ((PaperLayout)v).getValue()).ifPresent(v -> builder.setPaperMode(getDuplexValue(v)));
 		paperOption.map(p -> paperSizes.getOrDefault(paper, null)).ifPresent(p -> builder.setPaper(OptionalInt.of(p)));
 		Optional.ofNullable(attributes.get(Copies.class)).ifPresent(v -> builder.setCopies(((Copies)v).getValue()));
-		return builder.build();
+		IndexBrailleDocumentHandler handler = builder.build();
+		PageRanges pages = Optional.ofNullable((PageRanges)(attributes.get(PageRanges.class))).orElseGet(() -> new PageRanges());
+		return new PageFilterByteSourceHandler(handler, pages);
 	}
 	/**
 	 * Get the numeric value of the sides mode.
