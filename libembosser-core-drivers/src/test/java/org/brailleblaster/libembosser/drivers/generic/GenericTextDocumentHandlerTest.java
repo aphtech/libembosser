@@ -86,6 +86,11 @@ public class GenericTextDocumentHandlerTest {
 		data.add(new Object[] {createHandlerBuilder().setCopies(3).setLinesPerPage(30).build(), multiPageDocumentInput, Strings.repeat(Arrays.stream(multiPageDocumentOutputStrings).map(s -> s.concat("\f")).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString(), 3).getBytes(Charsets.US_ASCII)});
 		// Tests for adding/padding margins
 		data.add(new Object[] {createHandlerBuilder().setCopies(11).setLeftMargin(3).setTopMargin(2).build(), multiPageDocumentInput, Strings.repeat(Arrays.stream(multiPageDocumentOutputStrings).map(s -> String.format("\r\n\r\n   %s%s", s, "\f")).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString(), 11).getBytes(Charsets.US_ASCII)});
+		// Test that duplex volumes start on a right page
+		final ImmutableList<DocumentEvent> duplexVolumesEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2801"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2803"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		final String duplexVolumesString = "VOL #A\f\fVOL #B\f\f";
+		GenericTextDocumentHandler.Builder builder = createHandlerBuilder().setInterpoint(true);
+		data.add(new Object[] {builder.build(), duplexVolumesEvents, duplexVolumesString.getBytes(Charsets.US_ASCII)});
 		return data.iterator();
 	}
 	@Test(dataProvider="handlerProvider")

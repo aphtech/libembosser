@@ -138,6 +138,7 @@ public class GenericTextDocumentHandler implements DocumentToByteSourceHandler {
 	private byte[] newPageBytes;
 	private final boolean bottomPadding;
 	private int pendingLines;
+	private boolean rightPage = true;
 
 	private GenericTextDocumentHandler(int leftMargin, int topMargin, int cellsPerLine, int linesPerPage, int copies, boolean bottomPadding, boolean interpoint) {
 		defaultCellsPerLine = cellsPerLine;
@@ -167,6 +168,8 @@ public class GenericTextDocumentHandler implements DocumentToByteSourceHandler {
 		// Push the options to the stack
 		optionStack.push(options);;
 		stateStack.push(HandlerStates.DOCUMENT);
+		// Documents always start with a right page
+		rightPage = true;
 	}
 	
 	public void endDocument() {
@@ -190,9 +193,19 @@ public class GenericTextDocumentHandler implements DocumentToByteSourceHandler {
 	public void startSection(Set<SectionOption> options) {
 		optionStack.push(options);
 		stateStack.push(HandlerStates.SECTION);
+		// Ensure the section starts on a right page if duplex
+		ensureRightPage();
+	}
+
+	private void ensureRightPage() {
+		if ((!rightPage) && optionStack.stream().flatMap(o -> o.stream()).filter(o -> o instanceof Duplex).map(o -> ((Duplex)o).getValue()).findFirst().orElse(defaultInterpoint)) {
+			rightPage = !rightPage;
+			write(newPageBytes);
+		}
 	}
 	
 	public void endSection() {
+		ensureRightPage();
 		optionStack.pop();
 		stateStack.pop();
 	}
@@ -214,6 +227,7 @@ public class GenericTextDocumentHandler implements DocumentToByteSourceHandler {
 			write(repeatedBytes(newLineBytes, pendingLines));
 		}
 		write(newPageBytes);
+		rightPage = !rightPage;
 		optionStack.pop();
 		stateStack.pop();
 	}
