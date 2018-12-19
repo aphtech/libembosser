@@ -60,7 +60,7 @@ public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 		EnablingTechnologiesDocumentHandler.Builder builder = new EnablingTechnologiesDocumentHandler.Builder();
 		Optional.ofNullable(attributes.get(Copies.class)).ifPresent(v -> builder.setCopies(((Copies)v).getValue()));
 		builder.setLeftMargin(leftMargin).setCellsPerLine(rightMargin).setPageLength(paperHeight).setLinesPerPage(linesPerPage).setTopMargin(topMargin);
-		builder.setPapermode(Optional.ofNullable(attributes.get(PaperLayout.class)).map(v -> ((PaperLayout)v).getValue()).filter(EnablingTechnologiesDocumentHandler.supportedDuplexModes()::contains).orElse(Layout.P1ONLY));
+		builder.setPapermode(Optional.ofNullable(attributes.get(PaperLayout.class)).filter(v -> interpoint).map(v -> ((PaperLayout)v).getValue()).filter(EnablingTechnologiesDocumentHandler.supportedDuplexModes()::contains).orElse(Layout.P1ONLY));
 		if (EnablingTechnologiesDocumentHandler.supportedCellTypes().contains(cell)) {
 			builder.setCell(cell);
 		}
