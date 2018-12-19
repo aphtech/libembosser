@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.BrailleEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.DocumentEvent;
+import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.Duplex;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndDocumentEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndLineEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndPageEvent;
@@ -30,6 +31,7 @@ import org.testng.annotations.Test;
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 public class GenericTextDocumentHandlerTest {
 	private GenericTextDocumentHandler.Builder createHandlerBuilder() {
@@ -87,10 +89,23 @@ public class GenericTextDocumentHandlerTest {
 		// Tests for adding/padding margins
 		data.add(new Object[] {createHandlerBuilder().setCopies(11).setLeftMargin(3).setTopMargin(2).build(), multiPageDocumentInput, Strings.repeat(Arrays.stream(multiPageDocumentOutputStrings).map(s -> String.format("\r\n\r\n   %s%s", s, "\f")).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString(), 11).getBytes(Charsets.US_ASCII)});
 		// Test that duplex volumes start on a right page
-		final ImmutableList<DocumentEvent> duplexVolumesEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2801"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2803"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
-		final String duplexVolumesString = "VOL #A\f\fVOL #B\f\f";
+		final ImmutableList<DocumentEvent> duplexVolumesEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2801"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2803"), new EndLineEvent(), new EndPageEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u280f\u2801\u281b\u2811\u2800\u283c\u2803"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2809"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		final String duplexVolumesString = "VOL #A\f\fVOL #B\fPAGE #B\fVOL #C\f\f";
 		GenericTextDocumentHandler.Builder builder = createHandlerBuilder().setInterpoint(true);
 		data.add(new Object[] {builder.build(), duplexVolumesEvents, duplexVolumesString.getBytes(Charsets.US_ASCII)});
+		// Test duplex sections
+		final ImmutableList<DocumentEvent> duplexSectionsEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2801"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2803"), new EndLineEvent(), new EndPageEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u280f\u2801\u281b\u2811\u2800\u283c\u2803"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2809"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		final String duplexSectionsString = "VOL #A\f\fVOL #B\fPAGE #B\fVOL #C\f\f";
+		builder = createHandlerBuilder().setInterpoint(true);
+		data.add(new Object[] {builder.build(), duplexSectionsEvents, duplexSectionsString.getBytes(Charsets.US_ASCII)});
+		// Test mixed duplex documents.
+		final ImmutableList<DocumentEvent> mixedDuplexEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(ImmutableSet.of(new Duplex(true))), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2801"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new StartSectionEvent(ImmutableSet.of(new Duplex(false))), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2803"), new EndLineEvent(), new EndPageEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u280f\u2801\u281b\u2811\u2800\u283c\u2803"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2809"), new EndLineEvent(), new EndPageEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u280f\u2801\u281b\u2811\u2800\u283c\u2803"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		final String mixedDuplexString = "VOL #A\f\fVOL #B\f\fPAGE #B\f\fVOL #C\fPAGE #B\f";
+		builder = createHandlerBuilder().setInterpoint(true);
+		data.add(new Object[] {builder.build(), mixedDuplexEvents, mixedDuplexString.getBytes(Charsets.US_ASCII)});
+		final String singleMixedDuplexString = "VOL #A\fVOL #B\fPAGE #B\fVOL #C\fPAGE #B\f";
+		builder = createHandlerBuilder().setInterpoint(false);
+		data.add(new Object[] {builder.build(), mixedDuplexEvents, singleMixedDuplexString.getBytes(Charsets.US_ASCII)});
 		return data.iterator();
 	}
 	@Test(dataProvider="handlerProvider")

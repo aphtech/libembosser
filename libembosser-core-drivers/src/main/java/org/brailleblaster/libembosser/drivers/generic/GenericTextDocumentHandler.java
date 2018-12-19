@@ -198,7 +198,7 @@ public class GenericTextDocumentHandler implements DocumentToByteSourceHandler {
 	}
 
 	private void ensureRightPage() {
-		if ((!rightPage) && optionStack.stream().flatMap(o -> o.stream()).filter(o -> o instanceof Duplex).map(o -> ((Duplex)o).getValue()).findFirst().orElse(defaultInterpoint)) {
+		if ((!rightPage) && defaultInterpoint) {
 			rightPage = !rightPage;
 			write(newPageBytes);
 		}
@@ -218,6 +218,10 @@ public class GenericTextDocumentHandler implements DocumentToByteSourceHandler {
 		// Add the top margin
 		pendingLines = topMargin;
 		stateStack.push(HandlerStates.PAGE);
+		if (defaultInterpoint && (!rightPage) && optionStack.stream().flatMap(o -> o.stream()).filter(o -> o instanceof Duplex).anyMatch(o -> !((Duplex)o).getValue().booleanValue())) {
+			write(newPageBytes);
+			rightPage = !rightPage;
+		}
 	}
 	
 	public void endPage() {
