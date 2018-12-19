@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.BrailleEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.DocumentEvent;
+import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.Duplex;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndDocumentEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndLineEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndPageEvent;
@@ -31,6 +32,7 @@ import org.testng.annotations.Test;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 public class IndexBrailleDocumentHandlerTest {
 	private static IndexBrailleDocumentHandler.Builder createHandlerBuilder() {
@@ -79,6 +81,26 @@ public class IndexBrailleDocumentHandlerTest {
 		// Tests for adding/padding margins
 		data.add(new Object[] {createHandlerBuilder().setCopies(11).setLeftMargin(3).setTopMargin(2).build(), multiPageDocumentInput, String.format(copiesHeader, 11, 3, 40, 2, 25, Arrays.stream(multiPageDocumentOutputStrings).map(s -> String.format("%s%s", s, "\f")).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString())});
 		
+		// Test that duplex volumes start on a right page
+		final ImmutableList<DocumentEvent> duplexVolumesEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2801"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2803"), new EndLineEvent(), new EndPageEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u280f\u2801\u281b\u2811\u2800\u283c\u2803"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2809"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		final String duplexHeaderString = "\u001bDBT0,MC1,DP%s,BI0,CH40,TM0,LP25;%s";
+		final String duplexVolumesString = String.format(duplexHeaderString, '2', "VOL #A\f\fVOL #B\fPAGE #B\fVOL #C\f\f");
+		IndexBrailleDocumentHandler.Builder builder = createHandlerBuilder().setPaperMode(Layout.INTERPOINT);
+		data.add(new Object[] {builder.build(), duplexVolumesEvents, duplexVolumesString});
+		// Test duplex sections
+		final ImmutableList<DocumentEvent> duplexSectionsEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2801"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2803"), new EndLineEvent(), new EndPageEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u280f\u2801\u281b\u2811\u2800\u283c\u2803"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2809"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		final String duplexSectionsString = String.format(duplexHeaderString, '2', "VOL #A\f\fVOL #B\fPAGE #B\fVOL #C\f\f");
+		builder = createHandlerBuilder().setPaperMode(Layout.INTERPOINT);
+		data.add(new Object[] {builder.build(), duplexSectionsEvents, duplexSectionsString});
+		// Test mixed duplex documents.
+		final ImmutableList<DocumentEvent> mixedDuplexEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(ImmutableSet.of(new Duplex(true))), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2801"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new StartSectionEvent(ImmutableSet.of(new Duplex(false))), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2803"), new EndLineEvent(), new EndPageEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u280f\u2801\u281b\u2811\u2800\u283c\u2803"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2809"), new EndLineEvent(), new EndPageEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u280f\u2801\u281b\u2811\u2800\u283c\u2803"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		final String mixedDuplexString = String.format(duplexHeaderString, '2', "VOL #A\f\fVOL #B\f\fPAGE #B\f\fVOL #C\fPAGE #B\f");
+		builder = createHandlerBuilder().setPaperMode(Layout.INTERPOINT);
+		data.add(new Object[] {builder.build(), mixedDuplexEvents, mixedDuplexString});
+		final String singleMixedDuplexString = String.format(duplexHeaderString, '1', "VOL #A\fVOL #B\fPAGE #B\fVOL #C\fPAGE #B\f");
+		builder = createHandlerBuilder().setPaperMode(Layout.P1ONLY);
+		data.add(new Object[] {builder.build(), mixedDuplexEvents, singleMixedDuplexString});
+		data.add(new Object[] {new IndexBrailleDocumentHandler.Builder().build(), mixedDuplexEvents, singleMixedDuplexString});
 		return data.iterator();
 	}
 	@Test(dataProvider="handlerProvider")
@@ -103,20 +125,20 @@ public class IndexBrailleDocumentHandlerTest {
 		final String paperFormatHeader = "\u001bDBT0,MC1,DP%d,BI0,CH40,TM0,LP25;%s";
 		data.add(new Object[] {createHandlerBuilder(), Layout.P1ONLY, basicDocumentInput, String.format(paperFormatHeader, 1, basicDocumentOutput)});
 		data.add(new Object[] {createHandlerBuilder(), Layout.P2ONLY, basicDocumentInput, String.format(paperFormatHeader, 1, basicDocumentOutput)});
-		data.add(new Object[] {createHandlerBuilder(), Layout.INTERPOINT, basicDocumentInput, String.format(paperFormatHeader, 2, basicDocumentOutput)});
-		data.add(new Object[] {createHandlerBuilder(), Layout.Z_FOLDING_DOUBLE_HORIZONTAL, basicDocumentInput, String.format(paperFormatHeader, 3, basicDocumentOutput)});
-		data.add(new Object[] {createHandlerBuilder(), Layout.SADDLE_STITCH_DOUBLE_SIDED, basicDocumentInput, String.format(paperFormatHeader, 4, basicDocumentOutput)});
+		data.add(new Object[] {createHandlerBuilder(), Layout.INTERPOINT, basicDocumentInput, String.format(paperFormatHeader, 2, basicDocumentOutput + "\f")});
+		data.add(new Object[] {createHandlerBuilder(), Layout.Z_FOLDING_DOUBLE_HORIZONTAL, basicDocumentInput, String.format(paperFormatHeader, 3, basicDocumentOutput + "\f")});
+		data.add(new Object[] {createHandlerBuilder(), Layout.SADDLE_STITCH_DOUBLE_SIDED, basicDocumentInput, String.format(paperFormatHeader, 4, basicDocumentOutput + "\f")});
 		data.add(new Object[] {createHandlerBuilder(), Layout.Z_FOLDING_SINGLE_HORIZONTAL, basicDocumentInput, String.format(paperFormatHeader, 5, basicDocumentOutput)});
-		data.add(new Object[] {createHandlerBuilder(), Layout.Z_FOLDING_DOUBLE_VERTICAL, basicDocumentInput, String.format(paperFormatHeader, 6, basicDocumentOutput)});
+		data.add(new Object[] {createHandlerBuilder(), Layout.Z_FOLDING_DOUBLE_VERTICAL, basicDocumentInput, String.format(paperFormatHeader, 6, basicDocumentOutput + "\f")});
 		data.add(new Object[] {createHandlerBuilder(), Layout.Z_FOLDING_SINGLE_VERTICAL, basicDocumentInput, String.format(paperFormatHeader, 7, basicDocumentOutput)});
 		data.add(new Object[] {createHandlerBuilder(), Layout.SADDLE_STITCH_SINGLE_SIDED, basicDocumentInput, String.format(paperFormatHeader, 8, basicDocumentOutput)});
 		
 		data.add(new Object[] {createHandlerBuilder(), Integer.valueOf(1), basicDocumentInput, String.format(paperFormatHeader, 1, basicDocumentOutput)});
-		data.add(new Object[] {createHandlerBuilder(), Integer.valueOf(2), basicDocumentInput, String.format(paperFormatHeader, 2, basicDocumentOutput)});
-		data.add(new Object[] {createHandlerBuilder(), Integer.valueOf(3), basicDocumentInput, String.format(paperFormatHeader, 3, basicDocumentOutput)});
-		data.add(new Object[] {createHandlerBuilder(), Integer.valueOf(4), basicDocumentInput, String.format(paperFormatHeader, 4, basicDocumentOutput)});
+		data.add(new Object[] {createHandlerBuilder(), Integer.valueOf(2), basicDocumentInput, String.format(paperFormatHeader, 2, basicDocumentOutput + "\f")});
+		data.add(new Object[] {createHandlerBuilder(), Integer.valueOf(3), basicDocumentInput, String.format(paperFormatHeader, 3, basicDocumentOutput + "\f")});
+		data.add(new Object[] {createHandlerBuilder(), Integer.valueOf(4), basicDocumentInput, String.format(paperFormatHeader, 4, basicDocumentOutput + "\f")});
 		data.add(new Object[] {createHandlerBuilder(), Integer.valueOf(5), basicDocumentInput, String.format(paperFormatHeader, 5, basicDocumentOutput)});
-		data.add(new Object[] {createHandlerBuilder(), Integer.valueOf(6), basicDocumentInput, String.format(paperFormatHeader, 6, basicDocumentOutput)});
+		data.add(new Object[] {createHandlerBuilder(), Integer.valueOf(6), basicDocumentInput, String.format(paperFormatHeader, 6, basicDocumentOutput + "\f")});
 		data.add(new Object[] {createHandlerBuilder(), Integer.valueOf(7), basicDocumentInput, String.format(paperFormatHeader, 7, basicDocumentOutput)});
 		data.add(new Object[] {createHandlerBuilder(), Integer.valueOf(8), basicDocumentInput, String.format(paperFormatHeader, 8, basicDocumentOutput)});
 		return data.iterator();

@@ -1,5 +1,6 @@
 package org.brailleblaster.libembosser.drivers.indexBraille;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.OptionalInt;
@@ -7,7 +8,9 @@ import java.util.OptionalInt;
 import org.brailleblaster.libembosser.drivers.generic.GenericTextDocumentHandler;
 import org.brailleblaster.libembosser.drivers.utils.DocumentToByteSourceHandler;
 import org.brailleblaster.libembosser.spi.Layout;
+
 import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Streams;
 import com.google.common.io.ByteSource;
 
@@ -18,7 +21,7 @@ public class IndexBrailleDocumentHandler implements DocumentToByteSourceHandler 
 		private int cellsPerLine = 40;
 		private int linesPerPage = 25;
 		private int copies = 1;
-		private int paperMode = 1;
+		private Layout paperMode = Layout.P1ONLY;
 		private OptionalInt paperSize = OptionalInt.empty();
 		public Builder setLeftMargin(int leftMargin) {
 			this.leftMargin = leftMargin;
@@ -41,39 +44,13 @@ public class IndexBrailleDocumentHandler implements DocumentToByteSourceHandler 
 			return this;
 		}
 		public Builder setPaperMode(int mode) {
-			this.paperMode = mode;
+			checkArgument(PAPER_MODE_MAPPINGS.containsValue(mode), String.format("Index embossers do not support %s paper mode", mode));
+			this.paperMode = PAPER_MODE_MAPPINGS.entrySet().stream().filter(e -> e.getValue() == mode).findFirst().map(e -> e.getKey()).get();
 			return this;
 		}
 		public Builder setPaperMode(Layout sides) {
-			switch(sides) {
-			case P1ONLY:
-			case P2ONLY:
-				setPaperMode(1);
-				break;
-			case INTERPOINT:
-				setPaperMode(2);
-				break;
-			case Z_FOLDING_DOUBLE_HORIZONTAL:
-				setPaperMode(3);
-				break;
-			case SADDLE_STITCH_DOUBLE_SIDED:
-				setPaperMode(4);
-				break;
-			case Z_FOLDING_SINGLE_HORIZONTAL:
-				setPaperMode(5);
-				break;
-			case Z_FOLDING_DOUBLE_VERTICAL:
-				setPaperMode(6);
-				break;
-			case Z_FOLDING_SINGLE_VERTICAL:
-				setPaperMode(7);
-				break;
-			case SADDLE_STITCH_SINGLE_SIDED:
-				setPaperMode(8);
-				break;
-			default:
-				throw new IllegalArgumentException(String.format("Index embossers do not support %s paper mode", sides.name()));
-			}
+			checkArgument(PAPER_MODE_MAPPINGS.containsKey(sides), String.format("Index embossers do not support %s paper mode", sides.name()));
+			paperMode = sides;
 			return this;
 		}
 		public Builder setPaper(OptionalInt paper) {
@@ -85,18 +62,20 @@ public class IndexBrailleDocumentHandler implements DocumentToByteSourceHandler 
 			return new IndexBrailleDocumentHandler(leftMargin, topMargin, cellsPerLine, linesPerPage, paperMode, paperSize, copies);
 		}
 	}
+	private final static ImmutableMap<Layout, Integer> PAPER_MODE_MAPPINGS = new ImmutableMap.Builder<Layout, Integer>().put(Layout.P1ONLY, 1).put(Layout.P2ONLY, 1).put(Layout.INTERPOINT, 2).put(Layout.Z_FOLDING_DOUBLE_HORIZONTAL, 3).put(Layout.SADDLE_STITCH_DOUBLE_SIDED, 4).put(Layout.Z_FOLDING_SINGLE_HORIZONTAL, 5).put(Layout.Z_FOLDING_DOUBLE_VERTICAL, 6).put(Layout.Z_FOLDING_SINGLE_VERTICAL, 7).put(Layout.SADDLE_STITCH_SINGLE_SIDED, 8).build();
 	private final GenericTextDocumentHandler textHandler;
 	private final ByteSource header;
-	private IndexBrailleDocumentHandler(int leftMargin, int topMargin, int cellsPerLine, int linesPerPage, int paperMode, OptionalInt paperSize, int copies) {
+	private IndexBrailleDocumentHandler(int leftMargin, int topMargin, int cellsPerLine, int linesPerPage, Layout paperMode, OptionalInt paperSize, int copies) {
 		this.textHandler = new GenericTextDocumentHandler.Builder()
 				.setLeftMargin(0) // Left margin is handled by the escape sequences and needs no padding
 				.setTopMargin(0) // Top margin handled by escape sequence and need not be padded.
 				.setCellsPerLine(cellsPerLine)
 				.setLinesPerPage(linesPerPage)
 				.setCopies(1) // Our header will provide the copies escape sequence, so no data duplication needed.
+				.setInterpoint(paperMode.isDoubleSide())
 				.build();
 		String paperParam = Streams.stream(paperSize).mapToObj(v -> String.format("PA%d,", v)).findFirst().orElse("");
-		String headerString = String.format("\u001bDBT0,MC%d,DP%d,%sBI%d,CH%d,TM%d,LP%d;", copies, paperMode, paperParam, leftMargin, cellsPerLine, topMargin, linesPerPage);
+		String headerString = String.format("\u001bDBT0,MC%d,DP%d,%sBI%d,CH%d,TM%d,LP%d;", copies, PAPER_MODE_MAPPINGS.get(paperMode), paperParam, leftMargin, cellsPerLine, topMargin, linesPerPage);
 		header = ByteSource.wrap(headerString.getBytes(Charsets.US_ASCII));
 	}
 	@Override
