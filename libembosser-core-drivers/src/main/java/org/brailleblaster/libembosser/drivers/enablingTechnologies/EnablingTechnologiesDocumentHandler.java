@@ -25,11 +25,11 @@ public class EnablingTechnologiesDocumentHandler implements DocumentToByteSource
 		private int linesPerPage = 25;
 		private int copies = 1;
 		private int pageLength = 11;
-		private Layout duplex = Layout.INTERPOINT;
+		private Layout paperMode = Layout.INTERPOINT;
 		private BrlCell cell = BrlCell.NLS;
 		
 		public EnablingTechnologiesDocumentHandler build() {
-			return new EnablingTechnologiesDocumentHandler(leftMargin, cellsPerLine, topMargin, pageLength, linesPerPage, cell, duplex, copies);
+			return new EnablingTechnologiesDocumentHandler(leftMargin, cellsPerLine, topMargin, pageLength, linesPerPage, cell, paperMode, copies);
 		}
 
 		public Builder setCellsPerLine(int cellsPerLine) {
@@ -67,9 +67,9 @@ public class EnablingTechnologiesDocumentHandler implements DocumentToByteSource
 			return this;
 		}
 
-		public Builder setDuplex(Layout sides) {
+		public Builder setPapermode(Layout sides) {
 			if (DUPLEX_MAPPING.containsKey(sides)) {
-				this.duplex = sides;
+				this.paperMode = sides;
 			} else {
 				throw new IllegalArgumentException("Side must be one of INTERPOINT, P1ONLY or P2ONLY but was " + sides);
 			}

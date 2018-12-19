@@ -43,7 +43,7 @@ import com.google.common.collect.Streams;
 
 public class EnablingTechnologiesDocumentHandlerTest {
 	private EnablingTechnologiesDocumentHandler.Builder createHandlerBuilder() {
-		return new EnablingTechnologiesDocumentHandler.Builder().setDuplex(Layout.P1ONLY);
+		return new EnablingTechnologiesDocumentHandler.Builder().setPapermode(Layout.P1ONLY);
 	}
 	@DataProvider(name="handlerProvider")
 	public Iterator<Object[]> handlerProvider() {
@@ -93,20 +93,20 @@ public class EnablingTechnologiesDocumentHandlerTest {
 				final String duplexHeaderString = "\u001b@\u001bA@@\u001bK@\u001bW@\u001bi%s\u001bs@\u001bL@\u001bRh\u001bTK\u001bQY%s";
 				final String duplexVolumesString = String.format(duplexHeaderString, '@', "VOL #A\f\fVOL #B\fPAGE #B\fVOL #C\f\f");
 				data.add(new Object[] {new EnablingTechnologiesDocumentHandler.Builder().build(), duplexVolumesEvents, duplexVolumesString});
-				EnablingTechnologiesDocumentHandler.Builder builder = createHandlerBuilder().setDuplex(Layout.INTERPOINT);
+				EnablingTechnologiesDocumentHandler.Builder builder = createHandlerBuilder().setPapermode(Layout.INTERPOINT);
 				data.add(new Object[] {builder.build(), duplexVolumesEvents, duplexVolumesString});
 				// Test duplex sections
 				final ImmutableList<DocumentEvent> duplexSectionsEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2801"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2803"), new EndLineEvent(), new EndPageEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u280f\u2801\u281b\u2811\u2800\u283c\u2803"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2809"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 				final String duplexSectionsString = String.format(duplexHeaderString, '@', "VOL #A\f\fVOL #B\fPAGE #B\fVOL #C\f\f");
-				builder = createHandlerBuilder().setDuplex(Layout.INTERPOINT);
+				builder = createHandlerBuilder().setPapermode(Layout.INTERPOINT);
 				data.add(new Object[] {builder.build(), duplexSectionsEvents, duplexSectionsString});
 				// Test mixed duplex documents.
 				final ImmutableList<DocumentEvent> mixedDuplexEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(ImmutableSet.of(new Duplex(true))), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2801"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new StartSectionEvent(ImmutableSet.of(new Duplex(false))), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2803"), new EndLineEvent(), new EndPageEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u280f\u2801\u281b\u2811\u2800\u283c\u2803"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2809"), new EndLineEvent(), new EndPageEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u280f\u2801\u281b\u2811\u2800\u283c\u2803"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 				final String mixedDuplexString = String.format(duplexHeaderString, '@', "VOL #A\f\fVOL #B\f\fPAGE #B\f\fVOL #C\fPAGE #B\f");
-				builder = createHandlerBuilder().setDuplex(Layout.INTERPOINT);
+				builder = createHandlerBuilder().setPapermode(Layout.INTERPOINT);
 				data.add(new Object[] {builder.build(), mixedDuplexEvents, mixedDuplexString});
 				final String singleMixedDuplexString = String.format(duplexHeaderString, 'A', "VOL #A\fVOL #B\fPAGE #B\fVOL #C\fPAGE #B\f");
-				builder = createHandlerBuilder().setDuplex(Layout.P1ONLY);
+				builder = createHandlerBuilder().setPapermode(Layout.P1ONLY);
 				data.add(new Object[] {builder.build(), mixedDuplexEvents, singleMixedDuplexString});
 		return data.iterator();
 	}
@@ -294,7 +294,7 @@ public class EnablingTechnologiesDocumentHandlerTest {
 	}
 	@Test(dataProvider="duplexModeProvider")
 	public void testDuplexMode(Builder builder, Layout sides, List<DocumentEvent> events, String expected) {
-		EnablingTechnologiesDocumentHandler handler = builder.setDuplex(sides).build();
+		EnablingTechnologiesDocumentHandler handler = builder.setPapermode(sides).build();
 		for (DocumentEvent event: events) {
 			handler.onEvent(event);
 		}
@@ -314,7 +314,7 @@ public class EnablingTechnologiesDocumentHandlerTest {
 	}
 	@Test(dataProvider="invalidDuplexModeProvider")
 	public void testInvalidDuplexModeThrowsException(Builder builder, Layout sides) {
-		expectThrows(IllegalArgumentException.class, () -> builder.setDuplex(sides));
+		expectThrows(IllegalArgumentException.class, () -> builder.setPapermode(sides));
 	}
 	@DataProvider(name="cellTypeProvider")
 	public Iterator<Object[]> cellTypeProvider() {
