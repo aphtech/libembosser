@@ -18,6 +18,7 @@ import org.brailleblaster.libembosser.drivers.enablingTechnologies.EnablingTechn
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.BrailleEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.DocumentEvent;
+import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.Duplex;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndDocumentEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndLineEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndPageEvent;
@@ -42,12 +43,12 @@ import com.google.common.collect.Streams;
 
 public class EnablingTechnologiesDocumentHandlerTest {
 	private EnablingTechnologiesDocumentHandler.Builder createHandlerBuilder() {
-		return new EnablingTechnologiesDocumentHandler.Builder();
+		return new EnablingTechnologiesDocumentHandler.Builder().setDuplex(Layout.P1ONLY);
 	}
 	@DataProvider(name="handlerProvider")
 	public Iterator<Object[]> handlerProvider() {
 		List<Object[]> data = new ArrayList<>();
-		final String headerString = "\u001b@\u001bA@@\u001bK@\u001bW@\u001bi@\u001bs@\u001bL%s\u001bR%s\u001bT%s\u001bQ%s";
+		final String headerString = "\u001b@\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bL%s\u001bR%s\u001bT%s\u001bQ%s";
 		final ImmutableList<DocumentEvent> minimalDocumentInput = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		data.add(new Object[] {createHandlerBuilder().build(), minimalDocumentInput, String.format(headerString, "@", "h", "K", "Y") + "\f"});
 		data.add(new Object[] {createHandlerBuilder().setLinesPerPage(30).setPageLength(13).build(), minimalDocumentInput, String.format(headerString, "@", "h", "M", "^") + "\f"});
@@ -87,6 +88,26 @@ public class EnablingTechnologiesDocumentHandlerTest {
 		data.add(new Object[] {createHandlerBuilder().setCopies(3).setLinesPerPage(30).setPageLength(13).build(), multiPageDocumentInput, String.format(headerString, "@", "h", "M", "^") + Strings.repeat(Arrays.stream(multiPageDocumentOutputStrings).map(s -> s.concat("\f")).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString(), 3)});
 		// Tests for adding/padding margins
 		data.add(new Object[] {createHandlerBuilder().setCopies(11).setLeftMargin(3).setTopMargin(2).build(), multiPageDocumentInput, String.format(headerString, "C", "h", "K", "[") + Strings.repeat(Arrays.stream(multiPageDocumentOutputStrings).map(s -> String.format("\r\n\r\n%s\f", s)).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString(), 11)});
+		// Test that duplex volumes start on a right page
+				final ImmutableList<DocumentEvent> duplexVolumesEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2801"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2803"), new EndLineEvent(), new EndPageEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u280f\u2801\u281b\u2811\u2800\u283c\u2803"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2809"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+				final String duplexHeaderString = "\u001b@\u001bA@@\u001bK@\u001bW@\u001bi%s\u001bs@\u001bL@\u001bRh\u001bTK\u001bQY%s";
+				final String duplexVolumesString = String.format(duplexHeaderString, '@', "VOL #A\f\fVOL #B\fPAGE #B\fVOL #C\f\f");
+				data.add(new Object[] {new EnablingTechnologiesDocumentHandler.Builder().build(), duplexVolumesEvents, duplexVolumesString});
+				EnablingTechnologiesDocumentHandler.Builder builder = createHandlerBuilder().setDuplex(Layout.INTERPOINT);
+				data.add(new Object[] {builder.build(), duplexVolumesEvents, duplexVolumesString});
+				// Test duplex sections
+				final ImmutableList<DocumentEvent> duplexSectionsEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2801"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2803"), new EndLineEvent(), new EndPageEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u280f\u2801\u281b\u2811\u2800\u283c\u2803"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2809"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+				final String duplexSectionsString = String.format(duplexHeaderString, '@', "VOL #A\f\fVOL #B\fPAGE #B\fVOL #C\f\f");
+				builder = createHandlerBuilder().setDuplex(Layout.INTERPOINT);
+				data.add(new Object[] {builder.build(), duplexSectionsEvents, duplexSectionsString});
+				// Test mixed duplex documents.
+				final ImmutableList<DocumentEvent> mixedDuplexEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(ImmutableSet.of(new Duplex(true))), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2801"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new StartSectionEvent(ImmutableSet.of(new Duplex(false))), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2803"), new EndLineEvent(), new EndPageEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u280f\u2801\u281b\u2811\u2800\u283c\u2803"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2809"), new EndLineEvent(), new EndPageEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u280f\u2801\u281b\u2811\u2800\u283c\u2803"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+				final String mixedDuplexString = String.format(duplexHeaderString, '@', "VOL #A\f\fVOL #B\f\fPAGE #B\f\fVOL #C\fPAGE #B\f");
+				builder = createHandlerBuilder().setDuplex(Layout.INTERPOINT);
+				data.add(new Object[] {builder.build(), mixedDuplexEvents, mixedDuplexString});
+				final String singleMixedDuplexString = String.format(duplexHeaderString, 'A', "VOL #A\fVOL #B\fPAGE #B\fVOL #C\fPAGE #B\f");
+				builder = createHandlerBuilder().setDuplex(Layout.P1ONLY);
+				data.add(new Object[] {builder.build(), mixedDuplexEvents, singleMixedDuplexString});
 		return data.iterator();
 	}
 	@Test(dataProvider="handlerProvider")
@@ -202,11 +223,11 @@ public class EnablingTechnologiesDocumentHandlerTest {
 	public Iterator<Object[]> intPropertyProvider() {
 		List<Object[]> data = new ArrayList<>();
 		for (int i = 0; i < NUMBER_MAPPINGS.length; ++i) {
-			data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder()::setLeftMargin), i, String.format("\u001b@\u001bA@@\u001bK@\u001bW@\u001bi@\u001bs@\u001bL%s\u001bRh\u001bTK\u001bQY\f", NUMBER_MAPPINGS[i])});
-			data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder()::setCellsPerLine), i, String.format("\u001b@\u001bA@@\u001bK@\u001bW@\u001bi@\u001bs@\u001bL@\u001bR%s\u001bTK\u001bQY\f", NUMBER_MAPPINGS[i])});
-			data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder().setTopMargin(0).setPageLength(59)::setLinesPerPage), i, String.format("\u001b@\u001bA@@\u001bK@\u001bW@\u001bi@\u001bs@\u001bL@\u001bRh\u001bT{\u001bQ%s\f", NUMBER_MAPPINGS[i])});
-			data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder().setTopMargin(59 - i).setPageLength(59)::setLinesPerPage), i, String.format("\u001b@\u001bA@@\u001bK@\u001bW@\u001bi@\u001bs@\u001bL@\u001bRh\u001bT{\u001bQ%s\f", NUMBER_MAPPINGS[59])});
-			data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder().setTopMargin(0).setLinesPerPage(0)::setPageLength), i, String.format("\u001b@\u001bA@@\u001bK@\u001bW@\u001bi@\u001bs@\u001bL@\u001bRh\u001bT%s\u001bQ@\f", NUMBER_MAPPINGS[i])});
+			data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder()::setLeftMargin), i, String.format("\u001b@\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bL%s\u001bRh\u001bTK\u001bQY\f", NUMBER_MAPPINGS[i])});
+			data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder()::setCellsPerLine), i, String.format("\u001b@\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bL@\u001bR%s\u001bTK\u001bQY\f", NUMBER_MAPPINGS[i])});
+			data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder().setTopMargin(0).setPageLength(59)::setLinesPerPage), i, String.format("\u001b@\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bL@\u001bRh\u001bT{\u001bQ%s\f", NUMBER_MAPPINGS[i])});
+			data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder().setTopMargin(59 - i).setPageLength(59)::setLinesPerPage), i, String.format("\u001b@\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bL@\u001bRh\u001bT{\u001bQ%s\f", NUMBER_MAPPINGS[59])});
+			data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder().setTopMargin(0).setLinesPerPage(0)::setPageLength), i, String.format("\u001b@\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bL@\u001bRh\u001bT%s\u001bQ@\f", NUMBER_MAPPINGS[i])});
 		}
 		return data.iterator();
 	}
@@ -265,10 +286,10 @@ public class EnablingTechnologiesDocumentHandlerTest {
 	public Iterator<Object[]> duplexModeProvider() {
 		List<Object[]> data = new ArrayList<>();
 		List<DocumentEvent> inputEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(",TE/ DOCU;T"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
-		String outputTemplate = "\u001b@\u001bA@@\u001bK@\u001bW@\u001bi%s\u001bs@\u001bL@\u001bRh\u001bTK\u001bQY,TE/ DOCU;T\f";
-		data.add(new Object[] {createHandlerBuilder(), Layout.INTERPOINT, inputEvents, String.format(outputTemplate, "@")});
-		data.add(new Object[] {createHandlerBuilder(), Layout.P1ONLY, inputEvents, String.format(outputTemplate, "A")});
-		data.add(new Object[] {createHandlerBuilder(), Layout.P2ONLY, inputEvents, String.format(outputTemplate, "B")});
+		String outputTemplate = "\u001b@\u001bA@@\u001bK@\u001bW@\u001bi%s\u001bs@\u001bL@\u001bRh\u001bTK\u001bQY,TE/ DOCU;T%s";
+		data.add(new Object[] {createHandlerBuilder(), Layout.INTERPOINT, inputEvents, String.format(outputTemplate, "@", "\f\f")});
+		data.add(new Object[] {createHandlerBuilder(), Layout.P1ONLY, inputEvents, String.format(outputTemplate, "A", "\f")});
+		data.add(new Object[] {createHandlerBuilder(), Layout.P2ONLY, inputEvents, String.format(outputTemplate, "B", "\f")});
 		return data.iterator();
 	}
 	@Test(dataProvider="duplexModeProvider")
@@ -299,7 +320,7 @@ public class EnablingTechnologiesDocumentHandlerTest {
 	public Iterator<Object[]> cellTypeProvider() {
 		List<Object[]> data = new ArrayList<>();
 		List<DocumentEvent> inputEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(",TE/ DOCU;T"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
-		String outputTemplate = "\u001b@\u001bA@@\u001bK@\u001bW@\u001bi@\u001bs%s\u001bL@\u001bRh\u001bTT\u001bQY,TE/ DOCU;T\f";
+		String outputTemplate = "\u001b@\u001bA@@\u001bK@\u001bW@\u001biA\u001bs%s\u001bL@\u001bRh\u001bTT\u001bQY,TE/ DOCU;T\f";
 		data.add(new Object[] {createHandlerBuilder().setPageLength(20), BrlCell.NLS, inputEvents, String.format(outputTemplate, "@")});
 		data.add(new Object[] {createHandlerBuilder().setPageLength(20), BrlCell.CALIFORNIA_SIGN, inputEvents, String.format(outputTemplate, "A")});
 		data.add(new Object[] {createHandlerBuilder().setPageLength(20), BrlCell.JUMBO, inputEvents, String.format(outputTemplate, "B")});

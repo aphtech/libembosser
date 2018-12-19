@@ -122,6 +122,7 @@ public class EnablingTechnologiesDocumentHandler implements DocumentToByteSource
 				.setCellsPerLine(cellsPerLine)
 				.setTopMargin(topMargin)
 				.setLinesPerPage(linesPerPage)
+				.setInterpoint(duplex.isDoubleSide())
 				.setCopies(copies)
 				.build();
 		// Build the header
