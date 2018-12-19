@@ -86,18 +86,20 @@ public class CoreDriversTest {
 		
 		// Interpoint with margins
 		attrs = new EmbossingAttributeSet(new EmbossingAttribute[] {new PaperLayout(Layout.INTERPOINT), new PaperMargins(new Margins(new BigDecimal("13"), BigDecimal.ZERO, BigDecimal.TEN, BigDecimal.ZERO))});
-		expectedOutput = "\u001b@\u001bA@@\u001bK@\u001bW@\u001bi@\u001bs@\u001bLB\u001bRq\u001bTN\u001bQc\r\n  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f\f".getBytes(Charsets.US_ASCII);
+		expectedOutput = "\u001b@\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bLB\u001bRq\u001bTN\u001bQc\r\n  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f".getBytes(Charsets.US_ASCII);
 		data.add(new Object[] {"libembosser.et.phoenix_gold", testBrf, attrs, expectedOutput});
 		data.add(new Object[] {"libembosser.et.phoenix_silver", testBrf, attrs, expectedOutput});
 		data.add(new Object[] {"libembosser.et.cyclone", testBrf, attrs, expectedOutput});
+		expectedOutput = "\u001b@\u001bA@@\u001bK@\u001bW@\u001bi@\u001bs@\u001bLB\u001bRq\u001bTN\u001bQc\r\n  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f\f".getBytes(Charsets.US_ASCII);
 		data.add(new Object[] {"libembosser.et.trident", testBrf, attrs, expectedOutput});
 		
 		// Interpoint
 		attrs = new EmbossingAttributeSet(new PaperLayout(Layout.INTERPOINT));
-		expectedOutput = "\u001b@\u001bA@@\u001bK@\u001bW@\u001bi@\u001bs@\u001bL@\u001bRq\u001bTN\u001bQc  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f\f".getBytes(Charsets.US_ASCII);
+		expectedOutput = "\u001b@\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bL@\u001bRq\u001bTN\u001bQc  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f".getBytes(Charsets.US_ASCII);
 		data.add(new Object[] {"libembosser.et.phoenix_gold", testBrf, attrs, expectedOutput});
 		data.add(new Object[] {"libembosser.et.phoenix_silver", testBrf, attrs, expectedOutput});
 		data.add(new Object[] {"libembosser.et.cyclone", testBrf, attrs, expectedOutput});
+		expectedOutput = "\u001b@\u001bA@@\u001bK@\u001bW@\u001bi@\u001bs@\u001bL@\u001bRq\u001bTN\u001bQc  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f\f".getBytes(Charsets.US_ASCII);
 		data.add(new Object[] {"libembosser.et.trident", testBrf, attrs, expectedOutput});
 				
 		// Multiple copies
