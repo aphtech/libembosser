@@ -15,8 +15,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 public class IndexBrailleFactory implements IEmbosserFactory {
-	private static final EnumSet<Layout> BASIC_D_SIDES = EnumSet.of(Layout.INTERPOINT, Layout.P1ONLY, Layout.Z_FOLDING_DOUBLE_HORIZONTAL, Layout.Z_FOLDING_SINGLE_HORIZONTAL, Layout.Z_FOLDING_DOUBLE_VERTICAL, Layout.Z_FOLDING_SINGLE_VERTICAL);
-	private static final EnumSet<Layout> EVEREST_SIDES = EnumSet.of(Layout.INTERPOINT, Layout.P1ONLY, Layout.SADDLE_STITCH_DOUBLE_SIDED, Layout.SADDLE_STITCH_SINGLE_SIDED);
+	private static final EnumSet<Layout> BASIC_D_SIDES = EnumSet.of(Layout.INTERPOINT, Layout.P1ONLY, Layout.P2ONLY, Layout.Z_FOLDING_DOUBLE_HORIZONTAL, Layout.Z_FOLDING_SINGLE_HORIZONTAL, Layout.Z_FOLDING_DOUBLE_VERTICAL, Layout.Z_FOLDING_SINGLE_VERTICAL);
+	private static final EnumSet<Layout> EVEREST_SIDES = EnumSet.of(Layout.INTERPOINT, Layout.P1ONLY, Layout.P2ONLY, Layout.SADDLE_STITCH_DOUBLE_SIDED, Layout.SADDLE_STITCH_SINGLE_SIDED);
 	private static final EnumSet<Layout> BRAILLEBOX_SIDES = EVEREST_SIDES;
 	private static final EnumSet<Layout> FANFOLD_SIDES = BASIC_D_SIDES;
 	private static final EnumSet<Layout> ENABLING_SIDES = EnumSet.of(Layout.INTERPOINT, Layout.P1ONLY, Layout.P2ONLY, Layout.Z_FOLDING_DOUBLE_VERTICAL, Layout.Z_FOLDING_SINGLE_VERTICAL, Layout.Z_FOLDING_DOUBLE_HORIZONTAL, Layout.Z_FOLDING_SINGLE_HORIZONTAL);
