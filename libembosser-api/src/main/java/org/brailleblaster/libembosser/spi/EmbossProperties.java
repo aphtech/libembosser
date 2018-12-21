@@ -45,22 +45,26 @@ public final class EmbossProperties {
 		BrlCell cellType = this.cellType;
 		int copies = this.copies;
 		MultiSides sides = this.sides;
-		switch (name) {
-		case "paper":
-			paper = (Rectangle)value;
-			break;
-		case "margins":
-			margins = (Margins)value;
-			break;
-		case "cellType":
-			cellType = (BrlCell)value;
-			break;
-		case "copies":
-			copies = ((Integer)value).intValue();
-			break;
-		case "sides":
-			sides = (MultiSides)value;
-			break;
+		if (name != null) {
+			switch (name) {
+			case "paper":
+				paper = (Rectangle) value;
+				break;
+			case "margins":
+				margins = (Margins) value;
+				break;
+			case "cellType":
+				cellType = (BrlCell) value;
+				break;
+			case "copies":
+				copies = ((Integer) value).intValue();
+				break;
+			case "sides":
+				sides = (MultiSides) value;
+				break;
+			default:
+				break;
+			}
 		}
 		return new EmbossProperties(paper, margins, cellType, copies, sides);
 	}

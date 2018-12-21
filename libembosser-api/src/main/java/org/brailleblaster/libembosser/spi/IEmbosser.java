@@ -170,8 +170,10 @@ public interface IEmbosser {
 		switch(format) {
 		case BRF:
 			result = embossBrf(embosserDevice, is, embossProperties);
+			break;
 		case PEF:
 			result = embossPef(embosserDevice, is, embossProperties);
+			break;
 		}
 		return result;
 	}

@@ -27,6 +27,6 @@ public final class PaperMargins extends ObjectSyntax<Margins> implements Embossi
 	}
 	@Override
 	public boolean equals(Object object) {
-		return object instanceof Margins ? super.equals(object) : false;
+		return object instanceof PaperMargins ? super.equals(object) : false;
 	}
 }

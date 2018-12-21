@@ -12,6 +12,8 @@ import org.brailleblaster.libembosser.drivers.utils.BrailleFilterInputStream;
 import org.testng.annotations.Test;
 
 public class BrailleFilterInputStreamTest {
+	private final Random random = new Random(System.currentTimeMillis());
+
 	@Test
 	public void testReadByteConversion() {
 		byte[] convertArray = new byte[256];
@@ -25,7 +27,7 @@ public class BrailleFilterInputStreamTest {
 			convertArray[i] = (byte)i;
 		}
 		byte[] input = new byte[100000];
-		new Random().nextBytes(input);
+		random.nextBytes(input);
 		InputStream is = new BrailleFilterInputStream(new ByteArrayInputStream(input));
 		int counter = 0;
 		try {

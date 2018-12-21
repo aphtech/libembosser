@@ -43,7 +43,7 @@ public class CopyStreamPrintServiceFactory extends StreamPrintServiceFactory {
 	private static final DocFlavor[] DOC_FLAVORS = new DocFlavor[] { DocFlavor.INPUT_STREAM.AUTOSENSE };
 	private static final String OUTPUT_FORMAT = "text/plain";
 
-	public class CopyStreamPrintService extends StreamPrintService {
+	public static class CopyStreamPrintService extends StreamPrintService {
 
 		protected CopyStreamPrintService(OutputStream out) {
 			super(out);
@@ -143,7 +143,7 @@ public class CopyStreamPrintServiceFactory extends StreamPrintServiceFactory {
 		
 	}
 	
-	public class CopyDocPrintJob implements DocPrintJob {
+	public static class CopyDocPrintJob implements DocPrintJob {
 		private final StreamPrintService printService;
 		private final List<PrintJobListener> printJobListeners;
 		protected CopyDocPrintJob(StreamPrintService ps) {
@@ -211,7 +211,7 @@ public class CopyStreamPrintServiceFactory extends StreamPrintServiceFactory {
 
 	@Override
 	public DocFlavor[] getSupportedDocFlavors() {
-		return DOC_FLAVORS;
+		return Arrays.copyOf(DOC_FLAVORS, DOC_FLAVORS.length);
 	}
 
 }

@@ -1,3 +1,2 @@
 include 'libembosser-api','libembosser-core-drivers','libembosser-utils', 'et-test'
 rootProject.name = 'libembosser'
-enableFeaturePreview('STABLE_PUBLISHING')

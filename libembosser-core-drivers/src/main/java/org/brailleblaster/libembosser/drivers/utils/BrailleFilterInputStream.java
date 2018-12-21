@@ -9,7 +9,7 @@ public class BrailleFilterInputStream extends FilterInputStream {
 		super(arg0);
 	}
 	private byte translate(byte b) {
-		if (b > 0x5f && b < 0x80) {
+		if ((0xff & b) > 0x5f && (0xff & b) < 0x80) {
 			return (byte)(b - 0x20);
 		} else {
 			return b;

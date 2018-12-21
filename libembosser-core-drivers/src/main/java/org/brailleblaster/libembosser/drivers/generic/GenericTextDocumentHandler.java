@@ -125,7 +125,7 @@ public class GenericTextDocumentHandler implements DocumentToByteSourceHandler {
 	private final int defaultCellsPerLine;
 	private final int defaultLinesPerPage;
 	private final boolean defaultInterpoint;
-	private final int defaultRowGap = 0;
+	private final int defaultRowGap;
 	private int leftMargin;
 	private int topMargin;
 	private int linesRemaining = 0;
@@ -147,6 +147,7 @@ public class GenericTextDocumentHandler implements DocumentToByteSourceHandler {
 		this.cellsPerLine = defaultCellsPerLine;
 		defaultLinesPerPage = linesPerPage;
 		defaultInterpoint = interpoint;
+		defaultRowGap = 0;
 		this.leftMargin = leftMargin;
 		this.topMargin = topMargin;
 		initialBufferCapacity = 1000000;

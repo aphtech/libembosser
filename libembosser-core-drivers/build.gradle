@@ -1,5 +1,6 @@
 plugins {
 	id "java-library"
+	id "com.github.spotbugs" version "1.6.8"
 }
 
 dependencies {
@@ -18,5 +19,12 @@ publishing {
 		coreDrivers(MavenPublication) {
 			from components.java
 		}
+	}
+}
+
+tasks.withType(com.github.spotbugs.SpotBugsTask) {
+	reports {
+		xml.enabled = false
+		html.enabled = true
 	}
 }
