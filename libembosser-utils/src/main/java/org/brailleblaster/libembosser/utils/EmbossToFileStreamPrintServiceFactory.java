@@ -1,4 +1,4 @@
-package org.brailleblaster.libembosser.testutils;
+package org.brailleblaster.libembosser.utils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,25 +39,19 @@ import com.google.common.io.ByteStreams;
  * @author Michael Whapples
  *
  */
-public class CopyStreamPrintServiceFactory extends StreamPrintServiceFactory {
+public class EmbossToFileStreamPrintServiceFactory extends StreamPrintServiceFactory {
 	private static final DocFlavor[] DOC_FLAVORS = new DocFlavor[] { DocFlavor.INPUT_STREAM.AUTOSENSE };
 	private static final String OUTPUT_FORMAT = "text/plain";
 
-	public static class CopyStreamPrintService extends StreamPrintService {
-
-		protected CopyStreamPrintService(OutputStream out) {
+	private static class EmbossToFileStreamPrintService extends StreamPrintService {
+		protected EmbossToFileStreamPrintService(OutputStream out) {
 			super(out);
 		}
 
-		@Override
-		public void addPrintServiceAttributeListener(PrintServiceAttributeListener listener) {
-			// TODO Auto-generated method stub
-			
-		}
-
+		
 		@Override
 		public DocPrintJob createPrintJob() {
-			return new CopyDocPrintJob(this);
+			return new EmbossDocPrintJob(this);
 		}
 
 		@Override
@@ -140,13 +134,20 @@ public class CopyStreamPrintServiceFactory extends StreamPrintServiceFactory {
 		public String getOutputFormat() {
 			return OUTPUT_FORMAT;
 		}
+
+
+		@Override
+		public void addPrintServiceAttributeListener(PrintServiceAttributeListener listener) {
+			// TODO Auto-generated method stub
+			
+		}
 		
 	}
 	
-	public static class CopyDocPrintJob implements DocPrintJob {
+	private static class EmbossDocPrintJob implements DocPrintJob {
 		private final StreamPrintService printService;
 		private final List<PrintJobListener> printJobListeners;
-		protected CopyDocPrintJob(StreamPrintService ps) {
+		protected EmbossDocPrintJob(StreamPrintService ps) {
 			this.printService = ps;
 			this.printJobListeners = new ArrayList<>();
 		}
@@ -201,7 +202,7 @@ public class CopyStreamPrintServiceFactory extends StreamPrintServiceFactory {
 
 	@Override
 	public StreamPrintService getPrintService(OutputStream out) {
-		return new CopyStreamPrintService(out);
+		return new EmbossToFileStreamPrintService(out);
 	}
 
 	@Override

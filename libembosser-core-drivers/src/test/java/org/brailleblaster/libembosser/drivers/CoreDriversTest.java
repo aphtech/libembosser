@@ -28,7 +28,7 @@ import org.brailleblaster.libembosser.spi.IEmbosser;
 import org.brailleblaster.libembosser.spi.Layout;
 import org.brailleblaster.libembosser.spi.Margins;
 import org.brailleblaster.libembosser.spi.PaperSize;
-import org.brailleblaster.libembosser.testutils.CopyStreamPrintServiceFactory;
+import org.brailleblaster.libembosser.utils.EmbossToFileStreamPrintServiceFactory;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -173,7 +173,7 @@ public class CoreDriversTest {
 	public void testSimpleEmboss(String id, String input, EmbossingAttributeSet attrs, byte[] expected) {
 		Stream<IEmbosser> embosserStream = EmbosserService.getInstance().getEmbosserStream();
 		IEmbosser embosser = embosserStream.filter(e -> e.getId().equals(id)).findFirst().get();
-		StreamPrintServiceFactory factory = new CopyStreamPrintServiceFactory();
+		StreamPrintServiceFactory factory = new EmbossToFileStreamPrintServiceFactory();
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		StreamPrintService sps = factory.getPrintService(out);
 		try(InputStream in = new ByteArrayInputStream(input.getBytes(Charsets.US_ASCII))) {
