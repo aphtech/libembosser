@@ -4,9 +4,6 @@ plugins {
 }
 
 dependencies {
-	implementation 'javax.xml.bind:jaxb-api:2.3.0'
-	runtime 'org.glassfish.jaxb:jaxb-runtime:2.3.0.1'
-	runtime 'javax.activation:activation:1.1.1'
 	implementation 'com.google.guava:guava:23.5-jre'
 	api project(':libembosser-api')
 	compileOnly 'com.github.spotbugs:spotbugs-annotations:3.1.10'
