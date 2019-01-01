@@ -9,6 +9,7 @@ dependencies {
 	runtime 'javax.activation:activation:1.1.1'
 	implementation 'com.google.guava:guava:23.5-jre'
 	api project(':libembosser-api')
+	compile 'com.github.spotbugs:spotbugs-annotations:3.1.10'
 	testCompile 'org.testng:testng:6.13.1'
 }
 
@@ -22,6 +23,10 @@ publishing {
 			from components.java
 		}
 	}
+}
+
+spotbugs {
+	toolVersion = '3.1.10'
 }
 
 tasks.withType(com.github.spotbugs.SpotBugsTask) {

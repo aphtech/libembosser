@@ -28,6 +28,7 @@ import javax.print.event.PrintJobListener;
 import javax.print.event.PrintServiceAttributeListener;
 
 import com.google.common.io.ByteStreams;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Send embosser output to a OutputStream.
@@ -169,6 +170,7 @@ public class EmbossToStreamPrintServiceFactory extends StreamPrintServiceFactory
 			return null;
 		}
 
+		@SuppressFBWarnings("RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE")
 		@Override
 		public void print(Doc doc, PrintRequestAttributeSet attributes) throws PrintException {
 			Consumer<PrintJobListener> reporter;
