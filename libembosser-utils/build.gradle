@@ -9,7 +9,7 @@ dependencies {
 	runtime 'javax.activation:activation:1.1.1'
 	implementation 'com.google.guava:guava:23.5-jre'
 	api project(':libembosser-api')
-	compile 'com.github.spotbugs:spotbugs-annotations:3.1.10'
+	compileOnly 'com.github.spotbugs:spotbugs-annotations:3.1.10'
 	testCompile 'org.testng:testng:6.13.1'
 }
 
