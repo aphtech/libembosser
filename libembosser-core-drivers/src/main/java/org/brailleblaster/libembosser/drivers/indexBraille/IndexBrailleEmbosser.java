@@ -25,7 +25,6 @@ import org.brailleblaster.libembosser.spi.EmbossingAttributeSet;
 import org.brailleblaster.libembosser.spi.Layout;
 import org.brailleblaster.libembosser.spi.Margins;
 import org.brailleblaster.libembosser.spi.Rectangle;
-import org.brailleblaster.libembosser.spi.Version;
 import org.w3c.dom.Document;
 
 import com.google.common.collect.ImmutableMap;
@@ -46,11 +45,7 @@ public class IndexBrailleEmbosser extends BaseTextEmbosser {
 		supportedSides = sides;
 		this.paperSizes = ImmutableMap.copyOf(checkNotNull(paperSizes));
 	}
-	private static final Version API_VERSION = new Version(1, 0);
-	@Override
-	public Version getApiVersion() {
-		return API_VERSION;
-	}
+
 	@Override
 	public boolean supportsInterpoint() {
 		return supportedSides.stream().anyMatch(e -> e.isDoubleSide());

@@ -9,7 +9,6 @@ import org.brailleblaster.libembosser.drivers.utils.BaseTextEmbosser;
 import org.brailleblaster.libembosser.spi.EmbossException;
 import org.brailleblaster.libembosser.spi.EmbossingAttributeSet;
 import org.brailleblaster.libembosser.spi.Rectangle;
-import org.brailleblaster.libembosser.spi.Version;
 import org.w3c.dom.Document;
 
 /**
@@ -26,11 +25,7 @@ public class ViewPlusLegacyEmbosser extends BaseTextEmbosser {
 		super(id, "ViewPlus (Legacy)", model, maxPaper, minPaper);
 		delegate = new GenericTextEmbosser("ViewPlus", model, maxPaper, minPaper);
 	}
-	private final static Version API_VERSION = new Version(1, 0);
-	@Override
-	public Version getApiVersion() {
-		return API_VERSION;
-	}
+
 	@Override
 	public boolean supportsInterpoint() {
 		// For now say they don't do interpoint.

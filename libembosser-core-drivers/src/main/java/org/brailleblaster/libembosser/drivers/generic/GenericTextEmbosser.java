@@ -19,11 +19,9 @@ import org.brailleblaster.libembosser.spi.EmbossException;
 import org.brailleblaster.libembosser.spi.EmbossingAttributeSet;
 import org.brailleblaster.libembosser.spi.Margins;
 import org.brailleblaster.libembosser.spi.Rectangle;
-import org.brailleblaster.libembosser.spi.Version;
 import org.w3c.dom.Document;
 
 public class GenericTextEmbosser extends BaseTextEmbosser {
-	private final static Version API_VERSION = new Version(1, 0);
 	private boolean addMargins;
 	public GenericTextEmbosser(String manufacturer, String model, Rectangle maxPaper, Rectangle minPaper) {
 		this(manufacturer, model, maxPaper, minPaper, false);
@@ -32,11 +30,6 @@ public class GenericTextEmbosser extends BaseTextEmbosser {
 		super(id, "Generic", model, maxPaper, minPaper);
 		this.addMargins = addMargins;
 	}
-	@Override
-	public Version getApiVersion() {
-		return API_VERSION;
-	}
-
 	
 	private PageFilterByteSourceHandler createHandler(EmbossingAttributeSet attributes) {
 		BrlCell cell = Optional.ofNullable(attributes.get(BrailleCellType.class)).map(v -> ((BrailleCellType)v).getValue()).orElse(BrlCell.NLS);

@@ -21,11 +21,9 @@ import org.brailleblaster.libembosser.spi.EmbossingAttributeSet;
 import org.brailleblaster.libembosser.spi.Layout;
 import org.brailleblaster.libembosser.spi.Margins;
 import org.brailleblaster.libembosser.spi.Rectangle;
-import org.brailleblaster.libembosser.spi.Version;
 import org.w3c.dom.Document;
 
 public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
-	private final static Version API_VERSION = new Version(1, 0);
 	private boolean interpoint;
 
 	public EnablingTechnologiesEmbosser(String id, String model, Rectangle maxPaper, Rectangle minPaper, boolean interpoint) {
@@ -33,10 +31,6 @@ public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 		this.interpoint = interpoint;
 	}
 
-	@Override
-	public Version getApiVersion() {
-		return API_VERSION;
-	}
 
 	private PageFilterByteSourceHandler createHandler(EmbossingAttributeSet attributes) {
 		BrlCell cell = Optional.ofNullable(attributes.get(BrailleCellType.class)).map(v -> ((BrailleCellType)v).getValue()).orElse(BrlCell.NLS);

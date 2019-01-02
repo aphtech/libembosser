@@ -17,15 +17,6 @@ import org.w3c.dom.Document;
  *
  */
 public interface IEmbosser {
-	/**
-	 * The API version used.
-	 * 
-	 * The API version will be used to help ensure that drivers are compatible with
-	 * the BrailleBlaster version installed.
-	 * 
-	 * @return The API version.
-	 */
-	public Version getApiVersion();
 
 	/**
 	 * Get the ID of the embosser.

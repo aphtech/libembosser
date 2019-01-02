@@ -1,6 +1,4 @@
-package org.brailleblaster.libembosser.spi;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.brailleblaster.libembosser;
 
 /**
  * A class to represent API versions.
@@ -30,7 +28,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  */
 public final class Version {
-	private final static Version SPI_VERSION = new Version(1, 0);
+	private final static Version API_VERSION = new Version(1, 0);
 	private int major;
 	private int minor;
 	/**
@@ -38,8 +36,8 @@ public final class Version {
 	 * 
 	 * @return The version of the SPI.
 	 */
-	public static Version getSpiVersion() {
-		return SPI_VERSION;
+	public static Version getApiVersion() {
+		return API_VERSION;
 	}
 
 	/**
@@ -50,7 +48,7 @@ public final class Version {
 	 * @param minor
 	 *            The minor version number.
 	 */
-	public Version(int major, int minor) {
+	private Version(int major, int minor) {
 		this.major = major;
 		this.minor = minor;
 	}
@@ -71,11 +69,6 @@ public final class Version {
 	 */
 	public int getMinor() {
 		return this.minor;
-	}
-	
-	public boolean canUse(Version callee) {
-		checkNotNull(callee);
-		return major == callee.getMajor() && minor >= callee.getMinor();
 	}
 
 	@Override
