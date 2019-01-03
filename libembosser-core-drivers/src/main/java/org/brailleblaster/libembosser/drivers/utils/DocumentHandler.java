@@ -73,6 +73,15 @@ public interface DocumentHandler {
 		}
 	}
 	class EndLineEvent implements DocumentEvent {}
+	class StartGraphicEvent extends BaseOptionEvent<GraphicOption> {
+		public StartGraphicEvent() {
+			super();
+		}
+		public StartGraphicEvent(Set<GraphicOption> options) {
+			super(options);
+		}
+	}
+	class EndGraphicEvent implements DocumentEvent {}
 	class EndPageEvent implements DocumentEvent {}
 	class EndSectionEvent implements DocumentEvent {}
 	class EndVolumeEvent implements DocumentEvent {}
@@ -122,6 +131,7 @@ public interface DocumentHandler {
 	 *
 	 */
 	interface RowOption extends Option { }
+	interface GraphicOption extends Option { }
 	abstract class BaseOption {
 		@Override
 		public boolean equals(Object other) {
