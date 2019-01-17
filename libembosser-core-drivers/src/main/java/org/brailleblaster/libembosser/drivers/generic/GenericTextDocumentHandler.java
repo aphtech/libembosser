@@ -7,78 +7,93 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.function.BiConsumer;
 
+import org.brailleblaster.libembosser.drivers.utils.ClassUtils;
 import org.brailleblaster.libembosser.drivers.utils.DocumentToByteSourceHandler;
 import org.brailleblaster.libembosser.utils.BrailleMapper;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableList;
 import com.google.common.io.ByteSource;
 
 public class GenericTextDocumentHandler implements DocumentToByteSourceHandler {
 	private static void throwInvalidStateException(DocumentEvent event, String state) {
 		throw new IllegalStateException(String.format("Invalid event %s for state %s", event.getClass().getName(), state));
 	}
-	private enum HandlerStates {
-		READY((h, e) -> {
-			if (e instanceof StartDocumentEvent) {
-				h.startDocument(((StartDocumentEvent)e).getOptions());
-			} else {
-				throwInvalidStateException(e, "READY");
+	private static enum HandlerStates {
+		READY{
+			@Override
+			public void accept(GenericTextDocumentHandler h, DocumentEvent e) {
+				if (e instanceof StartDocumentEvent) {
+					h.startDocument(((StartDocumentEvent)e).getOptions());
+				} else {
+					throwInvalidStateException(e, "READY");
+				}
 			}
-		}),
-		DOCUMENT((h, e) -> {
-			if (e instanceof StartVolumeEvent) {
-				h.startVolume(((StartVolumeEvent)e).getOptions());
-			} else if (e instanceof EndDocumentEvent) {
-				h.endDocument();
-			} else {
-				throwInvalidStateException(e, "DOCUMENT");
+		},
+		DOCUMENT{
+			@Override
+			public void accept(GenericTextDocumentHandler h, DocumentEvent e) {
+				if (e instanceof StartVolumeEvent) {
+					h.startVolume(((StartVolumeEvent)e).getOptions());
+				} else if (e instanceof EndDocumentEvent) {
+					h.endDocument();
+				} else {
+					throwInvalidStateException(e, "DOCUMENT");
+				}
 			}
-		}),
-		VOLUME((h, e) -> {
-			if (e instanceof StartSectionEvent) {
-				h.startSection(((StartSectionEvent)e).getOptions());
-			} else if (e instanceof EndVolumeEvent) {
-				h.endVolume();
-			} else {
-				throwInvalidStateException(e, "VOLUME");
+		},
+		VOLUME{
+			@Override
+			public void accept(GenericTextDocumentHandler h, DocumentEvent e) {
+				if (e instanceof StartSectionEvent) {
+					h.startSection(((StartSectionEvent)e).getOptions());
+				} else if (e instanceof EndVolumeEvent) {
+					h.endVolume();
+				} else {
+					throwInvalidStateException(e, "VOLUME");
+				}
 			}
-		}),
-		SECTION((h, e) -> {
-			if (e instanceof StartPageEvent) {
-				h.startPage(((StartPageEvent)e).getOptions());
-			} else if (e instanceof EndSectionEvent) {
-				h.endSection();
-			} else {
-				throwInvalidStateException(e, "SECTION");
+		},
+		SECTION{
+			private ImmutableList<Class<?>> invalidEventTypes = ImmutableList.of(StartDocumentEvent.class, StartVolumeEvent.class, StartSectionEvent.class, StartLineEvent.class, BrailleEvent.class, EndLineEvent.class, EndPageEvent.class, EndVolumeEvent.class, EndDocumentEvent.class);
+			@Override
+			public void accept(GenericTextDocumentHandler h, DocumentEvent e) {
+				if (e instanceof StartPageEvent) {
+					h.startPage(((StartPageEvent)e).getOptions());
+				} else if (e instanceof EndSectionEvent) {
+					h.endSection();
+				} else if (ClassUtils.isInstanceOf(e, invalidEventTypes.stream())) {
+					throwInvalidStateException(e, "SECTION");
+				}
 			}
-		}),
-		PAGE((h, e) -> {
-			if (e instanceof StartLineEvent) {
-				h.startLine(((StartLineEvent)e).getOptions());
-			} else if (e instanceof EndPageEvent) {
-				h.endPage();
-			} else {
-				throwInvalidStateException(e, "PAGE");
+		},
+		PAGE{
+			ImmutableList<Class<?>> invalidEventTypes = ImmutableList.of(StartDocumentEvent.class, StartVolumeEvent.class, StartSectionEvent.class, StartPageEvent.class, BrailleEvent.class, EndLineEvent.class, EndSectionEvent.class, EndVolumeEvent.class, EndDocumentEvent.class);
+			@Override
+			public void accept(GenericTextDocumentHandler h, DocumentEvent e) {
+				if (e instanceof StartLineEvent) {
+					h.startLine(((StartLineEvent)e).getOptions());
+				} else if (e instanceof EndPageEvent) {
+					h.endPage();
+				} else if (ClassUtils.isInstanceOf(e, invalidEventTypes.stream())) {
+					throwInvalidStateException(e, "PAGE");
+				}
 			}
-		}),
-		LINE((h, e) -> {
-			if (e instanceof BrailleEvent) {
-				h.writeBraille(((BrailleEvent)e).getBraille());
-			} else if (e instanceof EndLineEvent) {
-				h.endLine();
-			} else {
-				throwInvalidStateException(e, "LINE");
+		},
+		LINE{ 
+			@Override
+			public void accept(GenericTextDocumentHandler h, DocumentEvent e) {
+				if (e instanceof BrailleEvent) {
+					h.writeBraille(((BrailleEvent)e).getBraille());
+				} else if (e instanceof EndLineEvent) {
+					h.endLine();
+				} else {
+					throwInvalidStateException(e, "LINE");
+				}
 			}
-		});
-		private BiConsumer<GenericTextDocumentHandler, DocumentEvent> f;
-		private HandlerStates(BiConsumer<GenericTextDocumentHandler, DocumentEvent> f) {
-			this.f = f;
-		}
-		public void accept(GenericTextDocumentHandler h, DocumentEvent e) {
-			f.accept(h, e);
-		}
+		};
+		public abstract void accept(GenericTextDocumentHandler h, DocumentEvent e);
 	}
 	public final static class Builder {
 		private int cellsPerLine = 40;
