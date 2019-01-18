@@ -45,6 +45,7 @@ public class EnablingTechnologiesDocumentHandler implements DocumentToByteSource
 
 		public Builder setLeftMargin(int leftMargin) {
 			checkNumberArgument(leftMargin);
+			checkArgument(leftMargin < NUMBER_MAPPING.length - 1);
 			this.leftMargin = leftMargin;
 			return this;
 		}
@@ -133,7 +134,7 @@ public class EnablingTechnologiesDocumentHandler implements DocumentToByteSource
 		headerOutput.write(new byte[] {0x1b, 'W', '@'}); // Line wrapping
 		headerOutput.write(new byte[] {0x1b, 'i', DUPLEX_MAPPING.get(duplex)}); // Interpoint mode
 		headerOutput.write(new byte[] {0x1b, 's', CELL_MAPPING.get(cell)}); // Braille cell type
-		headerOutput.write(new byte[] {0x1b, 'L', NUMBER_MAPPING[leftMargin]}); // Set left margin
+		headerOutput.write(new byte[] {0x1b, 'L', NUMBER_MAPPING[leftMargin + 1]}); // Set left margin
 		headerOutput.write(new byte[] {0x1b, 'R', NUMBER_MAPPING[cellsPerLine]}); // Set cells per line
 		headerOutput.write(new byte[] {0x1b, 'T', NUMBER_MAPPING[pageLength]});
 		headerOutput.write(new byte[] {0x1b, 'Q', NUMBER_MAPPING[totalLines]}); // Set lines per page, include top margin as this needs padding
