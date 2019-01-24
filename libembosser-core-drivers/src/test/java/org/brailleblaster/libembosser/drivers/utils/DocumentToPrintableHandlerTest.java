@@ -29,19 +29,45 @@ public class DocumentToPrintableHandlerTest {
 		return new DocumentToPrintableHandler.Builder();
 	}
 	@DataProvider(name="pageProvider")
-	public Object[][] pageProvider() {
-		return new Object[][] {
-			{ImmutableList.of()},
-			{ImmutableList.of(new DocumentToPrintableHandler.Page())},
-		};
+	public Iterator<Object[]> pageProvider() {
+		List<Object[]> data = new ArrayList<>();
+		data.add(new Object[] {ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent()), 1});
+		data.add(new Object[] {ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new EndPageEvent(), new StartPageEvent(), new EndPageEvent(), new StartPageEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent()), 3});
+		data.add(new Object[] {ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new EndPageEvent(), new EndSectionEvent(), new StartSectionEvent(), new StartPageEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent()), 2});
+		data.add(new Object[] {ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new EndPageEvent(), new StartPageEvent(), new EndPageEvent(), new EndSectionEvent(), new StartSectionEvent(), new StartPageEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent()), 3});
+		data.add(new Object[] {ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new EndPageEvent(), new StartPageEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent()), 3});
+		return data.iterator();
 	}
 	@Test(dataProvider="pageProvider")
-	public void testPageCount(List<DocumentToPrintableHandler.Page>pages ) {
+	public void testPageCount(List<DocumentEvent> events, int pages) {
 		DocumentToPrintableHandler handler = new DocumentToPrintableHandler.Builder().build();
-		for (DocumentToPrintableHandler.Page page: pages) {
-			handler.addPage(page);
+		for (DocumentEvent event: events) {
+			handler.onEvent(event);
+		}
+		assertEquals(handler.getpageCount(), pages);
+	}
+	@DataProvider(name="rowProvider")
+	public Iterator<Object[]> rowProvider() {
+		List<Object[]> data = new ArrayList<>();
+		String row1 = "\u2801\u2803\u2800\u2811";
+		String row2 = "\u2811\u2800\u2803\u2800\u2801";
+		ImmutableList<DocumentEvent> events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(row1), new EndLineEvent(), new StartLineEvent(), new BrailleEvent(row2), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		ImmutableList<DocumentToPrintableHandler.Page>pages = ImmutableList.of(new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row(row1), new DocumentToPrintableHandler.Row(row2)));
+		data.add(new Object[] {events, pages});
+		return data.iterator();
+	}
+	@Test(dataProvider="rowProvider")
+	public void testAddingRows(List<DocumentEvent> events, List<DocumentToPrintableHandler.Page>pages ) {
+		DocumentToPrintableHandler handler = createHandlerBuilder().build();
+		for (DocumentEvent event: events) {
+			handler.onEvent(event);
 		}
 		assertEquals(handler.getpageCount(), pages.size());
+		for (int i = 0; i < handler.getpageCount(); ++i) {
+			DocumentToPrintableHandler.Page actualPage = handler.getPage(i);
+			DocumentToPrintableHandler.Page expectedPage = pages.get(i);
+			assertEquals(actualPage, expectedPage);
+		}
 	}
 	@DataProvider(name="invalidStateChangeProvider")
 	public Iterator<Object[]> invalidStateChangeProvider() {
