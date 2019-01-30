@@ -2,7 +2,9 @@ package org.brailleblaster.libembosser.drivers.utils;
 
 import java.awt.Font;
 import java.awt.FontFormatException;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
@@ -11,22 +13,30 @@ import java.util.Arrays;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import com.google.common.collect.ImmutableList;
 
 public class DocumentToPrintableHandler implements DocumentHandler {
 	public static class Builder {
-		private Font font;
+		private Optional<Font> font;
 		public Builder() {
-			try {
-				this.font = Font.createFont(Font.TRUETYPE_FONT, DocumentToPrintableHandler.class.getResourceAsStream("/org/brailleblaster/libembosser/drivers/utils/fonts/APH_Braille_Font-6.otf"));
-			} catch (FontFormatException | IOException e) {
-				throw new RuntimeException(e);
-			}
+			font = Optional.empty();
+		}
+		public Builder setFont(Font f) {
+			font = Optional.of(f);
+			return this;
 		}
 		public DocumentToPrintableHandler build() {
-			return new DocumentToPrintableHandler(font);
+			Font fontToUse = font.orElseGet(() -> {
+				try {
+					return Font.createFont(Font.TRUETYPE_FONT, DocumentToPrintableHandler.class.getResourceAsStream("/org/brailleblaster/libembosser/drivers/utils/fonts/APH_Braille_Font-6.otf"));
+				} catch (FontFormatException | IOException e) {
+					throw new RuntimeException("Unable to create Braille font", e);
+				}
+			});
+			return new DocumentToPrintableHandler(fontToUse);
 		}
 	}
 	final static class Page {
@@ -102,13 +112,29 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 	}
 	private static class DocPrintable implements Printable {
 		private List<Page> pages;
-		public DocPrintable(Stream<Page> pages) {
+		private Font font;
+		public DocPrintable(Stream<Page> pages, Font font) {
 			this.pages = pages.collect(ImmutableList.toImmutableList());
+			this.font = font;
 		}
 		@Override
 		public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
 			if (pageIndex < 0 || pageIndex >= pages.size()) {
 				return NO_SUCH_PAGE;
+			}
+			Graphics2D g2d = (Graphics2D)graphics;
+			g2d.setFont(font);
+			g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
+			FontMetrics brailleMetrics = g2d.getFontMetrics();
+			int lineHeight = brailleMetrics.getHeight();
+			Page curPage = pages.get(pageIndex);
+			int xPos = 18;
+			int yPos = 18;
+			for (PageElement element: curPage.getElements()) {
+				if (element instanceof Row) {
+					g2d.drawString(((Row)element).getBraille(), xPos, yPos);
+					yPos += lineHeight;
+				}
 			}
 			return PAGE_EXISTS;
 		}
@@ -155,7 +181,7 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 			@Override
 			void accept(DocumentToPrintableHandler h, DocumentEvent e) {
 				if (e instanceof StartPageEvent) {
-					h.stateStack.push(HandlerStates.PAGE);
+					h.startPage((StartPageEvent)e);
 				} else if (e instanceof EndSectionEvent) {
 					h.stateStack.pop();
 				} else if (ClassUtils.isInstanceOf(e, StartDocumentEvent.class, StartVolumeEvent.class, StartSectionEvent.class, StartLineEvent.class, BrailleEvent.class, EndLineEvent.class, StartGraphicEvent.class, EndGraphicEvent.class, EndPageEvent.class, EndVolumeEvent.class, EndDocumentEvent.class)) {
@@ -208,7 +234,7 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 	}
 	
 	public Printable asPrintable() {
-		return new DocPrintable(pages.stream());
+		return new DocPrintable(pages.stream(), font);
 	}
 
 	int getpageCount() {
@@ -216,6 +242,10 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 	}
 	Page getPage(int index) {
 		return pages.get(index);
+	}
+	private void startPage(StartPageEvent event) {
+		stateStack.push(HandlerStates.PAGE);
+		pageElements.clear();
 	}
 	private void endPage(EndPageEvent event) {
 		pages.add(new Page(pageElements.stream()));
