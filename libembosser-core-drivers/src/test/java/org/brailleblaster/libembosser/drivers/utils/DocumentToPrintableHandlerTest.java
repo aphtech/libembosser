@@ -52,7 +52,10 @@ public class DocumentToPrintableHandlerTest {
 		String row1 = "\u2801\u2803\u2800\u2811";
 		String row2 = "\u2811\u2800\u2803\u2800\u2801";
 		ImmutableList<DocumentEvent> events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(row1), new EndLineEvent(), new StartLineEvent(), new BrailleEvent(row2), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
-		ImmutableList<DocumentToPrintableHandler.Page>pages = ImmutableList.of(new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row(row1), new DocumentToPrintableHandler.Row(row2)));
+		ImmutableList<DocumentToPrintableHandler.Page> pages = ImmutableList.of(new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row(row1), new DocumentToPrintableHandler.Row(row2)));
+		data.add(new Object[] {events, pages});
+		events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(row1), new EndLineEvent(), new EndPageEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(row2), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		pages = ImmutableList.of(new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row(row1)), new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row(row2)));
 		data.add(new Object[] {events, pages});
 		return data.iterator();
 	}
