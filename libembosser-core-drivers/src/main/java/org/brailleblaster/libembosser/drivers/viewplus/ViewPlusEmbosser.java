@@ -1,10 +1,13 @@
 package org.brailleblaster.libembosser.drivers.viewplus;
 
 import java.awt.Font;
+import java.awt.print.PageFormat;
+import java.awt.print.Paper;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.io.InputStream;
+import java.util.Optional;
 
 import javax.print.PrintService;
 
@@ -61,12 +64,20 @@ public class ViewPlusEmbosser implements IEmbosser {
 		} catch (ParseException e) {
 			throw new RuntimeException("Problem parsing document", e);
 		}
+		Rectangle paperSize = Optional.ofNullable(attributes.get(org.brailleblaster.libembosser.embossing.attribute.PaperSize.class)).map(p -> ((org.brailleblaster.libembosser.embossing.attribute.PaperSize)p).getValue()).orElse(getMaximumPaper());
+		Paper paper = new Paper();
+		double width = (paperSize.getWidth().doubleValue() * 72.0)/25.4;
+		double height = (paperSize.getHeight().doubleValue() * 72.0)/25.4;
+		paper.setSize(width, height);
+		paper.setImageableArea(0, 0, width, height);
+		PageFormat pf = new PageFormat();
+		pf.setPaper(paper);
 		Printable printable = handler.asPrintable();
 		PrinterJob printJob = PrinterJob.getPrinterJob();
-		printJob.setPrintable(printable);
 		printJob.setJobName("BrailleBlasterEmboss");
 		try {
 			printJob.setPrintService(ps);
+			printJob.setPrintable(printable, pf);
 			printJob.print();
 		} catch (PrinterException e) {
 			throw new EmbossException("Problem sending emboss job to embosser device.", e);

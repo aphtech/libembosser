@@ -9,8 +9,8 @@ import org.brailleblaster.libembosser.spi.IEmbosserFactory;
 import com.google.common.collect.ImmutableList;
 
 public class ViewPlusEmbosserFactory implements IEmbosserFactory {
-	// private ImmutableList<IEmbosser> embossers = ImmutableList.of(new ViewPlusEmbosser());
-	private ImmutableList<IEmbosser> embossers = ImmutableList.of();
+	private ImmutableList<IEmbosser> embossers = ImmutableList.of(new ViewPlusEmbosser());
+	// private ImmutableList<IEmbosser> embossers = ImmutableList.of();
 
 	@Override
 	public List<IEmbosser> getEmbossers() {
