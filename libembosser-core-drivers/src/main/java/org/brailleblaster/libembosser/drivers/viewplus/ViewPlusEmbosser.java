@@ -16,6 +16,7 @@ import org.brailleblaster.libembosser.drivers.utils.DocumentParser;
 import org.brailleblaster.libembosser.drivers.utils.DocumentParser.ParseException;
 import org.brailleblaster.libembosser.drivers.utils.DocumentToPrintableHandler;
 import org.brailleblaster.libembosser.drivers.utils.ThrowingBiConsumer;
+import org.brailleblaster.libembosser.embossing.attribute.PaperMargins;
 import org.brailleblaster.libembosser.spi.EmbossException;
 import org.brailleblaster.libembosser.spi.EmbossingAttributeSet;
 import org.brailleblaster.libembosser.spi.IEmbosser;
@@ -64,19 +65,24 @@ public class ViewPlusEmbosser implements IEmbosser {
 		} catch (ParseException e) {
 			throw new RuntimeException("Problem parsing document", e);
 		}
-		Rectangle paperSize = Optional.ofNullable(attributes.get(org.brailleblaster.libembosser.embossing.attribute.PaperSize.class)).map(p -> ((org.brailleblaster.libembosser.embossing.attribute.PaperSize)p).getValue()).orElse(getMaximumPaper());
-		Paper paper = new Paper();
-		double width = (paperSize.getWidth().doubleValue() * 72.0)/25.4;
-		double height = (paperSize.getHeight().doubleValue() * 72.0)/25.4;
-		paper.setSize(width, height);
-		paper.setImageableArea(0, 0, width, height);
-		PageFormat pf = new PageFormat();
-		pf.setPaper(paper);
 		Printable printable = handler.asPrintable();
 		PrinterJob printJob = PrinterJob.getPrinterJob();
 		printJob.setJobName("BrailleBlasterEmboss");
 		try {
 			printJob.setPrintService(ps);
+			PageFormat pf = printJob.defaultPage();
+			Paper paper = pf.getPaper();
+			Optional.ofNullable(attributes.get(org.brailleblaster.libembosser.embossing.attribute.PaperSize.class)).map(p -> ((org.brailleblaster.libembosser.embossing.attribute.PaperSize)p).getValue()).ifPresent(r -> paper.setSize(mmToPt(r.getWidth().doubleValue()), mmToPt(r.getHeight().doubleValue())));
+			final double width = paper.getWidth();
+			final double height = paper.getHeight();
+			Optional.ofNullable(attributes.get(org.brailleblaster.libembosser.embossing.attribute.PaperMargins.class)).map(m -> ((PaperMargins)m).getValue()).ifPresent(m -> {
+				final double left = mmToPt(m.getLeft().doubleValue());
+				// final double right = mmToPt(m.getRight().doubleValue());
+				final double top = mmToPt(m.getTop().doubleValue());
+				// final double bottom = mmToPt(m.getBottom().doubleValue());
+				paper.setImageableArea(left, top, width - left, height - top);
+			});
+			pf.setPaper(paper);
 			printJob.setPrintable(printable, pf);
 			printJob.print();
 		} catch (PrinterException e) {
@@ -99,5 +105,7 @@ public class ViewPlusEmbosser implements IEmbosser {
 		// For now don't support interpoint.
 		return false;
 	}
-
+	private double mmToPt(double mm) {
+		return (mm * 72.0)/25.4;
+	}
 }
