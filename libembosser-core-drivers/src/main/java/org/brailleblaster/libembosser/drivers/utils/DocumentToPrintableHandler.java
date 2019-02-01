@@ -31,7 +31,8 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 		public DocumentToPrintableHandler build() {
 			Font fontToUse = font.orElseGet(() -> {
 				try {
-					return Font.createFont(Font.TRUETYPE_FONT, DocumentToPrintableHandler.class.getResourceAsStream("/org/brailleblaster/libembosser/drivers/utils/fonts/APH_Braille_Font-6.otf"));
+					Font baseFont = Font.createFont(Font.TRUETYPE_FONT, DocumentToPrintableHandler.class.getResourceAsStream("/org/brailleblaster/libembosser/drivers//fonts/APH_Braille_Font-6.otf"));
+					return baseFont.deriveFont(26.0f);
 				} catch (FontFormatException | IOException e) {
 					throw new RuntimeException("Unable to create Braille font", e);
 				}

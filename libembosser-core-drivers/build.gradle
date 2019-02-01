@@ -7,6 +7,7 @@ dependencies {
 	implementation 'com.google.guava:guava:23.5-jre'
 	api project(':libembosser-api')
 	implementation project(':libembosser-utils')
+	implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
 	testCompile 'org.testng:testng:6.13.1'
 }
 
