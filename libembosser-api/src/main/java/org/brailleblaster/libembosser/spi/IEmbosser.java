@@ -2,8 +2,10 @@ package org.brailleblaster.libembosser.spi;
 
 import java.io.InputStream;
 import java.util.EnumSet;
+import java.util.Optional;
 
 import javax.print.PrintService;
+import javax.print.StreamPrintServiceFactory;
 
 import org.w3c.dom.Document;
 
@@ -187,4 +189,10 @@ public interface IEmbosser {
 	 * @return If the embosser can emboss interpoint then true, otherwise false.
 	 */
 	public boolean supportsInterpoint();
+	/**
+	 * Get a suitable StreamPrintServiceFactory to emboss to a OutputStream.
+	 * 
+	 * @return An optional of a suitable StreamPrintServiceFactory for embossing to a stream, empty if no suitable StreamPrintServiceFactory can be located.
+	 */
+	public Optional<StreamPrintServiceFactory> getStreamPrintServiceFactory();
 }

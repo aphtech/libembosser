@@ -28,7 +28,7 @@ package org.brailleblaster.libembosser;
  *
  */
 public final class Version {
-	private final static Version API_VERSION = new Version(1, 0);
+	private final static Version API_VERSION = new Version(1, 1);
 	private int major;
 	private int minor;
 	/**

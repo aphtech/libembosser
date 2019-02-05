@@ -9,7 +9,9 @@ import java.awt.print.PrinterJob;
 import java.io.InputStream;
 import java.util.Optional;
 
+import javax.print.DocFlavor;
 import javax.print.PrintService;
+import javax.print.StreamPrintServiceFactory;
 
 import org.brailleblaster.libembosser.drivers.utils.DocumentParser.ParseException;
 import org.brailleblaster.libembosser.embossing.attribute.Copies;
@@ -27,6 +29,7 @@ import org.w3c.dom.Document;
  *
  */
 public abstract class BaseGraphicsEmbosser implements IEmbosser {
+	private StreamPrintServiceFactory[] streamPrintServiceFactories = PrinterJob.lookupStreamPrintServices(DocFlavor.BYTE_ARRAY.POSTSCRIPT.getMimeType());
 	
 	/**
 	 * Get a suitable font for the Braille cell type.
@@ -88,6 +91,11 @@ public abstract class BaseGraphicsEmbosser implements IEmbosser {
 	
 	private double mmToPt(double mm) {
 		return (mm * 72.0)/25.4;
+	}
+	
+	@Override
+	public Optional<StreamPrintServiceFactory> getStreamPrintServiceFactory() {
+		return streamPrintServiceFactories.length > 0? Optional.of(streamPrintServiceFactories[0]) : Optional.empty();
 	}
 	
 }
