@@ -128,9 +128,10 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 			g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
 			FontMetrics brailleMetrics = g2d.getFontMetrics();
 			int lineHeight = brailleMetrics.getHeight();
+			System.out.println(String.format("Line height is %d pt", lineHeight));
 			Page curPage = pages.get(pageIndex);
-			int xPos = 18;
-			int yPos = 18;
+			int xPos = 0;
+			int yPos = 0;
 			for (PageElement element: curPage.getElements()) {
 				if (element instanceof Row) {
 					g2d.drawString(((Row)element).getBraille(), xPos, yPos);

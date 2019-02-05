@@ -15,6 +15,7 @@ import javax.print.StreamPrintServiceFactory;
 
 import org.brailleblaster.libembosser.drivers.utils.DocumentParser.ParseException;
 import org.brailleblaster.libembosser.embossing.attribute.Copies;
+import org.brailleblaster.libembosser.embossing.attribute.PageRanges;
 import org.brailleblaster.libembosser.embossing.attribute.PaperMargins;
 import org.brailleblaster.libembosser.spi.BrlCell;
 import org.brailleblaster.libembosser.spi.EmbossException;
@@ -57,12 +58,14 @@ public abstract class BaseGraphicsEmbosser implements IEmbosser {
 		emboss(embosserDevice, brf, attributes, new DocumentParser()::parseBrf);
 	}
 	private <T> void emboss(PrintService ps, T input, EmbossingAttributeSet attributes, ThrowingBiConsumer<T, DocumentHandler, ParseException> parseMethod) throws EmbossException {
-		DocumentToPrintableHandler handler = new DocumentToPrintableHandler.Builder().setFont(getFont(BrlCell.NLS)).build();
+		PageRanges pages = Optional.ofNullable((PageRanges)attributes.get(PageRanges.class)).orElseGet(() -> new PageRanges());
+		PageFilterHandler<DocumentToPrintableHandler> pageFilteredHandler = new PageFilterHandler<DocumentToPrintableHandler>(new DocumentToPrintableHandler.Builder().setFont(getFont(BrlCell.NLS)).build(), pages);
 		try {
-			parseMethod.accept(input, handler);
+			parseMethod.accept(input, pageFilteredHandler);
 		} catch (ParseException e) {
 			throw new RuntimeException("Problem parsing document", e);
 		}
+		DocumentToPrintableHandler handler = pageFilteredHandler.getDelegate();
 		Printable printable = handler.asPrintable();
 		PrinterJob printJob = PrinterJob.getPrinterJob();
 		printJob.setJobName("BrailleBlasterEmboss");
