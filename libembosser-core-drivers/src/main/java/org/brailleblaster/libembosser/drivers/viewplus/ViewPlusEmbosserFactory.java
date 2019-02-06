@@ -13,16 +13,16 @@ public class ViewPlusEmbosserFactory implements IEmbosserFactory {
 	private ImmutableList<IEmbosser> embossers;
 	public ViewPlusEmbosserFactory() {
 		embossers = new ImmutableList.Builder<IEmbosser>()
-				.add(new ViewPlusEmbosser("libembosser.vp.embraille", "EmBraille", new Rectangle("77", "10"), new Rectangle("216", "610"), false))
-				.add(new ViewPlusEmbosser("libembosser.vp.columbia", "Columbia", new Rectangle("77", "10"), new Rectangle("292", "610"), true))
-				.add(new ViewPlusEmbosser("libembosser.vp.delta", "Delta", new Rectangle("77", "10"), new Rectangle("292", "432"), true))
-				.add(new ViewPlusEmbosser("libembosser.vp.premier", "Premier", new Rectangle("77", "10"), new Rectangle("292", "610"), true))
-				.add(new ViewPlusEmbosser("libembosser.vp.elite", "Elite", new Rectangle("77", "10"), new Rectangle("292", "610"), true))
-				.add(new ViewPlusEmbosser("libembosser.vp.emprint", "Emprint", new Rectangle("77", "10"), new Rectangle("292", "432"), false))
-				.add(new ViewPlusEmbosser("libembosser.vp.SpotDot", "SpotDot", new Rectangle("77", "10"), new Rectangle("292", "432"), false))
-				.add(new ViewPlusEmbosser("libembosser.vp.max", "Max", new Rectangle("77", "10"), new Rectangle("356", "610"), false))
-				.add(new ViewPlusEmbosser("libembosser.vp.cub", "Cub", new Rectangle("77", "10"), new Rectangle("216", "610"), false))
-				.add(new ViewPlusEmbosser("libembosser.vp.cub_jr", "Cub JR.", new Rectangle("77", "10"), new Rectangle("216", "610"), false))
+				.add(new ViewPlusEmbosser("libembosser.vp.embraille", "EmBraille", new Rectangle("77", "20"), new Rectangle("216", "610"), false))
+				.add(new ViewPlusEmbosser("libembosser.vp.columbia", "Columbia", new Rectangle("176", "20"), new Rectangle("325", "610"), true))
+				.add(new ViewPlusEmbosser("libembosser.vp.delta", "Delta", new Rectangle("176", "20"), new Rectangle("305", "432"), true))
+				.add(new ViewPlusEmbosser("libembosser.vp.premier", "Premier", new Rectangle("101", "20"), new Rectangle("305", "610"), true))
+				.add(new ViewPlusEmbosser("libembosser.vp.elite", "Elite", new Rectangle("101", "20"), new Rectangle("305", "610"), true))
+				.add(new ViewPlusEmbosser("libembosser.vp.emprint", "Emprint", new Rectangle("110", "20"), new Rectangle("216", "432"), false))
+				.add(new ViewPlusEmbosser("libembosser.vp.SpotDot", "SpotDot", new Rectangle("110", "20"), new Rectangle("216", "432"), false))
+				.add(new ViewPlusEmbosser("libembosser.vp.max", "Max", new Rectangle("101", "20"), new Rectangle("356", "610"), false))
+				.add(new ViewPlusEmbosser("libembosser.vp.cub", "Cub", new Rectangle("77", "20"), new Rectangle("216", "610"), false))
+				.add(new ViewPlusEmbosser("libembosser.vp.cub_jr", "Cub JR.", new Rectangle("77", "20"), new Rectangle("216", "610"), false))
 				.build();
 	}
 
