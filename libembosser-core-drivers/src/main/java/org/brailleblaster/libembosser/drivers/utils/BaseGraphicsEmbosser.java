@@ -31,6 +31,15 @@ import org.w3c.dom.Document;
  */
 public abstract class BaseGraphicsEmbosser implements IEmbosser {
 	private StreamPrintServiceFactory[] streamPrintServiceFactories = PrinterJob.lookupStreamPrintServices(DocFlavor.BYTE_ARRAY.POSTSCRIPT.getMimeType());
+	private String id;
+	private String manufacturer;
+	private String model;
+	
+	protected BaseGraphicsEmbosser(String id, String manufacturer, String model) {
+		this.id = id;
+		this.manufacturer = manufacturer;
+		this.model = model;
+	}
 	
 	/**
 	 * Get a suitable font for the Braille cell type.
@@ -99,6 +108,24 @@ public abstract class BaseGraphicsEmbosser implements IEmbosser {
 	@Override
 	public Optional<StreamPrintServiceFactory> getStreamPrintServiceFactory() {
 		return streamPrintServiceFactories.length > 0? Optional.of(streamPrintServiceFactories[0]) : Optional.empty();
+	}
+	
+	@Override
+	public String getId() {
+		// TODO Auto-generated method stub
+		return id;
+	}
+	
+	@Override
+	public String getManufacturer() {
+		// TODO Auto-generated method stub
+		return manufacturer;
+	}
+	
+	@Override
+	public String getModel() {
+		// TODO Auto-generated method stub
+		return model;
 	}
 	
 }

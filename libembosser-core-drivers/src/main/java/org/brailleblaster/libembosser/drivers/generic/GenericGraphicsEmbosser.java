@@ -14,6 +14,7 @@ public class GenericGraphicsEmbosser extends BaseGraphicsEmbosser {
 	private final Font font;
 	
 	public GenericGraphicsEmbosser() {
+		super("libembosser.generic.graphics", "Generic", "Graphics embosser");
 		Font baseFont;
 		try {
 			baseFont = Font.createFont(Font.TRUETYPE_FONT, GenericGraphicsEmbosser.class.getResourceAsStream("/org/brailleblaster/libembosser/drivers/fonts/APH_Braille_Font-6.otf"));
@@ -21,20 +22,6 @@ public class GenericGraphicsEmbosser extends BaseGraphicsEmbosser {
 			throw new RuntimeException("Problem creating font, should not occur", e);
 		}
 		font = baseFont.deriveFont(26.0f);
-	}
-	@Override
-	public String getId() {
-		return "libembosser.generic.graphics";
-	}
-
-	@Override
-	public String getManufacturer() {
-		return "Generic";
-	}
-
-	@Override
-	public String getModel() {
-		return "Graphics embosser";
 	}
 
 	@Override

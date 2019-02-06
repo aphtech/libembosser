@@ -1,45 +1,37 @@
 package org.brailleblaster.libembosser.drivers.viewplus;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.awt.Font;
 
 import org.brailleblaster.libembosser.drivers.utils.BaseGraphicsEmbosser;
 import org.brailleblaster.libembosser.spi.BrlCell;
-import org.brailleblaster.libembosser.spi.PaperSize;
 import org.brailleblaster.libembosser.spi.Rectangle;
 
 public class ViewPlusEmbosser extends BaseGraphicsEmbosser {
-
-	@Override
-	public String getId() {
-		return "libembosser.vp.test_embosser";
+	private final Rectangle minPaper;
+	private final Rectangle maxPaper;
+	private final boolean duplex;
+	public ViewPlusEmbosser(String id, String model, Rectangle minPaper, Rectangle maxPaper, boolean duplex) {
+		super(id, "ViewPlus Technologies", model);
+		this.minPaper = checkNotNull(minPaper);
+		this.maxPaper = checkNotNull(maxPaper);
+		this.duplex = duplex;
 	}
-
-	@Override
-	public String getManufacturer() {
-		return "ViewPlus Technologies";
-	}
-
-	@Override
-	public String getModel() {
-		return "Test model";
-	}
-
 	
-
 	@Override
 	public Rectangle getMaximumPaper() {
-		return PaperSize.A3.getSize();
+		return maxPaper;
 	}
 
 	@Override
 	public Rectangle getMinimumPaper() {
-		return PaperSize.B10.getSize();
+		return minPaper;
 	}
 
 	@Override
 	public boolean supportsInterpoint() {
-		// For now don't support interpoint.
-		return false;
+		return duplex;
 	}
 
 	@Override
