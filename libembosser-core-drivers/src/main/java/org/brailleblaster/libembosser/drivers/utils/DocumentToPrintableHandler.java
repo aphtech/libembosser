@@ -127,14 +127,20 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 			g2d.setFont(font);
 			g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
 			FontMetrics brailleMetrics = g2d.getFontMetrics();
-			int lineHeight = brailleMetrics.getHeight();
-			System.out.println(String.format("Line height is %d pt", lineHeight));
 			Page curPage = pages.get(pageIndex);
-			int xPos = 0;
+			double xPos = 0;
 			int yPos = 0;
+			int lineHeight = brailleMetrics.getHeight();
+			int cellWidth = brailleMetrics.charWidth('\u2800');
+			if ((pageIndex % 2) == 1) {
+				// Calculate horizontal offset for back of page
+				double cellOffset = ((double) cellWidth) / 5.0;
+				double marginOffset = (pageFormat.getWidth() - (2 * pageFormat.getImageableX())) % (double) cellWidth;
+				xPos = marginOffset > cellOffset ? marginOffset - cellOffset : marginOffset + cellOffset;
+			}
 			for (PageElement element: curPage.getElements()) {
 				if (element instanceof Row) {
-					g2d.drawString(((Row)element).getBraille(), xPos, yPos);
+					g2d.drawString(((Row)element).getBraille(), (float)xPos, (float)yPos);
 					yPos += lineHeight;
 				}
 			}

@@ -12,10 +12,15 @@ import java.util.Optional;
 import javax.print.DocFlavor;
 import javax.print.PrintService;
 import javax.print.StreamPrintServiceFactory;
+import javax.print.attribute.HashPrintRequestAttributeSet;
+import javax.print.attribute.PrintRequestAttribute;
+import javax.print.attribute.PrintRequestAttributeSet;
+import javax.print.attribute.standard.Sides;
 
 import org.brailleblaster.libembosser.drivers.utils.DocumentParser.ParseException;
 import org.brailleblaster.libembosser.embossing.attribute.Copies;
 import org.brailleblaster.libembosser.embossing.attribute.PageRanges;
+import org.brailleblaster.libembosser.embossing.attribute.PaperLayout;
 import org.brailleblaster.libembosser.embossing.attribute.PaperMargins;
 import org.brailleblaster.libembosser.spi.BrlCell;
 import org.brailleblaster.libembosser.spi.EmbossException;
@@ -79,6 +84,7 @@ public abstract class BaseGraphicsEmbosser implements IEmbosser {
 		PrinterJob printJob = PrinterJob.getPrinterJob();
 		printJob.setJobName("BrailleBlasterEmboss");
 		Optional.ofNullable(attributes.get(Copies.class)).map(v -> ((org.brailleblaster.libembosser.embossing.attribute.Copies)v).getValue()).ifPresent(v -> printJob.setCopies(v));
+		PrintRequestAttribute duplex = Optional.ofNullable((org.brailleblaster.libembosser.embossing.attribute.PaperLayout)attributes.get(PaperLayout.class)).filter(p -> supportsInterpoint()).map(p -> p.getValue().isDoubleSide() ? Sides.DUPLEX : Sides.ONE_SIDED).orElse(Sides.ONE_SIDED);
 		try {
 			printJob.setPrintService(ps);
 			PageFormat pf = printJob.defaultPage();
@@ -95,7 +101,8 @@ public abstract class BaseGraphicsEmbosser implements IEmbosser {
 			});
 			pf.setPaper(paper);
 			printJob.setPrintable(printable, pf);
-			printJob.print();
+			PrintRequestAttributeSet requestAttributes = new HashPrintRequestAttributeSet(duplex);
+			printJob.print(requestAttributes);
 		} catch (PrinterException e) {
 			throw new EmbossException("Problem sending emboss job to embosser device.", e);
 		}
