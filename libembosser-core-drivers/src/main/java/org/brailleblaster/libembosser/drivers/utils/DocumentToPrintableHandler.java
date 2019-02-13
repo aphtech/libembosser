@@ -21,11 +21,17 @@ import com.google.common.collect.ImmutableList;
 public class DocumentToPrintableHandler implements DocumentHandler {
 	public static class Builder {
 		private Optional<Font> font;
+		private boolean duplex;
 		public Builder() {
 			font = Optional.empty();
+			duplex = false;
 		}
 		public Builder setFont(Font f) {
 			font = Optional.of(f);
+			return this;
+		}
+		public Builder setDuplex(boolean duplex) {
+			this.duplex = duplex;
 			return this;
 		}
 		public DocumentToPrintableHandler build() {
@@ -37,7 +43,7 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 					throw new RuntimeException("Unable to create Braille font", e);
 				}
 			});
-			return new DocumentToPrintableHandler(fontToUse);
+			return new DocumentToPrintableHandler(fontToUse, duplex);
 		}
 	}
 	final static class Page {
@@ -155,7 +161,7 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 			@Override
 			void accept(DocumentToPrintableHandler h, DocumentEvent e) {
 				if (e instanceof StartDocumentEvent) {
-					h.stateStack.push(HandlerStates.DOCUMENT);
+					h.startDocument((StartDocumentEvent)e);
 				} else {
 					throwInvalidStateException(e, "READY");
 				}
@@ -165,7 +171,7 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 			@Override
 			void accept(DocumentToPrintableHandler h, DocumentEvent e) {
 				if (e instanceof StartVolumeEvent) {
-					h.stateStack.push(HandlerStates.VOLUME);
+					h.startVolume((StartVolumeEvent)e);
 				} else if (e instanceof EndDocumentEvent) {
 					h.stateStack.pop();
 				} else if (ClassUtils.isInstanceOf(e, StartDocumentEvent.class, StartSectionEvent.class, StartPageEvent.class, StartLineEvent.class, BrailleEvent.class, EndLineEvent.class, StartGraphicEvent.class, EndGraphicEvent.class, EndPageEvent.class, EndSectionEvent.class, EndVolumeEvent.class)) {
@@ -229,10 +235,12 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 	private List<Page> pages = new LinkedList<>();
 	private List<PageElement> pageElements = new LinkedList<>();
 	private StringBuilder braille = new StringBuilder();
-	private Font font;
+	private final Font font;
+	private final boolean duplex;
 	
-	private DocumentToPrintableHandler(Font font) {
+	private DocumentToPrintableHandler(Font font, boolean duplex) {
 		this.font = font;
+		this.duplex = duplex;
 		stateStack.push(HandlerStates.READY);
 	}
 
@@ -250,6 +258,16 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 	}
 	Page getPage(int index) {
 		return pages.get(index);
+	}
+	private void startDocument(StartDocumentEvent event) {
+		stateStack.push(HandlerStates.DOCUMENT);
+		pages.clear();
+	}
+	private void startVolume(StartVolumeEvent event) {
+		stateStack.push(HandlerStates.VOLUME);
+		if (duplex && getpageCount() % 2 != 0) {
+			pages.add(new Page());
+		}
 	}
 	private void startPage(StartPageEvent event) {
 		stateStack.push(HandlerStates.PAGE);
