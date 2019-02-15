@@ -2,12 +2,16 @@ package org.brailleblaster.libembosser.drivers.generic;
 
 import java.awt.Font;
 import java.awt.FontFormatException;
+import java.awt.font.TextAttribute;
 import java.io.IOException;
+import java.util.Map;
 
 import org.brailleblaster.libembosser.drivers.utils.BaseGraphicsEmbosser;
 import org.brailleblaster.libembosser.spi.BrlCell;
 import org.brailleblaster.libembosser.spi.PaperSize;
 import org.brailleblaster.libembosser.spi.Rectangle;
+
+import com.google.common.collect.ImmutableMap;
 
 public class GenericGraphicsEmbosser extends BaseGraphicsEmbosser {
 
@@ -40,8 +44,8 @@ public class GenericGraphicsEmbosser extends BaseGraphicsEmbosser {
 	}
 
 	@Override
-	public Font getFont(BrlCell cell) {
-		return font;
+	public Map<TextAttribute, Object> getBrailleAttributes(BrlCell cell) {
+		return ImmutableMap.of(TextAttribute.FONT, font);
 	}
 
 }

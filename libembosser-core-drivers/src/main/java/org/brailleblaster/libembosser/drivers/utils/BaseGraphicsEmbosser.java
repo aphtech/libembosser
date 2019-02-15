@@ -1,12 +1,13 @@
 package org.brailleblaster.libembosser.drivers.utils;
 
-import java.awt.Font;
+import java.awt.font.TextAttribute;
 import java.awt.print.PageFormat;
 import java.awt.print.Paper;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.io.InputStream;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.print.DocFlavor;
@@ -52,7 +53,7 @@ public abstract class BaseGraphicsEmbosser implements IEmbosser {
 	 * @param cell The cell type to be embossed.
 	 * @return A suitable font for printing the Braille cell type.
 	 */
-	public abstract Font getFont(BrlCell cell);
+	public abstract Map<TextAttribute, Object> getBrailleAttributes(BrlCell cell);
 
 	@Override
 	public void embossPef(PrintService embosserDevice, Document pef, EmbossingAttributeSet attributes)
@@ -73,7 +74,7 @@ public abstract class BaseGraphicsEmbosser implements IEmbosser {
 	}
 	private <T> void emboss(PrintService ps, T input, EmbossingAttributeSet attributes, ThrowingBiConsumer<T, DocumentHandler, ParseException> parseMethod) throws EmbossException {
 		PageRanges pages = Optional.ofNullable((PageRanges)attributes.get(PageRanges.class)).orElseGet(() -> new PageRanges());
-		PageFilterHandler<DocumentToPrintableHandler> pageFilteredHandler = new PageFilterHandler<DocumentToPrintableHandler>(new DocumentToPrintableHandler.Builder().setFont(getFont(BrlCell.NLS)).build(), pages);
+		PageFilterHandler<DocumentToPrintableHandler> pageFilteredHandler = new PageFilterHandler<DocumentToPrintableHandler>(new DocumentToPrintableHandler.Builder().setBrailleAttributes(getBrailleAttributes(BrlCell.NLS)).build(), pages);
 		try {
 			parseMethod.accept(input, pageFilteredHandler);
 		} catch (ParseException e) {

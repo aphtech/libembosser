@@ -1,33 +1,40 @@
 package org.brailleblaster.libembosser.drivers.utils;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.awt.Font;
-import java.awt.FontFormatException;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.font.TextAttribute;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
-import java.io.IOException;
+import java.text.AttributedString;
 import java.util.Arrays;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import com.google.common.collect.ImmutableList;
 
 public class DocumentToPrintableHandler implements DocumentHandler {
 	public static class Builder {
-		private Optional<Font> font;
+		private Map<TextAttribute, Object> brailleAttributes;
 		private boolean duplex;
 		public Builder() {
-			font = Optional.empty();
+			brailleAttributes = new HashMap<>();
 			duplex = false;
 		}
 		public Builder setFont(Font f) {
-			font = Optional.of(f);
+			brailleAttributes.put(TextAttribute.FONT, checkNotNull(f));
+			return this;
+		}
+		public Builder setBrailleAttributes(Map<TextAttribute, Object> attributes) {
+			brailleAttributes = checkNotNull(attributes);
 			return this;
 		}
 		public Builder setDuplex(boolean duplex) {
@@ -35,15 +42,7 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 			return this;
 		}
 		public DocumentToPrintableHandler build() {
-			Font fontToUse = font.orElseGet(() -> {
-				try {
-					Font baseFont = Font.createFont(Font.TRUETYPE_FONT, DocumentToPrintableHandler.class.getResourceAsStream("/org/brailleblaster/libembosser/drivers//fonts/APH_Braille_Font-6.otf"));
-					return baseFont.deriveFont(26.0f);
-				} catch (FontFormatException | IOException e) {
-					throw new RuntimeException("Unable to create Braille font", e);
-				}
-			});
-			return new DocumentToPrintableHandler(fontToUse, duplex);
+			return new DocumentToPrintableHandler(brailleAttributes, duplex);
 		}
 	}
 	final static class Page {
@@ -119,20 +118,20 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 	}
 	private static class DocPrintable implements Printable {
 		private List<Page> pages;
-		private Font font;
-		public DocPrintable(Stream<Page> pages, Font font) {
+		private Map<TextAttribute, Object> brailleAttributes;
+		public DocPrintable(Stream<Page> pages, Map<TextAttribute, Object> brailleAttributes) {
 			this.pages = pages.collect(ImmutableList.toImmutableList());
-			this.font = font;
+			this.brailleAttributes = brailleAttributes;
 		}
 		@Override
 		public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
 			if (pageIndex < 0 || pageIndex >= pages.size()) {
 				return NO_SUCH_PAGE;
 			}
+			Font font = Font.getFont(brailleAttributes);
 			Graphics2D g2d = (Graphics2D)graphics;
-			g2d.setFont(font);
 			g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
-			FontMetrics brailleMetrics = g2d.getFontMetrics();
+			FontMetrics brailleMetrics = g2d.getFontMetrics(font);
 			Page curPage = pages.get(pageIndex);
 			double xPos = 0;
 			int yPos = 0;
@@ -146,7 +145,11 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 			}
 			for (PageElement element: curPage.getElements()) {
 				if (element instanceof Row) {
-					g2d.drawString(((Row)element).getBraille(), (float)xPos, (float)yPos);
+					final String brlStr = ((Row)element).getBraille();
+					if (!brlStr.isEmpty()) {
+						AttributedString braille = new AttributedString(brlStr, brailleAttributes);
+						g2d.drawString(braille.getIterator(), (float) xPos, (float) yPos);
+					}
 					yPos += lineHeight;
 				}
 			}
@@ -235,11 +238,11 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 	private List<Page> pages = new LinkedList<>();
 	private List<PageElement> pageElements = new LinkedList<>();
 	private StringBuilder braille = new StringBuilder();
-	private final Font font;
+	private final Map<TextAttribute, Object> brailleAttributes;
 	private final boolean duplex;
 	
-	private DocumentToPrintableHandler(Font font, boolean duplex) {
-		this.font = font;
+	private DocumentToPrintableHandler(Map<TextAttribute, Object> brailleAttributes, boolean duplex) {
+		this.brailleAttributes = brailleAttributes;
 		this.duplex = duplex;
 		stateStack.push(HandlerStates.READY);
 	}
@@ -250,7 +253,7 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 	}
 	
 	public Printable asPrintable() {
-		return new DocPrintable(pages.stream(), font);
+		return new DocPrintable(pages.stream(), brailleAttributes);
 	}
 
 	int getpageCount() {
