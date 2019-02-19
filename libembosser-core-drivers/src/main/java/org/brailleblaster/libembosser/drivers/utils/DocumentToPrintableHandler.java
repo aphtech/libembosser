@@ -13,7 +13,6 @@ import java.awt.print.PrinterException;
 import java.text.AttributedString;
 import java.util.Arrays;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -23,18 +22,14 @@ import com.google.common.collect.ImmutableList;
 
 public class DocumentToPrintableHandler implements DocumentHandler {
 	public static class Builder {
-		private Map<TextAttribute, Object> brailleAttributes;
+		private LayoutHelper layoutHelper;
 		private boolean duplex;
 		public Builder() {
-			brailleAttributes = new HashMap<>();
+			layoutHelper = new DefaultLayoutHelper();
 			duplex = false;
 		}
-		public Builder setFont(Font f) {
-			brailleAttributes.put(TextAttribute.FONT, checkNotNull(f));
-			return this;
-		}
-		public Builder setBrailleAttributes(Map<TextAttribute, Object> attributes) {
-			brailleAttributes = checkNotNull(attributes);
+		public Builder setLayoutHelper(LayoutHelper layoutHelper) {
+			this.layoutHelper = checkNotNull(layoutHelper);
 			return this;
 		}
 		public Builder setDuplex(boolean duplex) {
@@ -42,8 +37,41 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 			return this;
 		}
 		public DocumentToPrintableHandler build() {
-			return new DocumentToPrintableHandler(brailleAttributes, duplex);
+			return new DocumentToPrintableHandler(layoutHelper, duplex);
 		}
+	}
+	/**
+	 * Interface for classes which help layout the Braille.
+	 * 
+	 * @author Michael Whapples
+	 *
+	 */
+	public interface LayoutHelper {
+		/**
+		 * Get the text attributes to be applied to Braille strings.
+		 * 
+		 * @return A map of the text attributes to be applied to Braille strings.
+		 */
+		public Map<TextAttribute, Object> getBrailleAttributes();
+		/**
+		 * Calculate the left margin for the specific embosser.
+		 * 
+		 * Some embossers are restricted to where they can place dots, so this method will calculate a margin to align with the positions the embosser can do.
+		 * 
+		 * @param desiredWidth The desired margin.
+		 * @return The margin optimised for the embosser.
+		 */
+		public double calculateMargin(double desiredWidth);
+		/**
+		 * Calculate embosser specific margin for back side of the page.
+		 * 
+		 * This is very similar to calculateMargin except it will account for any offset required for interpoint Braille on the back of a page.
+		 * 
+		 * @param desiredWidth The desired width of the margin.
+		 * @param frontMargin The margin on the front of the page.
+		 * @return The optimised margin which should be used on the back of a page.
+		 */
+		public double calculateBackMargin(double desiredWidth, double frontMargin);
 	}
 	final static class Page {
 		private ImmutableList<PageElement> elements;
@@ -117,17 +145,18 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 		
 	}
 	private static class DocPrintable implements Printable {
-		private List<Page> pages;
-		private Map<TextAttribute, Object> brailleAttributes;
-		public DocPrintable(Stream<Page> pages, Map<TextAttribute, Object> brailleAttributes) {
+		private final List<Page> pages;
+		private final LayoutHelper layoutHelper;
+		public DocPrintable(Stream<Page> pages, LayoutHelper layoutHelper) {
 			this.pages = pages.collect(ImmutableList.toImmutableList());
-			this.brailleAttributes = brailleAttributes;
+			this.layoutHelper = layoutHelper;
 		}
 		@Override
 		public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
 			if (pageIndex < 0 || pageIndex >= pages.size()) {
 				return NO_SUCH_PAGE;
 			}
+			Map<TextAttribute, Object> brailleAttributes = layoutHelper.getBrailleAttributes();
 			Font font = Font.getFont(brailleAttributes);
 			Graphics2D g2d = (Graphics2D)graphics;
 			g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
@@ -238,11 +267,11 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 	private List<Page> pages = new LinkedList<>();
 	private List<PageElement> pageElements = new LinkedList<>();
 	private StringBuilder braille = new StringBuilder();
-	private final Map<TextAttribute, Object> brailleAttributes;
+	private final LayoutHelper layoutHelper;
 	private final boolean duplex;
 	
-	private DocumentToPrintableHandler(Map<TextAttribute, Object> brailleAttributes, boolean duplex) {
-		this.brailleAttributes = brailleAttributes;
+	private DocumentToPrintableHandler(LayoutHelper layoutHelper, boolean duplex) {
+		this.layoutHelper = layoutHelper;
 		this.duplex = duplex;
 		stateStack.push(HandlerStates.READY);
 	}
@@ -253,7 +282,7 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 	}
 	
 	public Printable asPrintable() {
-		return new DocPrintable(pages.stream(), brailleAttributes);
+		return new DocPrintable(pages.stream(), layoutHelper);
 	}
 
 	int getpageCount() {

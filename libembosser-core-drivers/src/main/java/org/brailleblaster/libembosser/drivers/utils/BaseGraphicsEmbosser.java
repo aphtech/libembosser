@@ -1,13 +1,11 @@
 package org.brailleblaster.libembosser.drivers.utils;
 
-import java.awt.font.TextAttribute;
 import java.awt.print.PageFormat;
 import java.awt.print.Paper;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.io.InputStream;
-import java.util.Map;
 import java.util.Optional;
 
 import javax.print.DocFlavor;
@@ -19,6 +17,7 @@ import javax.print.attribute.PrintRequestAttributeSet;
 import javax.print.attribute.standard.Sides;
 
 import org.brailleblaster.libembosser.drivers.utils.DocumentParser.ParseException;
+import org.brailleblaster.libembosser.drivers.utils.DocumentToPrintableHandler.LayoutHelper;
 import org.brailleblaster.libembosser.embossing.attribute.Copies;
 import org.brailleblaster.libembosser.embossing.attribute.PageRanges;
 import org.brailleblaster.libembosser.embossing.attribute.PaperLayout;
@@ -53,7 +52,7 @@ public abstract class BaseGraphicsEmbosser implements IEmbosser {
 	 * @param cell The cell type to be embossed.
 	 * @return A suitable font for printing the Braille cell type.
 	 */
-	public abstract Map<TextAttribute, Object> getBrailleAttributes(BrlCell cell);
+	public abstract LayoutHelper getLayoutHelper(BrlCell cell);
 
 	@Override
 	public void embossPef(PrintService embosserDevice, Document pef, EmbossingAttributeSet attributes)
@@ -74,7 +73,7 @@ public abstract class BaseGraphicsEmbosser implements IEmbosser {
 	}
 	private <T> void emboss(PrintService ps, T input, EmbossingAttributeSet attributes, ThrowingBiConsumer<T, DocumentHandler, ParseException> parseMethod) throws EmbossException {
 		PageRanges pages = Optional.ofNullable((PageRanges)attributes.get(PageRanges.class)).orElseGet(() -> new PageRanges());
-		PageFilterHandler<DocumentToPrintableHandler> pageFilteredHandler = new PageFilterHandler<DocumentToPrintableHandler>(new DocumentToPrintableHandler.Builder().setBrailleAttributes(getBrailleAttributes(BrlCell.NLS)).build(), pages);
+		PageFilterHandler<DocumentToPrintableHandler> pageFilteredHandler = new PageFilterHandler<DocumentToPrintableHandler>(new DocumentToPrintableHandler.Builder().setLayoutHelper(getLayoutHelper(BrlCell.NLS)).build(), pages);
 		try {
 			parseMethod.accept(input, pageFilteredHandler);
 		} catch (ParseException e) {
