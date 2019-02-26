@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import org.brailleblaster.libembosser.spi.BrlCell;
+
 import com.google.common.collect.ImmutableList;
 
 public class DocumentToPrintableHandler implements DocumentHandler {
@@ -49,10 +51,11 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 	public interface LayoutHelper {
 		/**
 		 * Get the text attributes to be applied to Braille strings.
+		 * @param brailleCell TODO
 		 * 
 		 * @return A map of the text attributes to be applied to Braille strings.
 		 */
-		public Map<TextAttribute, Object> getBrailleAttributes();
+		public Map<TextAttribute, Object> getBrailleAttributes(BrlCell brailleCell);
 		/**
 		 * Calculate the left margin for the specific embosser.
 		 * 
@@ -62,6 +65,14 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 		 * @return The margin optimised for the embosser.
 		 */
 		public double calculateMargin(double desiredWidth);
+	}
+	/**
+	 * Layout helper for interpoint Braille embossers.
+	 * 
+	 * @author Michael Whapples
+	 *
+	 */
+	public static interface InterpointLayoutHelper extends LayoutHelper {
 		/**
 		 * Calculate embosser specific margin for back side of the page.
 		 * 
@@ -69,9 +80,10 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 		 * 
 		 * @param desiredWidth The desired width of the margin.
 		 * @param frontMargin The margin on the front of the page.
+		 * @param pageWidth The width of the page.
 		 * @return The optimised margin which should be used on the back of a page.
 		 */
-		public double calculateBackMargin(double desiredWidth, double frontMargin);
+		public double calculateBackMargin(double desiredWidth, double frontMargin, double pageWidth);
 	}
 	final static class Page {
 		private ImmutableList<PageElement> elements;
@@ -156,7 +168,7 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 			if (pageIndex < 0 || pageIndex >= pages.size()) {
 				return NO_SUCH_PAGE;
 			}
-			Map<TextAttribute, Object> brailleAttributes = layoutHelper.getBrailleAttributes();
+			Map<TextAttribute, Object> brailleAttributes = layoutHelper.getBrailleAttributes(BrlCell.NLS);
 			Font font = Font.getFont(brailleAttributes);
 			Graphics2D g2d = (Graphics2D)graphics;
 			g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
@@ -166,7 +178,7 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 			int yPos = 0;
 			int lineHeight = brailleMetrics.getHeight();
 			int cellWidth = brailleMetrics.charWidth('\u2800');
-			if ((pageIndex % 2) == 1) {
+			if (layoutHelper instanceof InterpointLayoutHelper	&& (pageIndex % 2) == 1) {
 				// Calculate horizontal offset for back of page
 				double cellOffset = ((double) cellWidth) / 5.0;
 				double marginOffset = (pageFormat.getWidth() - (2 * pageFormat.getImageableX())) % (double) cellWidth;

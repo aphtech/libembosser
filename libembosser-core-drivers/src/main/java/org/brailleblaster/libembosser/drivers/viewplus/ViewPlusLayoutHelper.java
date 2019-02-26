@@ -1,14 +1,18 @@
 package org.brailleblaster.libembosser.drivers.viewplus;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import java.awt.Color;
 import java.awt.font.TextAttribute;
 import java.util.Map;
 
-import org.brailleblaster.libembosser.drivers.utils.DocumentToPrintableHandler.LayoutHelper;
+import org.brailleblaster.libembosser.drivers.utils.DocumentToPrintableHandler.InterpointLayoutHelper;
+import org.brailleblaster.libembosser.spi.BrlCell;
 
 import com.google.common.collect.ImmutableMap;
 
-public class ViewPlusLayoutHelper implements LayoutHelper {
+public class ViewPlusLayoutHelper implements InterpointLayoutHelper {
+	private final static int[] CELL_OFFSETS = new int[] {1, 0, 1, 2, 0};
 
 	private final Map<TextAttribute, Object> brailleAttributes;
 
@@ -17,20 +21,26 @@ public class ViewPlusLayoutHelper implements LayoutHelper {
 	}
 
 	@Override
-	public Map<TextAttribute, Object> getBrailleAttributes() {
+	public Map<TextAttribute, Object> getBrailleAttributes(BrlCell brailleCell) {
 		return brailleAttributes;
 	}
 
 	@Override
 	public double calculateMargin(double desiredWidth) {
-		// TODO Auto-generated method stub
-		return 0;
+		checkArgument(desiredWidth >= 0, "Desired width cannot be negative.");
+		return convertToWholeDots(desiredWidth) * 3.6;
+	}
+
+	private int convertToWholeDots(double desiredWidth) {
+		return (int)Math.ceil(desiredWidth/3.6);
 	}
 
 	@Override
-	public double calculateBackMargin(double desiredWidth, double frontMargin) {
-		// TODO Auto-generated method stub
-		return 0;
+	public double calculateBackMargin(double desiredWidth, double frontMargin, double pageWidth) {
+		final int desiredDots = convertToWholeDots(desiredWidth);
+		int marginOffset = (convertToWholeDots(pageWidth) - convertToWholeDots(frontMargin) - desiredDots) % 5;
+		int cellOffset = CELL_OFFSETS[marginOffset];
+		return (desiredDots + cellOffset) * 3.6;
 	}
 
 }

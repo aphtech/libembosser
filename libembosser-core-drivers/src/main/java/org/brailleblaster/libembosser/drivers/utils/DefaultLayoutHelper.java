@@ -1,5 +1,6 @@
 package org.brailleblaster.libembosser.drivers.utils;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.font.TextAttribute;
@@ -8,6 +9,7 @@ import java.util.Map;
 
 import org.brailleblaster.libembosser.drivers.generic.GenericGraphicsEmbosser;
 import org.brailleblaster.libembosser.drivers.utils.DocumentToPrintableHandler.LayoutHelper;
+import org.brailleblaster.libembosser.spi.BrlCell;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -17,7 +19,7 @@ public class DefaultLayoutHelper implements LayoutHelper {
 	public DefaultLayoutHelper() {
 		Font baseFont;
 		try {
-			baseFont = Font.createFont(Font.TRUETYPE_FONT, GenericGraphicsEmbosser.class.getResourceAsStream("/org/brailleblaster/libembosser/drivers/fonts/APH_Braille_Font-6.otf"));
+			baseFont = Font.createFont(Font.TRUETYPE_FONT, GenericGraphicsEmbosser.class.getResourceAsStream("/org/brailleblaster/libembosser/drivers/fonts/APH_Braille_Font-6.ttf"));
 		} catch (FontFormatException | IOException e) {
 			throw new RuntimeException("Problem creating font, should not occur", e);
 		}
@@ -26,20 +28,16 @@ public class DefaultLayoutHelper implements LayoutHelper {
 	}
 
 	@Override
-	public Map<TextAttribute, Object> getBrailleAttributes() {
+	public Map<TextAttribute, Object> getBrailleAttributes(BrlCell brailleCell) {
 		return brailleAttributes;
 	}
 
 	@Override
 	public double calculateMargin(double desiredWidth) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public double calculateBackMargin(double desiredWidth, double frontMargin) {
-		// TODO Auto-generated method stub
-		return 0;
+		checkArgument(desiredWidth >= 0, "Desired width must not be negative.");
+		// We assume the embosser can place dots at any position.
+		// Therefore return the desired margin.
+		return desiredWidth;
 	}
 
 }
