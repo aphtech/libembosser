@@ -19,10 +19,13 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import org.brailleblaster.libembosser.spi.BrlCell;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
 
 public class DocumentToPrintableHandler implements DocumentHandler {
+	private static final Logger log = LoggerFactory.getLogger(DocumentToPrintableHandler.class);
 	public static class Builder {
 		private LayoutHelper layoutHelper;
 		private boolean duplex;
@@ -171,18 +174,18 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 			Map<TextAttribute, Object> brailleAttributes = layoutHelper.getBrailleAttributes(BrlCell.NLS);
 			Font font = Font.getFont(brailleAttributes);
 			Graphics2D g2d = (Graphics2D)graphics;
-			g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
+			final double desiredMargin = pageFormat.getImageableX();
+			g2d.translate(desiredMargin, pageFormat.getImageableY());
 			FontMetrics brailleMetrics = g2d.getFontMetrics(font);
 			Page curPage = pages.get(pageIndex);
-			double xPos = 0;
+			double xPos = layoutHelper.calculateMargin(desiredMargin) - desiredMargin;
 			int yPos = 0;
 			int lineHeight = brailleMetrics.getHeight();
-			int cellWidth = brailleMetrics.charWidth('\u2800');
+			log.debug("xPos={} desiredMargin={} page width={}", xPos, desiredMargin, pageFormat.getWidth());
 			if (layoutHelper instanceof InterpointLayoutHelper	&& (pageIndex % 2) == 1) {
 				// Calculate horizontal offset for back of page
-				double cellOffset = ((double) cellWidth) / 5.0;
-				double marginOffset = (pageFormat.getWidth() - (2 * pageFormat.getImageableX())) % (double) cellWidth;
-				xPos = marginOffset > cellOffset ? marginOffset - cellOffset : marginOffset + cellOffset;
+				xPos = ((InterpointLayoutHelper)layoutHelper).calculateBackMargin(desiredMargin, desiredMargin, pageFormat.getWidth()) - desiredMargin;
+				log.debug("Changed xPos to {} for back side", xPos);
 			}
 			for (PageElement element: curPage.getElements()) {
 				if (element instanceof Row) {

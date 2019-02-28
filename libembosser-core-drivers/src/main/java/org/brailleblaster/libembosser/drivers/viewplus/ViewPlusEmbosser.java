@@ -12,12 +12,17 @@ public class ViewPlusEmbosser extends BaseGraphicsEmbosser {
 	private final Rectangle maxPaper;
 	private final boolean duplex;
 	public ViewPlusEmbosser(String id, String model, Rectangle minPaper, Rectangle maxPaper, boolean duplex) {
-		super(id, "ViewPlus Technologies", model);
+		this(id, "ViewPlus Technologies", model, minPaper, maxPaper, duplex);
+	}
+	
+	public ViewPlusEmbosser(String id, String manufacturer, String model, Rectangle minPaper, Rectangle maxPaper,
+			boolean duplex) {
+		super(id, manufacturer, model);
 		this.minPaper = checkNotNull(minPaper);
 		this.maxPaper = checkNotNull(maxPaper);
 		this.duplex = duplex;
 	}
-	
+
 	@Override
 	public Rectangle getMaximumPaper() {
 		return maxPaper;
