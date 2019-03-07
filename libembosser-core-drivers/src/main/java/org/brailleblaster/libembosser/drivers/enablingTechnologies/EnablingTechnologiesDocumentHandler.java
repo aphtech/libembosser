@@ -123,6 +123,7 @@ public class EnablingTechnologiesDocumentHandler implements DocumentToByteSource
 				.setCellsPerLine(cellsPerLine)
 				.setTopMargin(topMargin)
 				.setLinesPerPage(linesPerPage)
+				.setEndOfPage(new byte[] {'\r', '\n', '\f'})
 				.setInterpoint(duplex.isDoubleSide())
 				.setCopies(copies)
 				.build();

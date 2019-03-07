@@ -1,5 +1,7 @@
 package org.brailleblaster.libembosser.drivers.generic;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -102,7 +104,19 @@ public class GenericTextDocumentHandler implements DocumentToByteSourceHandler {
 		private int leftMargin = 0;
 		private int topMargin = 0;
 		private int copies = 1;
+		private byte[] endOfLine = new byte[] {'\r','\n'};
+		private byte[] endOfPage = new byte[] {'\f'};
 		private boolean padWithBlanks = false;
+		public Builder setEndOfLine(byte[] endOfLine) {
+			checkNotNull(endOfLine);
+			this.endOfLine = Arrays.copyOf(endOfLine, endOfLine.length);
+			return this;
+		}
+		public Builder setEndOfPage(byte[] endOfPage) {
+			checkNotNull(endOfPage);
+			this.endOfPage = Arrays.copyOf(endOfPage, endOfPage.length);
+			return this;
+		}
 		public Builder padWithBlankLines(boolean pad) {
 			padWithBlanks = pad;
 			return this;
@@ -132,7 +146,7 @@ public class GenericTextDocumentHandler implements DocumentToByteSourceHandler {
 			return this;
 		}
 		public GenericTextDocumentHandler build() {
-			return new GenericTextDocumentHandler(leftMargin, topMargin, cellsPerLine, linesPerPage, copies, padWithBlanks, interpoint);
+			return new GenericTextDocumentHandler(leftMargin, topMargin, cellsPerLine, linesPerPage, endOfLine, endOfPage, padWithBlanks, interpoint, copies);
 		}
 	}
 	private ByteArrayOutputStream output;
@@ -155,7 +169,7 @@ public class GenericTextDocumentHandler implements DocumentToByteSourceHandler {
 	private int pendingLines;
 	private boolean rightPage = true;
 
-	private GenericTextDocumentHandler(int leftMargin, int topMargin, int cellsPerLine, int linesPerPage, int copies, boolean bottomPadding, boolean interpoint) {
+	private GenericTextDocumentHandler(int leftMargin, int topMargin, int cellsPerLine, int linesPerPage, byte[] endOfLine, byte[] endOfPage, boolean bottomPadding, boolean interpoint, int copies) {
 		defaultCellsPerLine = cellsPerLine;
 		this.copies = copies;
 		this.bottomPadding = bottomPadding;
@@ -167,8 +181,8 @@ public class GenericTextDocumentHandler implements DocumentToByteSourceHandler {
 		this.topMargin = topMargin;
 		initialBufferCapacity = 1000000;
 		output = new ByteArrayOutputStream(initialBufferCapacity);
-		newLineBytes = new byte[] {'\r','\n'};
-		newPageBytes = new byte[] {'\f'};
+		newLineBytes = endOfLine;
+		newPageBytes = endOfPage;
 	}
 	
 	@Override
