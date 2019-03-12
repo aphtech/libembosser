@@ -4,13 +4,14 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Prefer using EmbosserFactory.
+ * A factory class to provide a number of embosser configurations.
  * 
  * @author Michael Whapples
  *
  */
-@Deprecated
-public interface IEmbosserFactory {
+@SuppressWarnings("deprecation")
+public interface EmbosserFactory extends IEmbosserFactory {
+
 	/**
 	 * Get the embossers supported by the factory.
 	 * 
@@ -18,7 +19,7 @@ public interface IEmbosserFactory {
 	 * 
 	 * @return A list of supported embosser models.
 	 */
-	public List<? extends IEmbosser> getEmbossers();
+	public List<Embosser> getEmbossers();
 	/**
 	 * Get embosser drivers localised to the locale.
 	 * 
@@ -29,5 +30,5 @@ public interface IEmbosserFactory {
 	 * @param locale The locale to be used by driver instances returned.
 	 * @return A list of embossers.
 	 */
-	public List<? extends IEmbosser> getEmbossers(Locale locale);
+	public List<Embosser> getEmbossers(Locale locale);
 }

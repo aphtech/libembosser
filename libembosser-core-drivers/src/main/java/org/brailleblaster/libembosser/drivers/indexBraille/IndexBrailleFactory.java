@@ -5,8 +5,8 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
 
-import org.brailleblaster.libembosser.spi.IEmbosser;
-import org.brailleblaster.libembosser.spi.IEmbosserFactory;
+import org.brailleblaster.libembosser.spi.Embosser;
+import org.brailleblaster.libembosser.spi.EmbosserFactory;
 import org.brailleblaster.libembosser.spi.Layout;
 import org.brailleblaster.libembosser.spi.PaperSize;
 import org.brailleblaster.libembosser.spi.Rectangle;
@@ -14,7 +14,7 @@ import org.brailleblaster.libembosser.spi.Rectangle;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
-public class IndexBrailleFactory implements IEmbosserFactory {
+public class IndexBrailleFactory implements EmbosserFactory {
 	private static final EnumSet<Layout> BASIC_D_SIDES = EnumSet.of(Layout.INTERPOINT, Layout.P1ONLY, Layout.P2ONLY, Layout.Z_FOLDING_DOUBLE_HORIZONTAL, Layout.Z_FOLDING_SINGLE_HORIZONTAL, Layout.Z_FOLDING_DOUBLE_VERTICAL, Layout.Z_FOLDING_SINGLE_VERTICAL);
 	private static final EnumSet<Layout> EVEREST_SIDES = EnumSet.of(Layout.INTERPOINT, Layout.P1ONLY, Layout.P2ONLY, Layout.SADDLE_STITCH_DOUBLE_SIDED, Layout.SADDLE_STITCH_SINGLE_SIDED);
 	private static final EnumSet<Layout> BRAILLEBOX_SIDES = EVEREST_SIDES;
@@ -29,9 +29,9 @@ public class IndexBrailleFactory implements IEmbosserFactory {
 	private static final ImmutableMap<Rectangle, Integer> ET_PA_PAPER_SIZES = ImmutableMap.of(ELEVEN_AND_HALF_BY_ELEVEN_PAPER, Integer.valueOf(0), LETTER_PAPER, Integer.valueOf(1), TEN_BY_ELEVEN_PAPER, Integer.valueOf(2), ELEVEN_BY_ELEVEN_PAPER, Integer.valueOf(3));
 	private static final Rectangle BRAILLEBOX_MAX_PAPER = new Rectangle(new BigDecimal("300"), new BigDecimal("440"));
 	private static final Rectangle BRAILLEBOX_MIN_PAPER = new Rectangle(new BigDecimal("200"), new BigDecimal("250"));
-	private List<IEmbosser> embossers;
+	private List<Embosser> embossers;
 	public IndexBrailleFactory() {
-		embossers = ImmutableList.<IEmbosser>builder()
+		embossers = ImmutableList.<Embosser>builder()
 				// The Enabling Technologies Romeo60 and Juliet120 are based on Index Basic D V5
 				.add(new IndexBrailleEmbosser("libembosser.ib.Romeo60", "Enabling Technologies", "Romeo 60", TWELVE_AND_HALF_BY_TWENTY_FOUR_PAPER, FOUR_BY_THREE_PAPER, 49, ENABLING_SIDES, ET_PA_PAPER_SIZES))
 				.add(new IndexBrailleEmbosser("libembosser.ib.Juliet120", "Enabling Technologies", "Juliet 120", TWELVE_AND_HALF_BY_TWENTY_FOUR_PAPER, FOUR_BY_THREE_PAPER, 49, ENABLING_SIDES, ET_PA_PAPER_SIZES))
@@ -45,11 +45,11 @@ public class IndexBrailleFactory implements IEmbosserFactory {
 				.build();
 	}
 	@Override
-	public List<IEmbosser> getEmbossers() {
+	public List<Embosser> getEmbossers() {
 		return embossers;
 	}
 	@Override
-	public List<IEmbosser> getEmbossers(Locale locale) {
+	public List<Embosser> getEmbossers(Locale locale) {
 		return embossers;
 	}
 }

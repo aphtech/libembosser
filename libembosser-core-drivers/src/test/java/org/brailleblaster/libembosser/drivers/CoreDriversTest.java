@@ -22,9 +22,9 @@ import org.brailleblaster.libembosser.embossing.attribute.Copies;
 import org.brailleblaster.libembosser.embossing.attribute.PaperLayout;
 import org.brailleblaster.libembosser.embossing.attribute.PaperMargins;
 import org.brailleblaster.libembosser.spi.EmbossException;
+import org.brailleblaster.libembosser.spi.Embosser;
 import org.brailleblaster.libembosser.spi.EmbossingAttribute;
 import org.brailleblaster.libembosser.spi.EmbossingAttributeSet;
-import org.brailleblaster.libembosser.spi.IEmbosser;
 import org.brailleblaster.libembosser.spi.Layout;
 import org.brailleblaster.libembosser.spi.Margins;
 import org.brailleblaster.libembosser.spi.PaperSize;
@@ -171,8 +171,8 @@ public class CoreDriversTest {
 	}
 	@Test(dataProvider="simpleEmbossProvider")
 	public void testSimpleEmboss(String id, String input, EmbossingAttributeSet attrs, byte[] expected) {
-		Stream<IEmbosser> embosserStream = EmbosserService.getInstance().getEmbosserStream();
-		IEmbosser embosser = embosserStream.filter(e -> e.getId().equals(id)).findFirst().get();
+		Stream<Embosser> embosserStream = EmbosserService.getInstance().getEmbosserStream();
+		Embosser embosser = embosserStream.filter(e -> e.getId().equals(id)).findFirst().get();
 		StreamPrintServiceFactory factory = new EmbossToStreamPrintServiceFactory();
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		StreamPrintService sps = factory.getPrintService(out);

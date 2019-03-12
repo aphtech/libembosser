@@ -24,8 +24,8 @@ import org.brailleblaster.libembosser.embossing.attribute.PaperLayout;
 import org.brailleblaster.libembosser.embossing.attribute.PaperMargins;
 import org.brailleblaster.libembosser.spi.BrlCell;
 import org.brailleblaster.libembosser.spi.EmbossException;
+import org.brailleblaster.libembosser.spi.Embosser;
 import org.brailleblaster.libembosser.spi.EmbossingAttributeSet;
-import org.brailleblaster.libembosser.spi.IEmbosser;
 import org.w3c.dom.Document;
 
 /**
@@ -34,7 +34,7 @@ import org.w3c.dom.Document;
  * @author Michael Whapples
  *
  */
-public abstract class BaseGraphicsEmbosser implements IEmbosser {
+public abstract class BaseGraphicsEmbosser implements Embosser {
 	private StreamPrintServiceFactory[] streamPrintServiceFactories = PrinterJob.lookupStreamPrintServices(DocFlavor.BYTE_ARRAY.POSTSCRIPT.getMimeType());
 	private String id;
 	private String manufacturer;

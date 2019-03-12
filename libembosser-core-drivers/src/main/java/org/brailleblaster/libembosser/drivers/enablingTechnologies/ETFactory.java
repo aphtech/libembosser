@@ -4,21 +4,21 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Locale;
 
-import org.brailleblaster.libembosser.spi.IEmbosser;
-import org.brailleblaster.libembosser.spi.IEmbosserFactory;
+import org.brailleblaster.libembosser.spi.Embosser;
+import org.brailleblaster.libembosser.spi.EmbosserFactory;
 import org.brailleblaster.libembosser.spi.Rectangle;
 
 import com.google.common.collect.ImmutableList;
 
-public class ETFactory implements IEmbosserFactory {
+public class ETFactory implements EmbosserFactory {
 	public static final Rectangle FIFTEEN_BY_FOURTEEN_PAPER = new Rectangle(new BigDecimal("381"), new BigDecimal("356"));
 	public static final Rectangle THIRTEEN_AND_QUARTER_BY_FOURTEEN_PAPER = new Rectangle(new BigDecimal("337"), new BigDecimal("356"));
 	public static final Rectangle TWELVE_BY_FOURTEEN_PAPER = new Rectangle(new BigDecimal("305"), new BigDecimal("356"));
 	public static final Rectangle EIGHT_AND_HALF_BY_FOURTEEN_PAPER = new Rectangle(new BigDecimal("216"), new BigDecimal("356"));
 	public static final Rectangle ONE_AND_HALF_BY_THREE_PAPER = new Rectangle(new BigDecimal("38"), new BigDecimal("76"));
-	private final List<IEmbosser> embossers;
+	private final List<Embosser> embossers;
 	public ETFactory() {
-		embossers = ImmutableList.<IEmbosser>builder()
+		embossers = ImmutableList.<Embosser>builder()
 				.add(new EnablingTechnologiesEmbosser("libembosser.et.phoenix_gold", "Phoenix Gold", TWELVE_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, false))
 				.add(new EnablingTechnologiesEmbosser("libembosser.et.phoenix_silver", "Phoenix  silver", TWELVE_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, false))
 				.add(new EnablingTechnologiesEmbosser("libembosser.et.cyclone", "Cyclone", TWELVE_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, false))
@@ -39,11 +39,11 @@ public class ETFactory implements IEmbosserFactory {
 	}
 
 	@Override
-	public List<IEmbosser> getEmbossers() {
+	public List<Embosser> getEmbossers() {
 		return embossers;
 	}
 	@Override
-	public List<IEmbosser> getEmbossers(Locale locale) {
+	public List<Embosser> getEmbossers(Locale locale) {
 		// For now ignore the locale.
 		return getEmbossers();
 	}

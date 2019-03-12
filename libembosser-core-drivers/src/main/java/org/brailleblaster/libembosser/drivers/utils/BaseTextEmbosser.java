@@ -16,11 +16,11 @@ import javax.print.event.PrintJobListener;
 
 import org.brailleblaster.libembosser.drivers.utils.DocumentParser.ParseException;
 import org.brailleblaster.libembosser.spi.EmbossException;
-import org.brailleblaster.libembosser.spi.IEmbosser;
+import org.brailleblaster.libembosser.spi.Embosser;
 import org.brailleblaster.libembosser.spi.Rectangle;
 import org.brailleblaster.libembosser.utils.EmbossToStreamPrintServiceFactory;
 
-public abstract class BaseTextEmbosser implements IEmbosser {
+public abstract class BaseTextEmbosser implements Embosser {
 	private StreamPrintServiceFactory streamPrintServiceFactory = new EmbossToStreamPrintServiceFactory();
 	private final String id;
 	private String manufacturer;

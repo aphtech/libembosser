@@ -6,7 +6,7 @@ package org.brailleblaster.libembosser.spi;
  * @author Michael Whapples
  *
  */
-public interface IGraphicsEmbosser extends IEmbosser {
+public interface IGraphicsEmbosser extends Embosser {
 	/**
 	 * Get the maximum resolution supported by this embosser.
 	 * 

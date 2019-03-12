@@ -3,16 +3,16 @@ package org.brailleblaster.libembosser.drivers.viewplus;
 import java.util.List;
 import java.util.Locale;
 
-import org.brailleblaster.libembosser.spi.IEmbosser;
-import org.brailleblaster.libembosser.spi.IEmbosserFactory;
+import org.brailleblaster.libembosser.spi.Embosser;
+import org.brailleblaster.libembosser.spi.EmbosserFactory;
 import org.brailleblaster.libembosser.spi.Rectangle;
 
 import com.google.common.collect.ImmutableList;
 
-public class ViewPlusEmbosserFactory implements IEmbosserFactory {
-	private ImmutableList<IEmbosser> embossers;
+public class ViewPlusEmbosserFactory implements EmbosserFactory {
+	private ImmutableList<Embosser> embossers;
 	public ViewPlusEmbosserFactory() {
-		embossers = new ImmutableList.Builder<IEmbosser>()
+		embossers = new ImmutableList.Builder<Embosser>()
 				.add(new ViewPlusEmbosser("libembosser.vp.embraille", "EmBraille", new Rectangle("77", "20"), new Rectangle("216", "610"), false))
 				.add(new ViewPlusEmbosser("libembosser.vp.columbia", "Columbia", new Rectangle("176", "20"), new Rectangle("325", "610"), true))
 				.add(new ViewPlusEmbosser("libembosser.vp.delta", "Delta", new Rectangle("176", "20"), new Rectangle("305", "432"), true))
@@ -30,12 +30,12 @@ public class ViewPlusEmbosserFactory implements IEmbosserFactory {
 	}
 
 	@Override
-	public List<IEmbosser> getEmbossers() {
+	public List<Embosser> getEmbossers() {
 		return embossers;
 	}
 
 	@Override
-	public List<IEmbosser> getEmbossers(Locale locale) {
+	public List<Embosser> getEmbossers(Locale locale) {
 		return embossers;
 	}
 
