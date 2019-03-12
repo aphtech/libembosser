@@ -1,11 +1,11 @@
 package org.brailleblaster.libembosser.spi;
 
 /**
- * Interface for embosser drivers capable of graphics.
- * 
+ * Prefer GraphicsEmbosser interface.
  * @author Michael Whapples
  *
  */
+@Deprecated
 public interface IGraphicsEmbosser extends Embosser {
 	/**
 	 * Get the maximum resolution supported by this embosser.
