@@ -2,6 +2,7 @@ package org.brailleblaster.libembosser.spi;
 
 import java.io.InputStream;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import javax.print.PrintService;
 import javax.print.StreamPrintServiceFactory;
@@ -103,4 +104,10 @@ public interface Embosser extends IEmbosser {
 	 * @return An optional of a suitable StreamPrintServiceFactory for embossing to a stream, empty if no suitable StreamPrintServiceFactory can be located.
 	 */
 	public Optional<StreamPrintServiceFactory> getStreamPrintServiceFactory();
+	/**
+	 * Check that all prerequisites are met for using this embosser.
+	 * 
+	 * @return A list of notifications informing the user of actions which must be taken to be able to use this embosser.
+	 */
+	public Stream<Notification> checkPrerequisites();
 }

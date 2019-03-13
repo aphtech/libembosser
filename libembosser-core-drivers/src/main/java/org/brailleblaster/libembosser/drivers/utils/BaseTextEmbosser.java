@@ -3,6 +3,7 @@ package org.brailleblaster.libembosser.drivers.utils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import javax.print.Doc;
 import javax.print.DocFlavor;
@@ -17,6 +18,7 @@ import javax.print.event.PrintJobListener;
 import org.brailleblaster.libembosser.drivers.utils.DocumentParser.ParseException;
 import org.brailleblaster.libembosser.spi.EmbossException;
 import org.brailleblaster.libembosser.spi.Embosser;
+import org.brailleblaster.libembosser.spi.Notification;
 import org.brailleblaster.libembosser.spi.Rectangle;
 import org.brailleblaster.libembosser.utils.EmbossToStreamPrintServiceFactory;
 
@@ -130,5 +132,8 @@ public abstract class BaseTextEmbosser implements Embosser {
 	public Optional<StreamPrintServiceFactory> getStreamPrintServiceFactory() {
 		return Optional.of(streamPrintServiceFactory);
 	}
-	
+	@Override
+	public Stream<Notification> checkPrerequisites() {
+		return Stream.empty();
+	}
 }

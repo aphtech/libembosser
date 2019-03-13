@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.OptionalInt;
-import java.util.stream.Collectors;
 
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.BrailleEvent;
@@ -64,7 +63,7 @@ public class IndexBrailleDocumentHandlerTest {
 		data.add(new Object[] {createHandlerBuilder().setLinesPerPage(3).build(), multiLineDocumentInput, String.format(basicHeader, 0, 40, 0, 3) + String.join("\r\n", multiLineDocumentOutputString) + "\f"});
 		// Confirm Braille is truncated to fit page limits.
 		data.add(new Object[] {createHandlerBuilder().setLinesPerPage(2).build(), multiLineDocumentInput, String.format(basicHeader, 0, 40, 0, 2) + String.join("\r\n", multiLineDocumentOutputString[0], multiLineDocumentOutputString[1]) + "\f"});
-		data.add(new Object[] {createHandlerBuilder().setCellsPerLine(6).build(), multiLineDocumentInput, String.format(basicHeader, 0, 6, 0, 25) + String.join("\r\n", Arrays.stream(multiLineDocumentOutputString).map(s -> s.substring(0, Math.min(s.length(), 6))).collect(Collectors.toUnmodifiableList())) + "\f"});
+		data.add(new Object[] {createHandlerBuilder().setCellsPerLine(6).build(), multiLineDocumentInput, String.format(basicHeader, 0, 6, 0, 25) + String.join("\r\n", Arrays.stream(multiLineDocumentOutputString).map(s -> s.substring(0, Math.min(s.length(), 6))).collect(ImmutableList.toImmutableList())) + "\f"});
 		// Test that multiple pages work.
 		final ImmutableList<DocumentEvent> multiPageDocumentInput = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("f/ page"), new EndLineEvent(), new EndPageEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("second page"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		final String[] multiPageDocumentOutputStrings = new String[] {"F/ PAGE", "SECOND PAGE"};

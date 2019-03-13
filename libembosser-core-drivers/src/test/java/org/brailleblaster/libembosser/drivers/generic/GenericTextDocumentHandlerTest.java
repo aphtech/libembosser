@@ -71,7 +71,7 @@ public class GenericTextDocumentHandlerTest {
 		data.add(new Object[] {createHandlerBuilder().padWithBlankLines(true).setLinesPerPage(3).build(), multiLineDocumentInput, String.join("\r\n", multiLineDocumentOutputString).concat("\f").getBytes(Charsets.US_ASCII)});
 		// Confirm Braille is truncated to fit page limits.
 		data.add(new Object[] {createHandlerBuilder().setLinesPerPage(2).build(), multiLineDocumentInput, String.join("\r\n", multiLineDocumentOutputString[0], multiLineDocumentOutputString[1]).concat("\f").getBytes(Charsets.US_ASCII)});
-		data.add(new Object[] {createHandlerBuilder().setCellsPerLine(6).build(), multiLineDocumentInput, String.join("\r\n", Arrays.stream(multiLineDocumentOutputString).map(s -> s.substring(0, Math.min(s.length(), 6))).collect(Collectors.toUnmodifiableList())).concat("\f").getBytes(Charsets.US_ASCII)});
+		data.add(new Object[] {createHandlerBuilder().setCellsPerLine(6).build(), multiLineDocumentInput, String.join("\r\n", Arrays.stream(multiLineDocumentOutputString).map(s -> s.substring(0, Math.min(s.length(), 6))).collect(ImmutableList.toImmutableList())).concat("\f").getBytes(Charsets.US_ASCII)});
 		// Test that multiple pages work.
 		final ImmutableList<DocumentEvent> multiPageDocumentInput = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("f/ page"), new EndLineEvent(), new EndPageEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("second page"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		final String[] multiPageDocumentOutputStrings = new String[] {"F/ PAGE", "SECOND PAGE"};
