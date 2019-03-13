@@ -56,7 +56,7 @@ public class ViewPlusEmbosser extends BaseGraphicsEmbosser {
 		Map<TextAttribute, Object> attrs = getLayoutHelper(BrlCell.NLS).getBrailleAttributes(BrlCell.NLS);
 		Font font = Font.getFont(attrs);
 		Stream.Builder<Notification> resultBuilder = Stream.builder();
-		if (!font.getName().equals("Braille")) {
+		if (!font.getName().equals("Braille29")) {
 			resultBuilder.add(new DefaultNotificationImpl(NotificationType.ERROR, "org.brailleblaster.libembosser.drivers.i18n.ViewPlus", "NoFont"));
 		}
 		return resultBuilder.build();
