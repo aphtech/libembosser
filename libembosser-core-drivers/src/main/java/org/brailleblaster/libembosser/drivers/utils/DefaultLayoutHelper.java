@@ -19,7 +19,7 @@ public class DefaultLayoutHelper implements LayoutHelper {
 	public DefaultLayoutHelper() {
 		Font baseFont;
 		try {
-			baseFont = Font.createFont(Font.TRUETYPE_FONT, GenericGraphicsEmbosser.class.getResourceAsStream("/org/brailleblaster/libembosser/drivers/fonts/APH_Braille_Font-6.ttf"));
+			baseFont = Font.createFont(Font.TRUETYPE_FONT, GenericGraphicsEmbosser.class.getResourceAsStream("/org/brailleblaster/libembosser/drivers/fonts/APH_Braille_Font-6.otf"));
 		} catch (FontFormatException | IOException e) {
 			throw new RuntimeException("Problem creating font, should not occur", e);
 		}

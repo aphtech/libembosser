@@ -21,7 +21,7 @@ public class DefaultLayoutHelperTest {
 		assertEquals(actualAttrs.size(), 1, "Expected number of text attributes should be 1");
 		assertTrue(actualAttrs.containsKey(TextAttribute.FONT));
 		Font actualFont = (Font)actualAttrs.get(TextAttribute.FONT);
-		assertEquals(actualFont.getName(), "APH Braille Font-6dot");
+		assertEquals(actualFont.getName(), "APH_Braille_Font-6");
 		assertEquals(actualFont.getSize(), 26);
 	}
 	@DataProvider(name="marginProvider")
