@@ -23,13 +23,17 @@ public class DefaultLayoutHelper implements LayoutHelper {
 		} catch (FontFormatException | IOException e) {
 			throw new RuntimeException("Problem creating font, should not occur", e);
 		}
-		Font font = baseFont.deriveFont(26.0f);
+		Font font = baseFont.deriveFont(24.0f);
 		brailleAttributes = ImmutableMap.of(TextAttribute.FONT, font);
 	}
 
 	@Override
 	public Map<TextAttribute, Object> getBrailleAttributes(BrlCell brailleCell) {
 		return brailleAttributes;
+	}
+	@Override
+	public int getLineSpacing() {
+		return 3;
 	}
 
 	@Override

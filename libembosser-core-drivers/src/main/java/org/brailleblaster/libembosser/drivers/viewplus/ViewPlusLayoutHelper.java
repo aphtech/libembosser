@@ -24,6 +24,10 @@ public class ViewPlusLayoutHelper implements InterpointLayoutHelper {
 	public Map<TextAttribute, Object> getBrailleAttributes(BrlCell brailleCell) {
 		return brailleAttributes;
 	}
+	@Override
+	public int getLineSpacing() {
+		return 0;
+	}
 
 	@Override
 	public double calculateMargin(double desiredWidth) {

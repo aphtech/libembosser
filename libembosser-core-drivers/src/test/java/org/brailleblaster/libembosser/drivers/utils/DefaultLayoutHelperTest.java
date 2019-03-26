@@ -22,7 +22,7 @@ public class DefaultLayoutHelperTest {
 		assertTrue(actualAttrs.containsKey(TextAttribute.FONT));
 		Font actualFont = (Font)actualAttrs.get(TextAttribute.FONT);
 		assertEquals(actualFont.getName(), "APH_Braille_Font-6");
-		assertEquals(actualFont.getSize(), 26);
+		assertEquals(actualFont.getSize(), 24);
 	}
 	@DataProvider(name="marginProvider")
 	public Iterator<Object[]> marginprovider() {

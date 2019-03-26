@@ -60,6 +60,13 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 		 */
 		public Map<TextAttribute, Object> getBrailleAttributes(BrlCell brailleCell);
 		/**
+		 * Get the padding which should be inserted between lines.
+		 * 
+		 * Whilst fonts should provide the leading or line spacing, some seem not to. In the cases where the line spacing is not accounted for in the font this will give the line spacing which should be inserted.
+		 * @return The line spacing in points.
+		 */
+		public int getLineSpacing();
+		/**
 		 * Calculate the left margin for the specific embosser.
 		 * 
 		 * Some embossers are restricted to where they can place dots, so this method will calculate a margin to align with the positions the embosser can do.
@@ -180,7 +187,7 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 			Page curPage = pages.get(pageIndex);
 			double xPos = layoutHelper.calculateMargin(desiredMargin) - desiredMargin;
 			int yPos = 0;
-			int lineHeight = brailleMetrics.getHeight();
+			int lineHeight = brailleMetrics.getHeight() + layoutHelper.getLineSpacing();
 			log.debug("xPos={} desiredMargin={} page width={}", xPos, desiredMargin, pageFormat.getWidth());
 			if (layoutHelper instanceof InterpointLayoutHelper	&& (pageIndex % 2) == 1) {
 				// Calculate horizontal offset for back of page
