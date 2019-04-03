@@ -1,5 +1,6 @@
 package org.brailleblaster.libembosser.drivers.braillo;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import org.brailleblaster.libembosser.drivers.generic.GenericTextDocumentHandler;
 import org.brailleblaster.libembosser.drivers.utils.DocumentToByteSourceHandler;
 
@@ -9,6 +10,11 @@ public class Braillo200DocumentHandler implements DocumentToByteSourceHandler {
 	public static class Builder {
 		public Braillo200DocumentHandler build() {
 			return new Braillo200DocumentHandler();
+		}
+
+		public Builder setCellsperLine(int cellsPerLine) {
+			checkArgument(10 <= cellsPerLine && cellsPerLine <= 42);
+			return this;
 		}
 	}
 	private ByteSource headerSource;

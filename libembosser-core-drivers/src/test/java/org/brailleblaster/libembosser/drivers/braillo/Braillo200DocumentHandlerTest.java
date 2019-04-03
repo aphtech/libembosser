@@ -1,10 +1,14 @@
 package org.brailleblaster.libembosser.drivers.braillo;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.fail;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
+import java.util.stream.IntStream;
 
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.BrailleEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.DocumentEvent;
@@ -18,11 +22,14 @@ import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartLineEve
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartPageEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartSectionEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartVolumeEvent;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Range;
+import com.google.common.collect.Streams;
 
 public class Braillo200DocumentHandlerTest {
 	@Test
@@ -43,5 +50,16 @@ public class Braillo200DocumentHandlerTest {
 		assertThat(actual)
 				.startsWith(expectedHeader)
 				.endsWith(expectedBody);
+	}
+	@DataProvider(name="invalidCellsPerLineProvider")
+	public Iterator<Object[]> invalidCellsPerLineProvider() {
+		Random r = new Random(System.currentTimeMillis());
+		Range<Integer> validCellsPerLine = Range.closed(10, 42);
+		return Streams.concat(IntStream.of(7, 8, 9, 43, 44, 45), r.ints())
+				.filter(i -> !validCellsPerLine.contains(i)).limit(100).mapToObj(i -> new Object[] { new Braillo200DocumentHandler.Builder(), i}).iterator();
+	}
+	@Test(dataProvider="invalidCellsPerLineProvider")
+	public void testSetCellsPerLineInvalidValueThrowsException(Braillo200DocumentHandler.Builder builder, int cellsPerLine) {
+		assertThatIllegalArgumentException().isThrownBy(() -> builder.setCellsperLine(cellsPerLine));
 	}
 }
