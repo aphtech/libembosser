@@ -16,6 +16,11 @@ public class Braillo200DocumentHandler implements DocumentToByteSourceHandler {
 			checkArgument(10 <= cellsPerLine && cellsPerLine <= 42);
 			return this;
 		}
+		public Builder setSheetLength(double inches) {
+			// Remember as rounding up to nearest half inch lower bound is 3.5
+			checkArgument(3.5 < inches && inches <= 14.0);
+			return this;
+		}
 	}
 	private ByteSource headerSource;
 	private GenericTextDocumentHandler handler;

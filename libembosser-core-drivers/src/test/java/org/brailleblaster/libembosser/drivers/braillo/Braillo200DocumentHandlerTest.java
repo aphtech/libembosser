@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.BrailleEvent;
@@ -55,11 +56,24 @@ public class Braillo200DocumentHandlerTest {
 	public Iterator<Object[]> invalidCellsPerLineProvider() {
 		Random r = new Random(System.currentTimeMillis());
 		Range<Integer> validCellsPerLine = Range.closed(10, 42);
-		return Streams.concat(IntStream.of(7, 8, 9, 43, 44, 45), r.ints())
-				.filter(i -> !validCellsPerLine.contains(i)).limit(100).mapToObj(i -> new Object[] { new Braillo200DocumentHandler.Builder(), i}).iterator();
+		return Streams.concat(IntStream.of(7, 8, 9, 43, 44, 45), r.ints().filter(i -> !validCellsPerLine.contains(i)))
+				.limit(100).mapToObj(i -> new Object[] { new Braillo200DocumentHandler.Builder(), i}).iterator();
 	}
 	@Test(dataProvider="invalidCellsPerLineProvider")
 	public void testSetCellsPerLineInvalidValueThrowsException(Braillo200DocumentHandler.Builder builder, int cellsPerLine) {
 		assertThatIllegalArgumentException().isThrownBy(() -> builder.setCellsperLine(cellsPerLine));
+	}
+	@DataProvider(name="invalidSheetLengthProvider")
+	public Iterator<Object[]> invalidSheetLengthProvider() {
+		Random r = new Random(System.currentTimeMillis());
+		// Sheet length should be between 4 and 14 inches, but values always rounded up to nearest half inch.
+		// This means lower bound is anything above 3.5
+		Range<Double> validSheetLength = Range.openClosed(3.5, 14.0);
+		return Streams.concat(DoubleStream.of(3.3, 3.4, 3.44, 14.02, 14.1, 14.5), r.doubles(0.0, 1000.0).filter(l -> !validSheetLength.contains(l)))
+				.limit(100).mapToObj(l -> new Object[] { new Braillo200DocumentHandler.Builder(), l}).iterator();
+	}
+	@Test(dataProvider="invalidSheetLengthProvider")
+	public void testSetSheetLengthInvalidThrowsException(Braillo200DocumentHandler.Builder builder, double sheetLength) {
+		assertThatIllegalArgumentException().isThrownBy(() -> builder.setSheetLength(sheetLength));
 	}
 }
