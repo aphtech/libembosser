@@ -172,4 +172,55 @@ public class Braillo200DocumentHandlerTest {
 				.contains(String.format("\u001bA%02d", (int)Math.ceil(sheetLength * 2)))
 				.contains(expectedBody);
 	}
+	@DataProvider(name="interPointProvider")
+	public Iterator<Object[]> interPointProvider() {
+		List<Object[]> data = new ArrayList<>();
+		String[][][] inputVols = new String[][][] {
+			{
+				{"\u2801",},
+			}, {
+				{"\u2803",},
+				{"\u2809",},
+			}, {
+				{"\u2819",},
+			},
+		};
+		String[][] outputPages = new String[][] {
+			{"A",},
+			{},
+			{"B",},
+			{"C",},
+			{"D",},
+			{},
+		};
+		final Braillo200DocumentHandler.Builder handlerBuilder = new Braillo200DocumentHandler.Builder().setCellsperLine(40).setSheetLength(11.0);
+		ImmutableList.Builder<DocumentEvent> eventsBuilder = ImmutableList.builder();
+		eventsBuilder.add(new StartDocumentEvent());
+		for (String[][] vol: inputVols) {
+			eventsBuilder.add(new StartVolumeEvent(), new StartSectionEvent());
+			for (String[] page: vol) {
+				eventsBuilder.add(new StartPageEvent());
+				for (String line: page) {
+					eventsBuilder.add(new StartLineEvent(), new BrailleEvent(line), new EndLineEvent());
+				}
+				eventsBuilder.add(new EndPageEvent());
+			}
+			eventsBuilder.add(new EndSectionEvent(), new EndVolumeEvent());
+		}
+		eventsBuilder.add(new EndDocumentEvent());
+		List<DocumentEvent> inputEvents = eventsBuilder.build();
+		data.add(new Object[] {handlerBuilder, false, inputEvents, Arrays.stream(outputPages).filter(p -> p.length > 0).map(p -> String.join("\r\n", p) + Strings.repeat("\r\n", 28 - p.length)).collect(Collectors.joining("\f"))});
+		data.add(new Object[] {handlerBuilder, true, inputEvents, Arrays.stream(outputPages).map(p -> p.length == 0 ? "\r\n" : String.join("\r\n", p) + Strings.repeat("\r\n", 28 - p.length)).collect(Collectors.joining("\f"))});
+		return data.iterator();
+	}
+	@Test(dataProvider="interPointProvider")
+	public void testSetInterpoint(Braillo200DocumentHandler.Builder builder, boolean interpoint, List<DocumentEvent> events, String expectedBody) throws IOException {
+		Braillo200DocumentHandler handler = builder.setInterpoint(interpoint).build();
+		for (DocumentEvent event: events) {
+			handler.onEvent(event);
+		}
+		String expectedHeader = interpoint ? "\u001bC1" : "\u001bC0";
+		String actual = handler.asByteSource().asCharSource(Charsets.US_ASCII).read();
+		assertThat(actual).contains(expectedHeader).contains(expectedBody);
+	}
 }
