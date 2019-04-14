@@ -52,6 +52,13 @@ public class Braillo200DocumentHandlerTest {
 		data.add(new Object[] { new Braillo200DocumentHandler.Builder().setInterpoint(true).setCopies(1), events, interpointExpectedBody });
 		data.add(new Object[] { new Braillo200DocumentHandler.Builder().setInterpoint(true).setCopies(2), events, Strings.repeat(interpointExpectedBody, 2) });
 		data.add(new Object[] { new Braillo200DocumentHandler.Builder().setInterpoint(true).setCopies(3), events, Strings.repeat(interpointExpectedBody, 3) });
+		events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2801\u2803"), new EndLineEvent(), new EndPageEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2803\u2809"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		final String multiPageBody = String.format("AB%s%sBC%s%s", Strings.repeat("\r\n", 26), "\r\n\f", Strings.repeat("\r\n",  26), "\r\n\f");
+		data.add(new Object[] { new Braillo200DocumentHandler.Builder(), events, multiPageBody });
+		data.add(new Object[] { new Braillo200DocumentHandler.Builder().setInterpoint(false).setCopies(2), events, Strings.repeat(multiPageBody, 2) });
+		data.add(new Object[] { new Braillo200DocumentHandler.Builder().setInterpoint(true).setCopies(2), events, Strings.repeat(multiPageBody, 2) });
+		data.add(new Object[] { new Braillo200DocumentHandler.Builder().setInterpoint(false).setCopies(3), events, Strings.repeat(multiPageBody, 3) });
+		data.add(new Object[] { new Braillo200DocumentHandler.Builder().setInterpoint(true).setCopies(3), events, Strings.repeat(multiPageBody, 3) });
 		return data.iterator();
 	}
 	@Test(dataProvider="basicAndCopiesProvider")
