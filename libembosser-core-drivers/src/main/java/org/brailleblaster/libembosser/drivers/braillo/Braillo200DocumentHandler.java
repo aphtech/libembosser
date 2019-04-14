@@ -12,10 +12,11 @@ public class Braillo200DocumentHandler implements DocumentToByteSourceHandler {
 		private int cellsPerLine = 40;
 		private double sheetLength = 11.0;
 		private int topMargin = 0;
+		private int leftMargin = 0;
 		private boolean interpoint = false;
 		private int copies = 1;
 		public Braillo200DocumentHandler build() {
-			return new Braillo200DocumentHandler(cellsPerLine, sheetLength, topMargin, interpoint, copies);
+			return new Braillo200DocumentHandler(cellsPerLine, sheetLength, topMargin, leftMargin, interpoint, copies);
 		}
 
 		public Builder setCellsperLine(int cellsPerLine) {
@@ -42,6 +43,7 @@ public class Braillo200DocumentHandler implements DocumentToByteSourceHandler {
 
 		public Builder setLeftMargin(int margin) {
 			checkArgument(margin >= 0);
+			this.leftMargin = margin;
 			return this;
 		}
 
@@ -53,11 +55,12 @@ public class Braillo200DocumentHandler implements DocumentToByteSourceHandler {
 	}
 	private ByteSource headerSource;
 	private GenericTextDocumentHandler handler;
-	private Braillo200DocumentHandler(int cellsPerLine, double sheetLength, int topMargin, boolean interpoint, int copies) {
+	private Braillo200DocumentHandler(int cellsPerLine, double sheetLength, int topMargin, int leftMargin, boolean interpoint, int copies) {
 		int linesPerPage = (int)Math.floor(sheetLength * 2.54);
 		handler = new GenericTextDocumentHandler.Builder()
 				.setTopMargin(topMargin)
-				.setCellsPerLine(cellsPerLine)
+				.setLeftMargin(leftMargin)
+				.setCellsPerLine(cellsPerLine - leftMargin)
 				.setLinesPerPage(linesPerPage - topMargin)
 				.padWithBlankLines(true)
 				.setEndOfPage(new byte[] {'\r', '\n', '\f'})

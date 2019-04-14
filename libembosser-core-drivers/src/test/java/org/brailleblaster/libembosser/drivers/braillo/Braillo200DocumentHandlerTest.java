@@ -288,4 +288,23 @@ public class Braillo200DocumentHandlerTest {
 		String actual = handler.asByteSource().asCharSource(Charsets.US_ASCII).read();
 		assertThat(actual).contains(expectedBody).hasLineCount(lines);
 	}
+	@DataProvider(name="leftMarginProvider")
+	public Iterator<Object[]> leftMarginProvider() {
+		List<Object[]> data = new ArrayList<>();
+		List<DocumentEvent> events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(Strings.repeat("\u2801\u2803", 25)), new EndLineEvent(), new StartLineEvent(), new BrailleEvent(Strings.repeat("\u2803", 25)), new EndLineEvent(), new StartLineEvent(), new BrailleEvent("\u2809"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		String[] expectedBody = new String[] { Strings.repeat("AB", 25), Strings.repeat("B", 25), "C"};
+		data.add(new Object[] { new Braillo200DocumentHandler.Builder().setCellsperLine(40), 0, events, Arrays.stream(expectedBody).map(s -> s.substring(0, Math.min(40, s.length()))+ "\r\n").collect(Collectors.joining())});
+		data.add(new Object[] { new Braillo200DocumentHandler.Builder().setCellsperLine(40), 1, events, Arrays.stream(expectedBody).map(s -> " " + s.substring(0, Math.min(39, s.length())) + "\r\n").collect(Collectors.joining())});
+		data.add(new Object[] { new Braillo200DocumentHandler.Builder(), 2, events, Arrays.stream(expectedBody).map(s -> "  " + s.substring(0, Math.min(38, s.length()))+ "\r\n").collect(Collectors.joining())});
+		return data.iterator();
+	}
+	@Test(dataProvider="leftMarginProvider")
+	public void testSetLeftMargin(Braillo200DocumentHandler.Builder builder, int leftMargin, List<DocumentEvent> events, String expectedBody) throws IOException {
+		Braillo200DocumentHandler handler = builder.setLeftMargin(leftMargin).build();
+		for (DocumentEvent event: events) {
+			handler.onEvent(event);
+		}
+		String actual = handler.asByteSource().asCharSource(Charsets.US_ASCII).read();
+		assertThat(actual).contains(expectedBody);
+		}
 }
