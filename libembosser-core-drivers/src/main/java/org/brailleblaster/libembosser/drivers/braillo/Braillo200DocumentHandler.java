@@ -34,6 +34,7 @@ public class Braillo200DocumentHandler implements DocumentToByteSourceHandler {
 		}
 
 		public Builder setCopies(int copies) {
+			checkArgument(copies > 0);
 			this.copies = copies;
 			return this;
 		}

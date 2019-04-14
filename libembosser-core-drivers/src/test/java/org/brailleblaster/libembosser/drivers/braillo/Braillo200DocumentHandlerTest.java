@@ -237,4 +237,17 @@ public class Braillo200DocumentHandlerTest {
 		String actual = handler.asByteSource().asCharSource(Charsets.US_ASCII).read();
 		assertThat(actual).contains(expectedHeader).contains(expectedBody);
 	}
+	@DataProvider(name="invalidCopiesProvider")
+	public Object[][] invalidCopiesProvider() {
+		return new Object[][] {
+			{ new Braillo200DocumentHandler.Builder(), 0 },
+			{new Braillo200DocumentHandler.Builder(), -1 },
+			{ new Braillo200DocumentHandler.Builder(), -2 },
+			{ new Braillo200DocumentHandler.Builder(), -4 },
+		};
+	}
+	@Test(dataProvider="invalidCopiesProvider")
+	public void testSetInvalidCopies(Braillo200DocumentHandler.Builder builder, int copies) {
+		assertThatIllegalArgumentException().isThrownBy(() -> builder.setCopies(copies));
+	}
 }
