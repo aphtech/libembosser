@@ -39,15 +39,29 @@ import com.google.common.collect.Streams;
 public class Braillo200DocumentHandlerTest {
 	private static final Range<Integer> VALID_CELLS_PER_LINE = Range.closed(10, 42);
 	private static final Range<Double> VALID_SHEET_LENGTH_RANGE = Range.openClosed(3.5, 14.0);
-	@Test
-	public void testDocumentBody() {
-		Braillo200DocumentHandler handler = new Braillo200DocumentHandler.Builder().build();
+	@DataProvider(name="basicAndCopiesProvider")
+	public Iterator<Object[]> basicAndCopiesProvider() {
+		List<Object[]> data = new ArrayList<>();
 		List<DocumentEvent> events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2801\u2800\u281e\u2811\u280c"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		final String expectedBody = "A TE/" + Strings.repeat("\r\n", 26) + "\r\n\f";
+		data.add(new Object[] { new Braillo200DocumentHandler.Builder(), events, expectedBody });
+		data.add(new Object[] { new Braillo200DocumentHandler.Builder().setInterpoint(false).setCopies(1), events, expectedBody });
+		data.add(new Object[] { new Braillo200DocumentHandler.Builder().setInterpoint(false).setCopies(2), events, Strings.repeat(expectedBody, 2) });
+		data.add(new Object[] { new Braillo200DocumentHandler.Builder().setInterpoint(false).setCopies(3), events, Strings.repeat(expectedBody, 3) });
+		final String interpointExpectedBody = expectedBody + "\r\n\f";
+		data.add(new Object[] { new Braillo200DocumentHandler.Builder().setInterpoint(true).setCopies(1), events, interpointExpectedBody });
+		data.add(new Object[] { new Braillo200DocumentHandler.Builder().setInterpoint(true).setCopies(2), events, Strings.repeat(interpointExpectedBody, 2) });
+		data.add(new Object[] { new Braillo200DocumentHandler.Builder().setInterpoint(true).setCopies(3), events, Strings.repeat(interpointExpectedBody, 3) });
+		return data.iterator();
+	}
+	@Test(dataProvider="basicAndCopiesProvider")
+	public void testDocumentBody(Braillo200DocumentHandler.Builder builder, List<DocumentEvent> events, String expectedBody) {
+		Braillo200DocumentHandler handler = builder.build();
 		for (DocumentEvent event: events) {
 			handler.onEvent(event);
 		}
 		String expectedHeader = "\u001bS1\u001bJ0\u001bN0";
-		String expectedBody = "A TE/" + Strings.repeat("\r\n", 26) + "\r\n\f";
+		
 		String actual = null;
 		try {
 			actual = handler.asByteSource().asCharSource(Charsets.US_ASCII).read();

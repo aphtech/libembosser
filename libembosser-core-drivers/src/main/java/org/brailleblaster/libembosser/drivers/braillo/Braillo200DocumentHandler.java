@@ -12,8 +12,9 @@ public class Braillo200DocumentHandler implements DocumentToByteSourceHandler {
 		private int cellsPerLine = 40;
 		private double sheetLength = 11.0;
 		private boolean interpoint = false;
+		private int copies = 1;
 		public Braillo200DocumentHandler build() {
-			return new Braillo200DocumentHandler(cellsPerLine, sheetLength, interpoint);
+			return new Braillo200DocumentHandler(cellsPerLine, sheetLength, interpoint, copies);
 		}
 
 		public Builder setCellsperLine(int cellsPerLine) {
@@ -31,10 +32,15 @@ public class Braillo200DocumentHandler implements DocumentToByteSourceHandler {
 			this.interpoint = interpoint;
 			return this;
 		}
+
+		public Builder setCopies(int copies) {
+			this.copies = copies;
+			return this;
+		}
 	}
 	private ByteSource headerSource;
 	private GenericTextDocumentHandler handler;
-	private Braillo200DocumentHandler(int cellsPerLine, double sheetLength, boolean interpoint) {
+	private Braillo200DocumentHandler(int cellsPerLine, double sheetLength, boolean interpoint, int copies) {
 		int linesPerPage = (int)Math.floor(sheetLength * 2.54);
 		handler = new GenericTextDocumentHandler.Builder()
 				.setCellsPerLine(cellsPerLine)
@@ -42,6 +48,7 @@ public class Braillo200DocumentHandler implements DocumentToByteSourceHandler {
 				.padWithBlankLines(true)
 				.setEndOfPage(new byte[] {'\r', '\n', '\f'})
 				.setInterpoint(interpoint)
+				.setCopies(copies)
 				.build();
 		headerSource = ByteSource.wrap(String.format("\u001bS1\u001bJ0\u001bN0\u001bA%02d\u001bB%02d\u001bC%d", (int)Math.ceil(sheetLength * 2), cellsPerLine, interpoint? 1:0).getBytes(Charsets.US_ASCII));
 	}
