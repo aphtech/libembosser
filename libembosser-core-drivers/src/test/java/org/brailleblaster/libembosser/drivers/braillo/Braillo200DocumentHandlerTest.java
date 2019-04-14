@@ -257,4 +257,35 @@ public class Braillo200DocumentHandlerTest {
 	public void testSetInvalidCopies(Braillo200DocumentHandler.Builder builder, int copies) {
 		assertThatIllegalArgumentException().isThrownBy(() -> builder.setCopies(copies));
 	}
+	@DataProvider(name="invalidMarginsProvider")
+	public Iterator<Object[]> invalidMarginsProvider() {
+		return Arrays.stream(new int[] { -1, -2, -3, -4, -5, -7, -10 }).mapToObj(m -> new Object[] {new Braillo200DocumentHandler.Builder(), m}).iterator();
+	}
+	@Test(dataProvider="invalidMarginsProvider")
+	public void testInvalidTopMargin(Braillo200DocumentHandler.Builder builder, int margin) {
+		assertThatIllegalArgumentException().isThrownBy(() -> builder.setTopMargin(margin));
+	}
+	@Test(dataProvider="invalidMarginsProvider")
+	public void testInvalidLeftMargin(Braillo200DocumentHandler.Builder builder, int margin) {
+		assertThatIllegalArgumentException().isThrownBy(() -> builder.setLeftMargin(margin));
+	}
+	@DataProvider(name="topMarginProvider")
+	public Iterator<Object[]> topMarginProvider() {
+		List<Object[]> data = new ArrayList<>();
+		List<DocumentEvent> events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2801"), new EndLineEvent(), new StartLineEvent(), new BrailleEvent("\u2803"), new EndLineEvent(), new StartLineEvent(), new BrailleEvent("\u2809"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		String expectedBody = "A\r\nB\r\nC\r\n";
+		data.add(new Object[] { new Braillo200DocumentHandler.Builder(), 0, 28, events, String.format("%s%s%s", expectedBody, Strings.repeat("\r\n", 23), "\r\n\f")});
+		data.add(new Object[] { new Braillo200DocumentHandler.Builder(), 1, 28, events, String.format("%s%s%s%s", "\r\n", expectedBody, Strings.repeat("\r\n", 22), "\r\n\f")});
+		data.add(new Object[] { new Braillo200DocumentHandler.Builder(), 2, 28, events, String.format("%s%s%s%s", Strings.repeat("\r\n", 2), expectedBody, Strings.repeat("\r\n", 21), "\r\n\f")});
+		return data.iterator();
+	}
+	@Test(dataProvider="topMarginProvider")
+	public void testSetTopMargin(Braillo200DocumentHandler.Builder builder, int topMargin, int lines, List<DocumentEvent> events, String expectedBody) throws IOException {
+		Braillo200DocumentHandler handler = builder.setTopMargin(topMargin).build();
+		for (DocumentEvent event: events) {
+			handler.onEvent(event);
+		}
+		String actual = handler.asByteSource().asCharSource(Charsets.US_ASCII).read();
+		assertThat(actual).contains(expectedBody).hasLineCount(lines);
+	}
 }
