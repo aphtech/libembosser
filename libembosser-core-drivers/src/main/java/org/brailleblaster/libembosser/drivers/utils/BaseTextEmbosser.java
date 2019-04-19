@@ -18,9 +18,11 @@ import javax.print.event.PrintJobListener;
 import org.brailleblaster.libembosser.drivers.utils.DocumentParser.ParseException;
 import org.brailleblaster.libembosser.spi.EmbossException;
 import org.brailleblaster.libembosser.spi.Embosser;
+import org.brailleblaster.libembosser.spi.EmbossingAttributeSet;
 import org.brailleblaster.libembosser.spi.Notification;
 import org.brailleblaster.libembosser.spi.Rectangle;
 import org.brailleblaster.libembosser.utils.EmbossToStreamPrintServiceFactory;
+import org.w3c.dom.Document;
 
 public abstract class BaseTextEmbosser implements Embosser {
 	private StreamPrintServiceFactory streamPrintServiceFactory = new EmbossToStreamPrintServiceFactory();
@@ -62,6 +64,27 @@ public abstract class BaseTextEmbosser implements Embosser {
 	@Override
 	public Rectangle getMinimumPaper() {
 		return minimumPaper;
+	}
+	abstract protected DocumentToByteSourceHandler createHandler(EmbossingAttributeSet attributes);
+	@Override
+	public void embossPef(PrintService embosserDevice, Document pef, EmbossingAttributeSet attributes)
+			throws EmbossException {
+		DocumentParser parser = new DocumentParser();
+		emboss(embosserDevice, pef, parser::parsePef, createHandler(attributes));
+	}
+
+	@Override
+	public void embossPef(PrintService embosserDevice, InputStream pef, EmbossingAttributeSet attributes)
+			throws EmbossException {
+		DocumentParser parser = new DocumentParser();
+		emboss(embosserDevice, pef, parser::parsePef, createHandler(attributes));
+	}
+
+	@Override
+	public void embossBrf(PrintService embosserDevice, InputStream brf, EmbossingAttributeSet attributes)
+			throws EmbossException {
+		DocumentParser parser = new DocumentParser();
+		emboss(embosserDevice, brf, parser::parseBrf, createHandler(attributes));
 	}
 	protected <T> boolean emboss(PrintService embosserDevice, T input, ThrowingBiConsumer<T, DocumentHandler, ParseException> parseMethod, DocumentToByteSourceHandler handler) throws EmbossException {
 		try {

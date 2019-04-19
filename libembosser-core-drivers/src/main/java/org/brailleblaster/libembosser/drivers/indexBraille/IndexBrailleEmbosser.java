@@ -2,17 +2,13 @@ package org.brailleblaster.libembosser.drivers.indexBraille;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 
-import javax.print.PrintService;
-
 import org.brailleblaster.libembosser.drivers.utils.BaseTextEmbosser;
-import org.brailleblaster.libembosser.drivers.utils.DocumentParser;
 import org.brailleblaster.libembosser.drivers.utils.PageFilterByteSourceHandler;
 import org.brailleblaster.libembosser.embossing.attribute.Copies;
 import org.brailleblaster.libembosser.embossing.attribute.PageRanges;
@@ -20,12 +16,10 @@ import org.brailleblaster.libembosser.embossing.attribute.PaperLayout;
 import org.brailleblaster.libembosser.embossing.attribute.PaperMargins;
 import org.brailleblaster.libembosser.embossing.attribute.PaperSize;
 import org.brailleblaster.libembosser.spi.BrlCell;
-import org.brailleblaster.libembosser.spi.EmbossException;
 import org.brailleblaster.libembosser.spi.EmbossingAttributeSet;
 import org.brailleblaster.libembosser.spi.Layout;
 import org.brailleblaster.libembosser.spi.Margins;
 import org.brailleblaster.libembosser.spi.Rectangle;
-import org.w3c.dom.Document;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -51,7 +45,7 @@ public class IndexBrailleEmbosser extends BaseTextEmbosser {
 		return supportedSides.stream().anyMatch(e -> e.isDoubleSide());
 	}
 	
-	private PageFilterByteSourceHandler createHandler(EmbossingAttributeSet attributes) {
+	protected PageFilterByteSourceHandler createHandler(EmbossingAttributeSet attributes) {
 		// For now assume NLS Braille cell type.
 		BrlCell cell = BrlCell.NLS;
 		Optional<Rectangle> paperOption = Optional.ofNullable(attributes.get(PaperSize.class)).map(v -> ((PaperSize)v).getValue());
@@ -144,22 +138,5 @@ public class IndexBrailleEmbosser extends BaseTextEmbosser {
 		}
 		// All Index Braille embossers should support P1ONLY, single side
 		return Layout.P1ONLY;
-	}
-	@Override
-	public void embossPef(PrintService embosserDevice, Document pef, EmbossingAttributeSet attributes) throws EmbossException {
-		DocumentParser parser = new DocumentParser();
-		emboss(embosserDevice, pef, parser::parsePef, createHandler(attributes));
-	}
-	@Override
-	public void embossPef(PrintService embosserDevice, InputStream pef, EmbossingAttributeSet attributes)
-			throws EmbossException {
-		DocumentParser parser = new DocumentParser();
-		emboss(embosserDevice, pef, parser::parsePef, createHandler(attributes));
-	}
-	@Override
-	public void embossBrf(PrintService embosserDevice, InputStream brf, EmbossingAttributeSet attributes)
-			throws EmbossException {
-		DocumentParser parser = new DocumentParser();
-		emboss(embosserDevice, brf, parser::parseBrf, createHandler(attributes));
 	}
 }

@@ -1,13 +1,9 @@
 package org.brailleblaster.libembosser.drivers.enablingTechnologies;
 
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.Optional;
 
-import javax.print.PrintService;
-
 import org.brailleblaster.libembosser.drivers.utils.BaseTextEmbosser;
-import org.brailleblaster.libembosser.drivers.utils.DocumentParser;
 import org.brailleblaster.libembosser.drivers.utils.PageFilterByteSourceHandler;
 import org.brailleblaster.libembosser.embossing.attribute.BrailleCellType;
 import org.brailleblaster.libembosser.embossing.attribute.Copies;
@@ -16,12 +12,10 @@ import org.brailleblaster.libembosser.embossing.attribute.PaperLayout;
 import org.brailleblaster.libembosser.embossing.attribute.PaperMargins;
 import org.brailleblaster.libembosser.embossing.attribute.PaperSize;
 import org.brailleblaster.libembosser.spi.BrlCell;
-import org.brailleblaster.libembosser.spi.EmbossException;
 import org.brailleblaster.libembosser.spi.EmbossingAttributeSet;
 import org.brailleblaster.libembosser.spi.Layout;
 import org.brailleblaster.libembosser.spi.Margins;
 import org.brailleblaster.libembosser.spi.Rectangle;
-import org.w3c.dom.Document;
 
 public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 	private boolean interpoint;
@@ -32,7 +26,7 @@ public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 	}
 
 
-	private PageFilterByteSourceHandler createHandler(EmbossingAttributeSet attributes) {
+	protected PageFilterByteSourceHandler createHandler(EmbossingAttributeSet attributes) {
 		BrlCell cell = Optional.ofNullable(attributes.get(BrailleCellType.class)).map(v -> ((BrailleCellType)v).getValue()).orElse(BrlCell.NLS);
 		Rectangle paper = Optional.ofNullable(attributes.get(PaperSize.class)).map(v -> ((PaperSize)v).getValue()).orElse(getMaximumPaper());
 		Margins margins = Optional.ofNullable(attributes.get(PaperMargins.class)).map(v -> ((PaperMargins)v).getValue()).orElse(Margins.NO_MARGINS);
@@ -66,26 +60,6 @@ public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 	@Override
 	public boolean supportsInterpoint() {
 		return interpoint;
-	}
-
-	@Override
-	public void embossPef(PrintService embosserDevice, Document pef, EmbossingAttributeSet attributes) throws EmbossException {
-		DocumentParser parser = new DocumentParser();
-		emboss(embosserDevice, pef, parser::parsePef, createHandler(attributes));
-	}
-
-	@Override
-	public void embossPef(PrintService embosserDevice, InputStream pef, EmbossingAttributeSet attributes)
-			throws EmbossException {
-		DocumentParser parser = new DocumentParser();
-		emboss(embosserDevice, pef, parser::parsePef, createHandler(attributes));
-	}
-
-	@Override
-	public void embossBrf(PrintService embosserDevice, InputStream brf, EmbossingAttributeSet attributes)
-			throws EmbossException {
-		DocumentParser parser = new DocumentParser();
-		emboss(embosserDevice, brf, parser::parseBrf, createHandler(attributes));
 	}
 	
 }
