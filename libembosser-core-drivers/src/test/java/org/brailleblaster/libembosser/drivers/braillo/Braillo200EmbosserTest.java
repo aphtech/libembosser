@@ -44,7 +44,7 @@ public class Braillo200EmbosserTest {
 		attributes = new EmbossingAttributeSet(new Copies(2));
 		data.add(new Object[] {embosser, events, attributes, new String[] {Strings.repeat(expected, 2)}});
 		attributes = new EmbossingAttributeSet(new PaperSize(new Rectangle("65.0", "250.0")));
-		data.add(new Object[] {embosser, events, attributes, new String[] {"\u001bA20", "ABA" + Strings.repeat("\r\n", 25) + "\f"}});
+		data.add(new Object[] {embosser, events, attributes, new String[] {"\u001bA20", "\u001bB10", "ABA" + Strings.repeat("\r\n", 25) + "\f"}});
 		return data.iterator();
 	}
 	@Test(dataProvider="basicDocumentProvider")
