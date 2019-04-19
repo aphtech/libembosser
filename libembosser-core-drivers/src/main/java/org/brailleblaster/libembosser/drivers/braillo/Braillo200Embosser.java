@@ -1,11 +1,13 @@
 package org.brailleblaster.libembosser.drivers.braillo;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 import org.brailleblaster.libembosser.drivers.utils.BaseTextEmbosser;
 import org.brailleblaster.libembosser.drivers.utils.PageFilterByteSourceHandler;
 import org.brailleblaster.libembosser.embossing.attribute.Copies;
 import org.brailleblaster.libembosser.embossing.attribute.PageRanges;
+import org.brailleblaster.libembosser.embossing.attribute.PaperSize;
 import org.brailleblaster.libembosser.spi.EmbossingAttributeSet;
 import org.brailleblaster.libembosser.spi.Rectangle;
 
@@ -14,9 +16,12 @@ public class Braillo200Embosser extends BaseTextEmbosser {
 		super(id, "Braillo", model, maxPaper, minPaper);
 	}
 	protected PageFilterByteSourceHandler createHandler(EmbossingAttributeSet attributes) {
+		Rectangle paper = Optional.ofNullable((PaperSize)(attributes.get(PaperSize.class))).map(p -> p.getValue()).orElse(org.brailleblaster.libembosser.spi.PaperSize.BRAILLE_11_5X11.getSize());
+		BigDecimal height = paper.getHeight();
 		int copies = Optional.ofNullable((Copies)(attributes.get(Copies.class))).map(c -> c.getValue()).orElse(1);
 		Braillo200DocumentHandler handler = new Braillo200DocumentHandler.Builder()
 				.setCopies(copies)
+				.setSheetLength(height.doubleValue() / 25.4)
 				.build();
 		PageRanges pages = Optional.ofNullable((PageRanges)(attributes.get(PageRanges.class))).orElseGet(() -> new PageRanges());
 		return new PageFilterByteSourceHandler(handler, pages);

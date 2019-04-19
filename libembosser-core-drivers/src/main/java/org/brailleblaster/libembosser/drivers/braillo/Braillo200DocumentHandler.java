@@ -26,7 +26,7 @@ public class Braillo200DocumentHandler implements DocumentToByteSourceHandler {
 		}
 		public Builder setSheetLength(double inches) {
 			// Remember as rounding up to nearest half inch lower bound is 3.5
-			checkArgument(3.5 < inches && inches <= 14.0);
+			checkArgument(3.5 < inches && inches <= 14.0, "Sheet length should be between 4 and 14 inches, given value is %d", inches);
 			sheetLength = inches;
 			return this;
 		}

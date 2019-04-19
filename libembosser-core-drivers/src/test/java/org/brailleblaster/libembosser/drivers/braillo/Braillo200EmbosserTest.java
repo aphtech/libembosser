@@ -22,6 +22,7 @@ import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartSection
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartVolumeEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentToByteSourceHandler;
 import org.brailleblaster.libembosser.embossing.attribute.Copies;
+import org.brailleblaster.libembosser.embossing.attribute.PaperSize;
 import org.brailleblaster.libembosser.spi.EmbossingAttributeSet;
 import org.brailleblaster.libembosser.spi.Rectangle;
 import org.testng.annotations.DataProvider;
@@ -39,13 +40,15 @@ public class Braillo200EmbosserTest {
 		List<DocumentEvent> events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2801\u2803\u2801"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		String expected = "ABA" + Strings.repeat("\r\n", 27) + "\f";
 		EmbossingAttributeSet attributes = new EmbossingAttributeSet(new Copies(1));
-		data.add(new Object[] {embosser, events, attributes, expected});
+		data.add(new Object[] {embosser, events, attributes, new String[] {expected}});
 		attributes = new EmbossingAttributeSet(new Copies(2));
-		data.add(new Object[] {embosser, events, attributes, Strings.repeat(expected, 2)});
+		data.add(new Object[] {embosser, events, attributes, new String[] {Strings.repeat(expected, 2)}});
+		attributes = new EmbossingAttributeSet(new PaperSize(new Rectangle("65.0", "250.0")));
+		data.add(new Object[] {embosser, events, attributes, new String[] {"\u001bA20", "ABA" + Strings.repeat("\r\n", 25) + "\f"}});
 		return data.iterator();
 	}
 	@Test(dataProvider="basicDocumentProvider")
-	public void testNumberOfCopies(Braillo200Embosser embosser, List<DocumentEvent> events, EmbossingAttributeSet attributes, String expected) throws IOException {
+	public void testBasicDocumentEmbossing(Braillo200Embosser embosser, List<DocumentEvent> events, EmbossingAttributeSet attributes, String[] expected) throws IOException {
 		DocumentToByteSourceHandler handler = embosser.createHandler(attributes);
 		for (DocumentEvent event : events) {
 			handler.onEvent(event);
