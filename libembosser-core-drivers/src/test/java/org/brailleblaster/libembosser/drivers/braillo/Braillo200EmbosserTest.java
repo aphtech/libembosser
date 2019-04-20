@@ -22,8 +22,10 @@ import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartSection
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartVolumeEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentToByteSourceHandler;
 import org.brailleblaster.libembosser.embossing.attribute.Copies;
+import org.brailleblaster.libembosser.embossing.attribute.PaperLayout;
 import org.brailleblaster.libembosser.embossing.attribute.PaperSize;
 import org.brailleblaster.libembosser.spi.EmbossingAttributeSet;
+import org.brailleblaster.libembosser.spi.Layout;
 import org.brailleblaster.libembosser.spi.Rectangle;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -45,6 +47,16 @@ public class Braillo200EmbosserTest {
 		data.add(new Object[] {embosser, events, attributes, new String[] {Strings.repeat(expected, 2)}});
 		attributes = new EmbossingAttributeSet(new PaperSize(new Rectangle("65.0", "250.0")));
 		data.add(new Object[] {embosser, events, attributes, new String[] {"\u001bA20", "\u001bB10", "ABA" + Strings.repeat("\r\n", 25) + "\f"}});
+		attributes = new EmbossingAttributeSet(new PaperLayout(Layout.P1ONLY));
+		data.add(new Object[] {embosser, events, attributes, new String[] {"\u001bC0", "ABA"}});
+		attributes = new EmbossingAttributeSet(new PaperLayout(Layout.P2ONLY));
+		data.add(new Object[] {embosser, events, attributes, new String[] {"\u001bC0", "ABA"}});
+		attributes = new EmbossingAttributeSet(new PaperLayout(Layout.Z_FOLDING_SINGLE_HORIZONTAL));
+		data.add(new Object[] {embosser, events, attributes, new String[] {"\u001bC0", "ABA"}});
+		attributes = new EmbossingAttributeSet(new PaperLayout(Layout.INTERPOINT));
+		data.add(new Object[] {embosser, events, attributes, new String[] {"\u001bC1", "ABA"}});
+		attributes = new EmbossingAttributeSet(new PaperLayout(Layout.Z_FOLDING_DOUBLE_HORIZONTAL));
+		data.add(new Object[] {embosser, events, attributes, new String[] {"\u001bC1", "ABA"}});
 		return data.iterator();
 	}
 	@Test(dataProvider="basicDocumentProvider")

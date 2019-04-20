@@ -7,6 +7,7 @@ import org.brailleblaster.libembosser.drivers.utils.BaseTextEmbosser;
 import org.brailleblaster.libembosser.drivers.utils.PageFilterByteSourceHandler;
 import org.brailleblaster.libembosser.embossing.attribute.Copies;
 import org.brailleblaster.libembosser.embossing.attribute.PageRanges;
+import org.brailleblaster.libembosser.embossing.attribute.PaperLayout;
 import org.brailleblaster.libembosser.embossing.attribute.PaperSize;
 import org.brailleblaster.libembosser.spi.BrlCell;
 import org.brailleblaster.libembosser.spi.EmbossingAttributeSet;
@@ -17,6 +18,7 @@ public class Braillo200Embosser extends BaseTextEmbosser {
 		super(id, "Braillo", model, maxPaper, minPaper);
 	}
 	protected PageFilterByteSourceHandler createHandler(EmbossingAttributeSet attributes) {
+		boolean interpoint = Optional.ofNullable((PaperLayout)(attributes.get(PaperLayout.class))).map(l -> l.getValue().isDoubleSide()).orElse(false);
 		Rectangle paper = Optional.ofNullable((PaperSize)(attributes.get(PaperSize.class))).map(p -> p.getValue()).orElse(org.brailleblaster.libembosser.spi.PaperSize.BRAILLE_11_5X11.getSize());
 		BigDecimal height = paper.getHeight();
 		BigDecimal width = paper.getWidth();
@@ -30,6 +32,7 @@ public class Braillo200Embosser extends BaseTextEmbosser {
 		int copies = Optional.ofNullable((Copies)(attributes.get(Copies.class))).map(c -> c.getValue()).orElse(1);
 		Braillo200DocumentHandler handler = new Braillo200DocumentHandler.Builder()
 				.setCopies(copies)
+				.setInterpoint(interpoint)
 				.setSheetLength(height.doubleValue() / 25.4)
 				.setCellsperLine(cellsPerLine)
 				.build();
