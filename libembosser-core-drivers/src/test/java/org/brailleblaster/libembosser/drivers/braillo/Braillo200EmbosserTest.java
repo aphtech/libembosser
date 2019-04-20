@@ -23,9 +23,11 @@ import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartVolumeE
 import org.brailleblaster.libembosser.drivers.utils.DocumentToByteSourceHandler;
 import org.brailleblaster.libembosser.embossing.attribute.Copies;
 import org.brailleblaster.libembosser.embossing.attribute.PaperLayout;
+import org.brailleblaster.libembosser.embossing.attribute.PaperMargins;
 import org.brailleblaster.libembosser.embossing.attribute.PaperSize;
 import org.brailleblaster.libembosser.spi.EmbossingAttributeSet;
 import org.brailleblaster.libembosser.spi.Layout;
+import org.brailleblaster.libembosser.spi.Margins;
 import org.brailleblaster.libembosser.spi.Rectangle;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -57,6 +59,8 @@ public class Braillo200EmbosserTest {
 		data.add(new Object[] {embosser, events, attributes, new String[] {"\u001bC1", "ABA"}});
 		attributes = new EmbossingAttributeSet(new PaperLayout(Layout.Z_FOLDING_DOUBLE_HORIZONTAL));
 		data.add(new Object[] {embosser, events, attributes, new String[] {"\u001bC1", "ABA"}});
+		attributes = new EmbossingAttributeSet(new PaperMargins(new Margins(new BigDecimal("19.7"), BigDecimal.ZERO, new BigDecimal("22.0"), BigDecimal.ZERO)));
+		data.add(new Object[] {embosser, events, attributes, new String[] {"\r\n\r\n   ABA"}});
 		return data.iterator();
 	}
 	@Test(dataProvider="basicDocumentProvider")
