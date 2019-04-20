@@ -35,12 +35,14 @@ public class Braillo200Embosser extends BaseTextEmbosser {
 		int leftMargin = cell.getCellsForWidth(margins.getLeft());
 		int rightMargin = cell.getCellsForWidth(margins.getRight());
 		int topMargin = cell.getLinesForHeight(margins.getTop());
+		int bottomMargin = cell.getLinesForHeight(margins.getBottom());
 		int copies = Optional.ofNullable((Copies)(attributes.get(Copies.class))).map(c -> c.getValue()).orElse(1);
 		Braillo200DocumentHandler handler = new Braillo200DocumentHandler.Builder()
 				.setCopies(copies)
 				.setInterpoint(interpoint)
 				.setSheetLength(height.doubleValue() / 25.4)
 				.setTopMargin(topMargin)
+				.setBottomMargin(bottomMargin)
 				.setCellsperLine(cellsPerLine)
 				.setLeftMargin(leftMargin)
 				.setRightMargin(rightMargin)

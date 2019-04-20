@@ -6,6 +6,7 @@ import org.brailleblaster.libembosser.drivers.generic.GenericTextDocumentHandler
 import org.brailleblaster.libembosser.drivers.utils.DocumentToByteSourceHandler;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Strings;
 import com.google.common.io.ByteSource;
 
 public class Braillo200DocumentHandler implements DocumentToByteSourceHandler {
@@ -13,12 +14,13 @@ public class Braillo200DocumentHandler implements DocumentToByteSourceHandler {
 		private int cellsPerLine = 40;
 		private double sheetLength = 11.0;
 		private int topMargin = 0;
+		private int bottomMargin = 0;
 		private int leftMargin = 0;
 		private int rightMargin = 0;
 		private boolean interpoint = false;
 		private int copies = 1;
 		public Braillo200DocumentHandler build() {
-			return new Braillo200DocumentHandler(cellsPerLine, sheetLength, topMargin, leftMargin, rightMargin, interpoint, copies);
+			return new Braillo200DocumentHandler(cellsPerLine, sheetLength, topMargin, bottomMargin, leftMargin, rightMargin, interpoint, copies);
 		}
 
 		public Builder setCellsperLine(int cellsPerLine) {
@@ -56,6 +58,11 @@ public class Braillo200DocumentHandler implements DocumentToByteSourceHandler {
 			this.topMargin = margin;
 			return this;
 		}
+		public Builder setBottomMargin(int bottomMargin) {
+			checkArgument(bottomMargin >= 0);
+			this.bottomMargin = bottomMargin;
+			return this;
+		}
 
 		public Builder setRightMargin(int rightMargin) {
 			checkArgument(rightMargin >= 0);
@@ -70,15 +77,15 @@ public class Braillo200DocumentHandler implements DocumentToByteSourceHandler {
 	}
 	private ByteSource headerSource;
 	private GenericTextDocumentHandler handler;
-	private Braillo200DocumentHandler(int cellsPerLine, double sheetLength, int topMargin, int leftMargin, int rightMargin, boolean interpoint, int copies) {
+	private Braillo200DocumentHandler(int cellsPerLine, double sheetLength, int topMargin, int bottomMargin, int leftMargin, int rightMargin, boolean interpoint, int copies) {
 		int linesPerPage = (int)Math.floor(sheetLength * 2.54);
 		handler = new GenericTextDocumentHandler.Builder()
 				.setTopMargin(topMargin)
 				.setLeftMargin(leftMargin)
 				.setCellsPerLine(cellsPerLine - leftMargin - rightMargin)
-				.setLinesPerPage(linesPerPage - topMargin)
+				.setLinesPerPage(linesPerPage - topMargin - bottomMargin)
 				.padWithBlankLines(true)
-				.setEndOfPage(new byte[] {'\r', '\n', '\f'})
+				.setEndOfPage(String.format("%s\f", Strings.repeat("\r\n", bottomMargin + 1)).getBytes(Charsets.US_ASCII))
 				.setInterpoint(interpoint)
 				.setCopies(copies)
 				.build();

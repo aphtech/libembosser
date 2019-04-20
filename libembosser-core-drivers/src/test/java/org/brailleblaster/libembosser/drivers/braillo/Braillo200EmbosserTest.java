@@ -64,7 +64,7 @@ public class Braillo200EmbosserTest {
 		data.add(new Object[] {embosser, events, attributes, new String[] {"\r\n\r\n   ABA"}});
 		attributes = new EmbossingAttributeSet(new EmbossingAttribute[] {new PaperSize(new Rectangle(new BigDecimal("63.0"), new BigDecimal("103.0"))), new PaperMargins(new Margins(BigDecimal.ZERO, new BigDecimal("50"), BigDecimal.ZERO, new BigDecimal("81.0")))});
 		events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(Strings.repeat("\u2801\u2803\u2809", 3)), new EndLineEvent(), new StartLineEvent(), new BrailleEvent(Strings.repeat("\u2803\u2809\u2801", 3)), new EndLineEvent(), new StartLineEvent(), new BrailleEvent(Strings.repeat("\u2809\u2801\u2803", 3)), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
-		data.add(new Object[] {embosser, events, attributes, new String[] {"AB\r\nBC\r\nCA"}});
+		data.add(new Object[] {embosser, events, attributes, new String[] {"AB\r\nBC\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\f"}});
 		return data.iterator();
 	}
 	@Test(dataProvider="basicDocumentProvider")
