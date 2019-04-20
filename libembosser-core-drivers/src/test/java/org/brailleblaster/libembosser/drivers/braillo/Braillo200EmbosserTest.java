@@ -1,7 +1,8 @@
 package org.brailleblaster.libembosser.drivers.braillo;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -41,7 +42,7 @@ public class Braillo200EmbosserTest {
 	@DataProvider(name="basicDocumentProvider")
 	public Iterator<Object[]> basicDocumentProvider() {
 		List<Object[]> data = new ArrayList<>();
-		Braillo200Embosser embosser = new Braillo200Embosser("test.braillo", "Test Braillo", new Rectangle(new BigDecimal("279.0"), new BigDecimal("360.0")), new Rectangle(new BigDecimal("60.0"), new BigDecimal("100.0")));
+		Braillo200Embosser embosser = new Braillo200Embosser("test.braillo", "Test Braillo", new Rectangle(new BigDecimal("279.0"), new BigDecimal("360.0")), new Rectangle(new BigDecimal("60.0"), new BigDecimal("100.0")), true);
 		List<DocumentEvent> events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2801\u2803\u2801"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		String expected = "ABA" + Strings.repeat("\r\n", 27) + "\f";
 		EmbossingAttributeSet attributes = new EmbossingAttributeSet(new Copies(1));
@@ -75,5 +76,13 @@ public class Braillo200EmbosserTest {
 		}
 		String actual = handler.asByteSource().asCharSource(Charsets.US_ASCII).read();
 		assertThat(actual).contains(expected);
+	}
+	@Test
+	public void checkSettingInterpointCapability() {
+		Braillo200Embosser embosser = new Braillo200Embosser("braillo.test", "Test Braillo", new Rectangle("279.", "279.0"), new Rectangle("100.0", "100.0"), false);
+		assertFalse(embosser.supportsInterpoint());
+		embosser = new Braillo200Embosser("braillo.test", "Test Braillo", new Rectangle("279.", "279.0"), new Rectangle("100.0", "100.0"), true);
+		assertTrue(embosser.supportsInterpoint());
+		
 	}
 }

@@ -16,8 +16,11 @@ import org.brailleblaster.libembosser.spi.Margins;
 import org.brailleblaster.libembosser.spi.Rectangle;
 
 public class Braillo200Embosser extends BaseTextEmbosser {
-	Braillo200Embosser(String id, String model, Rectangle maxPaper, Rectangle minPaper) {
+	private boolean interpoint;
+
+	Braillo200Embosser(String id, String model, Rectangle maxPaper, Rectangle minPaper, boolean interpoint) {
 		super(id, "Braillo", model, maxPaper, minPaper);
+		this.interpoint = interpoint;
 	}
 	protected PageFilterByteSourceHandler createHandler(EmbossingAttributeSet attributes) {
 		boolean interpoint = Optional.ofNullable((PaperLayout)(attributes.get(PaperLayout.class))).map(l -> l.getValue().isDoubleSide()).orElse(false);
@@ -53,8 +56,7 @@ public class Braillo200Embosser extends BaseTextEmbosser {
 
 	@Override
 	public boolean supportsInterpoint() {
-		// TODO Auto-generated method stub
-		return false;
+		return interpoint;
 	}
 
 }
