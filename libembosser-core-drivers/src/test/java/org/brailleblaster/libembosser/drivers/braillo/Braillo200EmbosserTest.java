@@ -25,6 +25,7 @@ import org.brailleblaster.libembosser.embossing.attribute.Copies;
 import org.brailleblaster.libembosser.embossing.attribute.PaperLayout;
 import org.brailleblaster.libembosser.embossing.attribute.PaperMargins;
 import org.brailleblaster.libembosser.embossing.attribute.PaperSize;
+import org.brailleblaster.libembosser.spi.EmbossingAttribute;
 import org.brailleblaster.libembosser.spi.EmbossingAttributeSet;
 import org.brailleblaster.libembosser.spi.Layout;
 import org.brailleblaster.libembosser.spi.Margins;
@@ -61,6 +62,9 @@ public class Braillo200EmbosserTest {
 		data.add(new Object[] {embosser, events, attributes, new String[] {"\u001bC1", "ABA"}});
 		attributes = new EmbossingAttributeSet(new PaperMargins(new Margins(new BigDecimal("19.7"), BigDecimal.ZERO, new BigDecimal("22.0"), BigDecimal.ZERO)));
 		data.add(new Object[] {embosser, events, attributes, new String[] {"\r\n\r\n   ABA"}});
+		attributes = new EmbossingAttributeSet(new EmbossingAttribute[] {new PaperSize(new Rectangle(new BigDecimal("63.0"), new BigDecimal("103.0"))), new PaperMargins(new Margins(BigDecimal.ZERO, new BigDecimal("50"), BigDecimal.ZERO, new BigDecimal("81.0")))});
+		events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(Strings.repeat("\u2801\u2803\u2809", 3)), new EndLineEvent(), new StartLineEvent(), new BrailleEvent(Strings.repeat("\u2803\u2809\u2801", 3)), new EndLineEvent(), new StartLineEvent(), new BrailleEvent(Strings.repeat("\u2809\u2801\u2803", 3)), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		data.add(new Object[] {embosser, events, attributes, new String[] {"AB\r\nBC\r\nCA"}});
 		return data.iterator();
 	}
 	@Test(dataProvider="basicDocumentProvider")

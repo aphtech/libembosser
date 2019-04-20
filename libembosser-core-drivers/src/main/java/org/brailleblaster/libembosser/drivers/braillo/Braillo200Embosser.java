@@ -33,6 +33,7 @@ public class Braillo200Embosser extends BaseTextEmbosser {
 			cellsPerLine = 10;
 		}
 		int leftMargin = cell.getCellsForWidth(margins.getLeft());
+		int rightMargin = cell.getCellsForWidth(margins.getRight());
 		int topMargin = cell.getLinesForHeight(margins.getTop());
 		int copies = Optional.ofNullable((Copies)(attributes.get(Copies.class))).map(c -> c.getValue()).orElse(1);
 		Braillo200DocumentHandler handler = new Braillo200DocumentHandler.Builder()
@@ -42,6 +43,7 @@ public class Braillo200Embosser extends BaseTextEmbosser {
 				.setTopMargin(topMargin)
 				.setCellsperLine(cellsPerLine)
 				.setLeftMargin(leftMargin)
+				.setRightMargin(rightMargin)
 				.build();
 		PageRanges pages = Optional.ofNullable((PageRanges)(attributes.get(PageRanges.class))).orElseGet(() -> new PageRanges());
 		return new PageFilterByteSourceHandler(handler, pages);
