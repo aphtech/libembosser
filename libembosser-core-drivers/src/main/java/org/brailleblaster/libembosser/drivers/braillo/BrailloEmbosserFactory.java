@@ -14,7 +14,7 @@ public class BrailloEmbosserFactory implements EmbosserFactory {
 	private final List<Embosser> embossers;
 	public BrailloEmbosserFactory() {
 		ImmutableList.Builder<Embosser> eb = new ImmutableList.Builder<Embosser>();
-		eb.add(new Braillo200Embosser("libembosser.braillo.200", "Braillo 200", new Rectangle(BigDecimal.valueOf(330.0), BigDecimal.valueOf(14.0/25.4)), new Rectangle(BigDecimal.valueOf(140.0), BigDecimal.valueOf(4.0/25.4)), true));
+		eb.add(new Braillo200Embosser("libembosser.braillo.200", "Braillo 200", new Rectangle(BigDecimal.valueOf(330.0), BigDecimal.valueOf(356)), new Rectangle(BigDecimal.valueOf(140.0), BigDecimal.valueOf(102)), true));
 		embossers = eb.build();
 	}
 

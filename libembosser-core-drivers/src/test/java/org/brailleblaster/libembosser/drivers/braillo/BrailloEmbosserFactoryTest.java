@@ -18,6 +18,8 @@ public class BrailloEmbosserFactoryTest {
 				.hasSize(1)
 				.element(0).hasFieldOrPropertyWithValue("model", "Braillo 200")
 				.matches(e -> BigDecimal.valueOf(330.0).compareTo(e.getMaximumPaper().getWidth()) == 0)
-				.matches(e -> BigDecimal.valueOf(140.0).compareTo(e.getMinimumPaper().getWidth()) == 0);
+				.matches(e -> BigDecimal.valueOf(140.0).compareTo(e.getMinimumPaper().getWidth()) == 0)
+				.matches(e -> BigDecimal.valueOf(356).compareTo(e.getMaximumPaper().getHeight()) == 0)
+				.matches(e -> BigDecimal.valueOf(102).compareTo(e.getMinimumPaper().getHeight()) == 0);
 	}
 }
