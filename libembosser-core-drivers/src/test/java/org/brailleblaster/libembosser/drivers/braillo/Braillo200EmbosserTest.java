@@ -58,7 +58,7 @@ public class Braillo200EmbosserTest {
 		attributes = new EmbossingAttributeSet(new PaperLayout(Layout.Z_FOLDING_SINGLE_HORIZONTAL));
 		data.add(new Object[] {embosser, events, attributes, new String[] {"\u001bH1", "\u001bC0", "ABA"}});
 		attributes = new EmbossingAttributeSet(new PaperLayout(Layout.INTERPOINT));
-		data.add(new Object[] {embosser, events, attributes, new String[] {"\u001H0", "\u001bC1", "ABA"}});
+		data.add(new Object[] {embosser, events, attributes, new String[] {"\u001bH0", "\u001bC1", "ABA"}});
 		attributes = new EmbossingAttributeSet(new PaperLayout(Layout.Z_FOLDING_DOUBLE_HORIZONTAL));
 		data.add(new Object[] {embosser, events, attributes, new String[] {"\u001bH1", "\u001bC1", "ABA"}});
 		attributes = new EmbossingAttributeSet(new PaperMargins(new Margins(new BigDecimal("19.7"), BigDecimal.ZERO, new BigDecimal("22.0"), BigDecimal.ZERO)));
