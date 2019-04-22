@@ -19,8 +19,9 @@ public class Braillo200DocumentHandler implements DocumentToByteSourceHandler {
 		private int rightMargin = 0;
 		private boolean interpoint = false;
 		private int copies = 1;
+		private boolean zfolding;
 		public Braillo200DocumentHandler build() {
-			return new Braillo200DocumentHandler(cellsPerLine, sheetLength, topMargin, bottomMargin, leftMargin, rightMargin, interpoint, copies);
+			return new Braillo200DocumentHandler(cellsPerLine, sheetLength, topMargin, bottomMargin, leftMargin, rightMargin, interpoint, zfolding, copies);
 		}
 
 		public Builder setCellsperLine(int cellsPerLine) {
@@ -74,10 +75,15 @@ public class Braillo200DocumentHandler implements DocumentToByteSourceHandler {
 		private boolean checkLine(int cellsPerLine, int leftMargin, int rightMargin) {
 			return rightMargin + leftMargin < cellsPerLine;
 		}
+
+		public Builder setZFolding(boolean zfolding) {
+			this.zfolding = zfolding;
+			return this;
+		}
 	}
 	private ByteSource headerSource;
 	private GenericTextDocumentHandler handler;
-	private Braillo200DocumentHandler(int cellsPerLine, double sheetLength, int topMargin, int bottomMargin, int leftMargin, int rightMargin, boolean interpoint, int copies) {
+	private Braillo200DocumentHandler(int cellsPerLine, double sheetLength, int topMargin, int bottomMargin, int leftMargin, int rightMargin, boolean interpoint, boolean zfolding, int copies) {
 		int linesPerPage = (int)Math.floor(sheetLength * 2.54);
 		handler = new GenericTextDocumentHandler.Builder()
 				.setTopMargin(topMargin)
@@ -89,7 +95,7 @@ public class Braillo200DocumentHandler implements DocumentToByteSourceHandler {
 				.setInterpoint(interpoint)
 				.setCopies(copies)
 				.build();
-		headerSource = ByteSource.wrap(String.format("\u001bS1\u001bJ0\u001bN0\u001bA%02d\u001bB%02d\u001bC%d", (int)Math.ceil(sheetLength * 2), cellsPerLine, interpoint? 1:0).getBytes(Charsets.US_ASCII));
+		headerSource = ByteSource.wrap(String.format("\u001bS1\u001bJ0\u001bN0\u001bR0\u001bA%02d\u001bB%02d\u001bC%d\u001bH%d", (int)Math.ceil(sheetLength * 2), cellsPerLine, interpoint? 1:0, zfolding?1:0).getBytes(Charsets.US_ASCII));
 	}
 	@Override
 	public void onEvent(DocumentEvent event) {

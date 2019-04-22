@@ -67,7 +67,7 @@ public class Braillo200DocumentHandlerTest {
 		for (DocumentEvent event: events) {
 			handler.onEvent(event);
 		}
-		String expectedHeader = "\u001bS1\u001bJ0\u001bN0";
+		String expectedHeader = "\u001bS1\u001bJ0\u001bN0\u001bR0";
 		
 		String actual = null;
 		try {
@@ -307,4 +307,21 @@ public class Braillo200DocumentHandlerTest {
 		String actual = handler.asByteSource().asCharSource(Charsets.US_ASCII).read();
 		assertThat(actual).contains(expectedBody);
 		}
+	@DataProvider(name="zfoldingProvider")
+	public Object[][] zfoldingProvider() {
+		return new Object[][] {
+			{new Braillo200DocumentHandler.Builder(), false},
+			{new Braillo200DocumentHandler.Builder(), true}
+		};
+	}
+	@Test(dataProvider="zfoldingProvider")
+	public void testSettingZfolding(Braillo200DocumentHandler.Builder builder, boolean zfolding) throws IOException {
+		List<DocumentEvent> events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		Braillo200DocumentHandler handler = builder.setZFolding(zfolding).build();
+		for (DocumentEvent event: events) {
+			handler.onEvent(event);
+		}
+		String actual = handler.asByteSource().asCharSource(Charsets.US_ASCII).read();
+		assertThat(actual).contains(String.format("\u001bH%s", zfolding? "1":"0"));
+	}
 }
