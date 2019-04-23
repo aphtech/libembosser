@@ -182,18 +182,20 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 			Font font = Font.getFont(brailleAttributes);
 			Graphics2D g2d = (Graphics2D)graphics;
 			final double desiredMargin = pageFormat.getImageableX();
-			g2d.translate(desiredMargin, pageFormat.getImageableY());
+			// g2d.translate(desiredMargin, pageFormat.getImageableY());
 			FontMetrics brailleMetrics = g2d.getFontMetrics(font);
 			Page curPage = pages.get(pageIndex);
-			double xPos = layoutHelper.calculateMargin(desiredMargin) - desiredMargin;
-			int yPos = 0;
-			int lineHeight = brailleMetrics.getHeight() + layoutHelper.getLineSpacing();
-			log.debug("xPos={} desiredMargin={} page width={}", xPos, desiredMargin, pageFormat.getWidth());
+			double xPos = 0.0;
+			double yPos = brailleMetrics.getAscent() + pageFormat.getImageableY();
+			double lineHeight = brailleMetrics.getHeight() + layoutHelper.getLineSpacing();
 			if (layoutHelper instanceof InterpointLayoutHelper	&& (pageIndex % 2) == 1) {
 				// Calculate horizontal offset for back of page
-				xPos = ((InterpointLayoutHelper)layoutHelper).calculateBackMargin(desiredMargin, desiredMargin, pageFormat.getWidth()) - desiredMargin;
+				xPos = ((InterpointLayoutHelper)layoutHelper).calculateBackMargin(desiredMargin, desiredMargin, pageFormat.getWidth());
 				log.debug("Changed xPos to {} for back side", xPos);
+			} else {
+				xPos = layoutHelper.calculateMargin(desiredMargin);
 			}
+			log.debug("xPos={} desiredMargin={} page width={}", xPos, desiredMargin, pageFormat.getWidth());
 			for (PageElement element: curPage.getElements()) {
 				if (element instanceof Row) {
 					final String brlStr = ((Row)element).getBraille();
