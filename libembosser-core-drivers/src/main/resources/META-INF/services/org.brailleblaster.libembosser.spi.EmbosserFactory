@@ -1,5 +1,3 @@
 org.brailleblaster.libembosser.drivers.generic.GenericEmbosserFactory
-org.brailleblaster.libembosser.drivers.braillo.BrailloEmbosserFactory
 org.brailleblaster.libembosser.drivers.enablingTechnologies.ETFactory
 org.brailleblaster.libembosser.drivers.indexBraille.IndexBrailleFactory
-org.brailleblaster.libembosser.drivers.viewplus.ViewPlusEmbosserFactory

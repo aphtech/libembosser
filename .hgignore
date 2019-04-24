@@ -15,3 +15,7 @@ syntax: regexp
 ^libembosser-utils/bin$
 syntax: regexp
 ^et-test/bin$
+syntax: regexp
+^libembosser-braillo-driver/bin$
+syntax: regexp
+^libembosser-viewplus-driver/bin$

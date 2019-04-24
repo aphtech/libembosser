@@ -1,0 +1,33 @@
+plugins {
+	id "java-library"
+	id "com.github.spotbugs" version "1.6.8"
+}
+
+dependencies {
+	implementation 'com.google.guava:guava:23.5-jre'
+	api project(':libembosser-api')
+	implementation project(':libembosser-core-drivers')
+	implementation project(':libembosser-utils')
+	implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+	testImplementation 'org.testng:testng:6.13.1'
+	testImplementation 'org.assertj:assertj-core:3.11.1'
+}
+
+test {
+	useTestNG()
+}
+
+publishing {
+	publications {
+		brailloDriver(MavenPublication) {
+			from components.java
+		}
+	}
+}
+
+tasks.withType(com.github.spotbugs.SpotBugsTask) {
+	reports {
+		xml.enabled = false
+		html.enabled = true
+	}
+}

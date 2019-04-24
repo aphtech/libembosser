@@ -7,7 +7,7 @@ subprojects {
 	apply plugin: 'net.linguica.maven-settings'
 
 	group = 'org.brailleblaster.libembosser'
-	version = '1.1-BETA3'
+	version = '1.1'
 	repositories {
 		// No need for maven central as jcenter is a superset.
 		jcenter()

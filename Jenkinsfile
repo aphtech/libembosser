@@ -41,7 +41,7 @@ pipeline {
 					warnings consoleParsers: [[parserName: 'Java Compiler (javac)']]
 					
 					// last to prevent more issues
-					archiveArtifacts allowEmptyArchive: true, artifacts: "libembosser-utils/build/libs/*.jar,libembosser-core-drivers/build/libs/*.jar,libembosser-api/build/libs/*.jar"
+					archiveArtifacts allowEmptyArchive: true, artifacts: "libembosser-utils/build/libs/*.jar,libembosser-core-drivers/build/libs/*.jar,libembosser-braillo-driver/build/libs/*.jar,libembosser-viewplus-driver/build/libs/*.jar,libembosser-api/build/libs/*.jar"
 				}
 			}
 		}
