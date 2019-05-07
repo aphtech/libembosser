@@ -2,14 +2,11 @@ package org.brailleblaster.libembosser.drivers.braillo;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
-import org.brailleblaster.libembosser.drivers.generic.GenericTextDocumentHandler;
-import org.brailleblaster.libembosser.drivers.utils.DocumentToByteSourceHandler;
 
 import com.google.common.base.Charsets;
-import com.google.common.base.Strings;
 import com.google.common.io.ByteSource;
 
-public class Braillo200DocumentHandler implements DocumentToByteSourceHandler {
+public class Braillo200DocumentHandler extends AbstractBrailloDocumentHandler {
 	public static class Builder {
 		private int cellsPerLine = 40;
 		private double sheetLength = 11.0;
@@ -82,28 +79,12 @@ public class Braillo200DocumentHandler implements DocumentToByteSourceHandler {
 		}
 	}
 	private ByteSource headerSource;
-	private GenericTextDocumentHandler handler;
 	private Braillo200DocumentHandler(int cellsPerLine, double sheetLength, int topMargin, int bottomMargin, int leftMargin, int rightMargin, boolean interpoint, boolean zfolding, int copies) {
-		int linesPerPage = (int)Math.floor(sheetLength * 2.54);
-		handler = new GenericTextDocumentHandler.Builder()
-				.setTopMargin(topMargin)
-				.setLeftMargin(leftMargin)
-				.setCellsPerLine(cellsPerLine - leftMargin - rightMargin)
-				.setLinesPerPage(linesPerPage - topMargin - bottomMargin)
-				.padWithBlankLines(true)
-				.setEndOfPage(String.format("%s\f", Strings.repeat("\r\n", bottomMargin + 1)).getBytes(Charsets.US_ASCII))
-				.setInterpoint(interpoint)
-				.setCopies(copies)
-				.build();
+		super(cellsPerLine, sheetLength, topMargin, bottomMargin, leftMargin, rightMargin, interpoint, copies);
 		headerSource = ByteSource.wrap(String.format("\u001bS1\u001bJ0\u001bN0\u001bR0\u001bA%02d\u001bB%02d\u001bC%d\u001bH%d", (int)Math.ceil(sheetLength * 2), cellsPerLine, interpoint? 1:0, zfolding?1:0).getBytes(Charsets.US_ASCII));
 	}
 	@Override
-	public void onEvent(DocumentEvent event) {
-		handler.onEvent(event);
-	}
-	@Override
-	public ByteSource asByteSource() {
-		// TODO Auto-generated method stub
-		return ByteSource.concat(headerSource, handler.asByteSource());
+	protected ByteSource getHeader() {
+		return headerSource;
 	}
 }
