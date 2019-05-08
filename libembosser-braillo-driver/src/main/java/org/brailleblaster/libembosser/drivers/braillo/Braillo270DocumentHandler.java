@@ -1,18 +1,32 @@
 package org.brailleblaster.libembosser.drivers.braillo;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import com.google.common.base.Charsets;
 import com.google.common.io.ByteSource;
 
 public class Braillo270DocumentHandler extends AbstractBrailloDocumentHandler {
 	public static class Builder {
+		private int cellsPerLine = 40;
 		public Braillo270DocumentHandler build() {
-			return new Braillo270DocumentHandler(0, 0.0, 0, 0, 0, 0, false, 1);
+			return new Braillo270DocumentHandler(cellsPerLine, 0.0, 0, 0, 0, 0, false, 1);
+		}
+
+		public Builder setCellsPerLine(int cellsPerLine) {
+			checkArgument(27 <= cellsPerLine && cellsPerLine <= 42, "Cells per line invalid %s, valid range is 27 <= cells per line <= 42", cellsPerLine);
+			this.cellsPerLine = cellsPerLine;
+			return this;
+		}
+
+		public Object setSheetlength(double sheetLength) {
+			checkArgument(9.5 < sheetLength && sheetLength <= 14.0, "Sheet length invalid %s, valid range is 9.5 < sheet length <= 14.0", sheetLength);
+			return this;
 		}
 	}
 	private ByteSource headerSource;
 	private Braillo270DocumentHandler(int cellsPerLine, double sheetLength, int topMargin, int bottomMargin, int leftMargin, int rightMargin, boolean interpoint, int copies) {
 		super(cellsPerLine, sheetLength, topMargin, bottomMargin, leftMargin, rightMargin, interpoint, copies);
-		headerSource = ByteSource.wrap("\u001bE\u001bA\u001b6".getBytes(Charsets.US_ASCII));
+		String cells = Integer.toHexString(cellsPerLine - 27).toUpperCase();
+		headerSource = ByteSource.wrap(String.format("\u001bE\u001bA\u001b6\u001b\u001f%s", cells).getBytes(Charsets.US_ASCII));
 	}
 	@Override
 	protected ByteSource getHeader() {
