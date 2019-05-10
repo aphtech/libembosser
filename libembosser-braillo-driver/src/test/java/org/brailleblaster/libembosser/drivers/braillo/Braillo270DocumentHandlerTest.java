@@ -66,12 +66,49 @@ public class Braillo270DocumentHandlerTest {
 	public Object[][] invalidSheetLengthProvider() {
 		return new Object[][] {
 			{-3.5}, {-1.34}, {-1.21}, {-0.5}, {-0.12},
-				{0.0}, {0.69}, {0.98}, {1.2}, {1.5}
+				{0.0}, {0.69}, {0.98}, {1.2}, {1.5},
+				{2.43}, {2.89}, {3.58}, {4.57}, {5.9}, {6.77}, {7.32},
+				{8.12}, {8.79}, {9.01}, {9.297}, {9.49}, {9.50},
+				{14.01}, {14.10}, {14.15}, {14.98}, {15.7}, {16.0}, {17.9}
 		};
 	}
 	@Test(dataProvider="invalidSheetLengthProvider")
 	public void testInvalidSheetLengthThrowsException(double sheetLength) {
 		Braillo270DocumentHandler.Builder builder = new Braillo270DocumentHandler.Builder();
 		assertThatIllegalArgumentException().isThrownBy(() -> builder.setSheetlength(sheetLength)).withMessage("Sheet length invalid %s, valid range is 9.5 < sheet length <= 14.0", sheetLength);
+	}
+	@DataProvider(name="sheetLengthProvider")
+	public Object[][] sheetLengthProvider() {
+		String headerFormat = "\u001b\u001E%s";
+		return new Object[][] {
+			{9.51, String.format(headerFormat, "0")},
+			{9.53, String.format(headerFormat, "0")},
+			{9.99, String.format(headerFormat, "0")},
+			{10.0, String.format(headerFormat, "0")},
+			{10.01, String.format(headerFormat, "1")},
+			{10.3, String.format(headerFormat, "1")},
+			{10.49, String.format(headerFormat, "1")},
+			{10.50, String.format(headerFormat, "1")},
+			{10.51, String.format(headerFormat, "2")},
+			{11.00, String.format(headerFormat, "2")},
+			{11.01, String.format(headerFormat, "3")},
+			{11.50, String.format(headerFormat, "3")},
+			{11.51, String.format(headerFormat, "4")},
+			{12.00, String.format(headerFormat, "4")},
+			{12.01, String.format(headerFormat, "5")},
+			{12.50, String.format(headerFormat, "5")},
+			{12.51, String.format(headerFormat, "6")},
+			{13.00, String.format(headerFormat, "6")},
+			{13.01, String.format(headerFormat, "7")},
+			{13.50, String.format(headerFormat, "7")},
+			{13.51, String.format(headerFormat, "8")},
+			{14.00, String.format(headerFormat, "8")},
+		};
+	}
+	@Test(dataProvider="sheetLengthProvider")
+	public void testSetSheetLength(double sheetLength, String expected) throws IOException {
+		Braillo270DocumentHandler handler = new Braillo270DocumentHandler.Builder().setSheetlength(sheetLength).build();
+		String actual = handler.getHeader().asCharSource(Charsets.US_ASCII).read();
+		assertThat(actual).contains(expected);
 	}
 }

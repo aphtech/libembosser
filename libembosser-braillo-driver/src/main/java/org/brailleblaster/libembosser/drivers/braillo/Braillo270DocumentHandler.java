@@ -7,8 +7,9 @@ import com.google.common.io.ByteSource;
 public class Braillo270DocumentHandler extends AbstractBrailloDocumentHandler {
 	public static class Builder {
 		private int cellsPerLine = 40;
+		private double sheetLength = 11.0;
 		public Braillo270DocumentHandler build() {
-			return new Braillo270DocumentHandler(cellsPerLine, 0.0, 0, 0, 0, 0, false, 1);
+			return new Braillo270DocumentHandler(cellsPerLine, sheetLength, 0, 0, 0, 0, false, 1);
 		}
 
 		public Builder setCellsPerLine(int cellsPerLine) {
@@ -17,8 +18,9 @@ public class Braillo270DocumentHandler extends AbstractBrailloDocumentHandler {
 			return this;
 		}
 
-		public Object setSheetlength(double sheetLength) {
+		public Builder setSheetlength(double sheetLength) {
 			checkArgument(9.5 < sheetLength && sheetLength <= 14.0, "Sheet length invalid %s, valid range is 9.5 < sheet length <= 14.0", sheetLength);
+			this.sheetLength = sheetLength;
 			return this;
 		}
 	}
@@ -26,7 +28,8 @@ public class Braillo270DocumentHandler extends AbstractBrailloDocumentHandler {
 	private Braillo270DocumentHandler(int cellsPerLine, double sheetLength, int topMargin, int bottomMargin, int leftMargin, int rightMargin, boolean interpoint, int copies) {
 		super(cellsPerLine, sheetLength, topMargin, bottomMargin, leftMargin, rightMargin, interpoint, copies);
 		String cells = Integer.toHexString(cellsPerLine - 27).toUpperCase();
-		headerSource = ByteSource.wrap(String.format("\u001bE\u001bA\u001b6\u001b\u001f%s", cells).getBytes(Charsets.US_ASCII));
+		int sl = ((int)Math.ceil(sheetLength * 2)) - 20;
+		headerSource = ByteSource.wrap(String.format("\u001bE\u001bA\u001b6\u001b\u001E%1d\u001b\u001f%s", sl, cells).getBytes(Charsets.US_ASCII));
 	}
 	@Override
 	protected ByteSource getHeader() {
