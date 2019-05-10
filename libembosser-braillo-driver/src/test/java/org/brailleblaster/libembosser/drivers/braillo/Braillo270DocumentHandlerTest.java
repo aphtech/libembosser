@@ -111,4 +111,15 @@ public class Braillo270DocumentHandlerTest {
 		String actual = handler.getHeader().asCharSource(Charsets.US_ASCII).read();
 		assertThat(actual).contains(expected);
 	}
+	@DataProvider(name="invalidCopiesProvider")
+	public Object[][] invalidCopiesProvider() {
+		return new Object[][] {
+			{-100}, {-10}, {-9}, {-8}, {-7}, {-6}, {-5}, {-4}, {-3}, {-2}, {-1}, {0}
+		};
+	}
+	@Test(dataProvider="invalidCopiesProvider")
+	public void testInvalidCopiesProvider(int copies) {
+		Braillo270DocumentHandler.Builder builder = new Braillo270DocumentHandler.Builder();
+		assertThatIllegalArgumentException().isThrownBy(() -> builder.setCopies(copies));
+	}
 }
