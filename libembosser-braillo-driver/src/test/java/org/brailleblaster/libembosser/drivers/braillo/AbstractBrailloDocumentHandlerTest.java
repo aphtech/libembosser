@@ -86,6 +86,8 @@ public class AbstractBrailloDocumentHandlerTest {
 		data.add(new Object[] { 40, 0, events, Arrays.stream(expectedBody).map(s -> s.substring(0, Math.min(40, s.length()))+ "\r\n").collect(Collectors.joining())});
 		data.add(new Object[] { 40, 1, events, Arrays.stream(expectedBody).map(s -> " " + s.substring(0, Math.min(39, s.length())) + "\r\n").collect(Collectors.joining())});
 		data.add(new Object[] { 40, 2, events, Arrays.stream(expectedBody).map(s -> "  " + s.substring(0, Math.min(38, s.length()))+ "\r\n").collect(Collectors.joining())});
+		data.add(new Object[] { 40, 3, events, Arrays.stream(expectedBody).map(s -> "   " + s.substring(0, Math.min(37, s.length()))+ "\r\n").collect(Collectors.joining())});
+		data.add(new Object[] { 40, 5, events, Arrays.stream(expectedBody).map(s -> "     " + s.substring(0, Math.min(35, s.length()))+ "\r\n").collect(Collectors.joining())});
 		data.add(new Object[] { 38, 2, events, Arrays.stream(expectedBody).map(s -> "  " + s.substring(0, Math.min(36, s.length()))+ "\r\n").collect(Collectors.joining())});
 		return data.iterator();
 	}
