@@ -36,16 +36,17 @@ public class Braillo200Embosser extends BaseTextEmbosser {
 		BigDecimal height = paper.getHeight();
 		BigDecimal width = paper.getWidth();
 		BrlCell cell = BrlCell.NLS;
-		int cellsPerLine = cell.getCellsForWidth(width);
+		int leftMargin = Math.max(cell.getCellsForWidth(margins.getLeft()) - 5, 0);
+		int rightMargin = 0;
+		int topMargin = cell.getLinesForHeight(margins.getTop());
+		int bottomMargin = cell.getLinesForHeight(margins.getBottom());
+		int cellsPerLine = cell.getCellsForWidth(width.subtract(margins.getRight()));
 		if (cellsPerLine > 42) {
 			cellsPerLine = 42;
 		} else if (cellsPerLine < 10) {
+			rightMargin = 10 - cellsPerLine;
 			cellsPerLine = 10;
 		}
-		int leftMargin = cell.getCellsForWidth(margins.getLeft());
-		int rightMargin = cell.getCellsForWidth(margins.getRight());
-		int topMargin = cell.getLinesForHeight(margins.getTop());
-		int bottomMargin = cell.getLinesForHeight(margins.getBottom());
 		int copies = Optional.ofNullable((Copies)(attributes.get(Copies.class))).map(c -> c.getValue()).orElse(1);
 		Braillo200DocumentHandler handler = new Braillo200DocumentHandler.Builder()
 				.setCopies(copies)
