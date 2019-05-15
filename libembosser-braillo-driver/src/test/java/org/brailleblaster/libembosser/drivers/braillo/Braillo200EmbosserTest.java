@@ -10,12 +10,14 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.BrailleEvent;
+import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.CellsPerLine;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.DocumentEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndDocumentEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndLineEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndPageEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndSectionEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndVolumeEvent;
+import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.LinesPerPage;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartDocumentEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartLineEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartPageEvent;
@@ -37,6 +39,7 @@ import org.testng.annotations.Test;
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 public class Braillo200EmbosserTest {
 	@DataProvider(name="basicDocumentProvider")
@@ -66,6 +69,11 @@ public class Braillo200EmbosserTest {
 		attributes = new EmbossingAttributeSet(new EmbossingAttribute[] {new PaperSize(new Rectangle(new BigDecimal("63.0"), new BigDecimal("103.0"))), new PaperMargins(new Margins(BigDecimal.ZERO, new BigDecimal("50"), BigDecimal.ZERO, new BigDecimal("81.0")))});
 		events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(Strings.repeat("\u2801\u2803\u2809", 3)), new EndLineEvent(), new StartLineEvent(), new BrailleEvent(Strings.repeat("\u2803\u2809\u2801", 3)), new EndLineEvent(), new StartLineEvent(), new BrailleEvent(Strings.repeat("\u2809\u2801\u2803", 3)), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		data.add(new Object[] {embosser, events, attributes, new String[] {"AB\r\nBC\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\f"}});
+		attributes = new EmbossingAttributeSet(new EmbossingAttribute[] {new PaperSize(new Rectangle(new BigDecimal("292"), new BigDecimal("279"))), new PaperMargins(new Margins(new BigDecimal("31.75"), new BigDecimal("12.3"), new BigDecimal("12.7"), new BigDecimal("12.7")))});
+		events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(Strings.repeat("\u2801\u2803\u2809", 20)), new EndLineEvent(), new StartLineEvent(), new BrailleEvent(Strings.repeat("\u2803\u2809\u2801", 20)), new EndLineEvent(), new StartLineEvent(), new BrailleEvent(Strings.repeat("\u2809\u2801\u2803", 20)), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		data.add(new Object[] {embosser, events, attributes, new String[] {"     ABCABCABCABCABCABCABCABCABCABCABCABC\r\n     BCABCABCABCABCABCABCABCABCABCABCABCA\r\n     CABCABCABCABCABCABCABCABCABCABCABCAB\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\f"}});
+		events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(ImmutableSet.of(new CellsPerLine(40), new LinesPerPage(25))), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(Strings.repeat("\u2801\u2803\u2809", 20)), new EndLineEvent(), new StartLineEvent(), new BrailleEvent(Strings.repeat("\u2803\u2809\u2801", 20)), new EndLineEvent(), new StartLineEvent(), new BrailleEvent(Strings.repeat("\u2809\u2801\u2803", 20)), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		data.add(new Object[] {embosser, events, attributes, new String[] {"     ABCABCABCABCABCABCABCABCABCABCABCABC\r\n     BCABCABCABCABCABCABCABCABCABCABCABCA\r\n     CABCABCABCABCABCABCABCABCABCABCABCAB\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\f"}});
 		return data.iterator();
 	}
 	@Test(dataProvider="basicDocumentProvider")

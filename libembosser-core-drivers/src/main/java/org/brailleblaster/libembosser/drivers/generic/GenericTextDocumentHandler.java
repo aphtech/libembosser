@@ -151,7 +151,7 @@ public class GenericTextDocumentHandler implements DocumentToByteSourceHandler {
 	}
 	private ByteArrayOutputStream output;
 	private final int initialBufferCapacity;
-	private final int defaultCellsPerLine;
+	private final int maxCellsPerLine;
 	private final int defaultLinesPerPage;
 	private final boolean defaultInterpoint;
 	private final int defaultRowGap;
@@ -170,10 +170,10 @@ public class GenericTextDocumentHandler implements DocumentToByteSourceHandler {
 	private boolean rightPage = true;
 
 	private GenericTextDocumentHandler(int leftMargin, int topMargin, int cellsPerLine, int linesPerPage, byte[] endOfLine, byte[] endOfPage, boolean bottomPadding, boolean interpoint, int copies) {
-		defaultCellsPerLine = cellsPerLine;
+		maxCellsPerLine = cellsPerLine;
 		this.copies = copies;
 		this.bottomPadding = bottomPadding;
-		this.cellsPerLine = defaultCellsPerLine;
+		this.cellsPerLine = maxCellsPerLine;
 		defaultLinesPerPage = linesPerPage;
 		defaultInterpoint = interpoint;
 		defaultRowGap = 0;
@@ -244,7 +244,7 @@ public class GenericTextDocumentHandler implements DocumentToByteSourceHandler {
 		optionStack.push(options);
 		// Get the linesPerPage
 		linesRemaining = optionStack.stream().flatMap(o -> o.stream()).filter(o -> o instanceof LinesPerPage).findFirst().map(o -> ((LinesPerPage)o).getValue()).orElse(defaultLinesPerPage) - 1;
-		cellsPerLine = optionStack.stream().flatMap(o -> o.stream()).filter(o -> o instanceof CellsPerLine).findFirst().map(o -> ((CellsPerLine)o).getValue()).orElse(defaultCellsPerLine);
+		cellsPerLine = Math.min(maxCellsPerLine, optionStack.stream().flatMap(o -> o.stream()).filter(o -> o instanceof CellsPerLine).findFirst().map(o -> ((CellsPerLine)o).getValue()).orElse(maxCellsPerLine));
 		// Add the top margin
 		pendingLines = topMargin;
 		stateStack.push(HandlerStates.PAGE);
