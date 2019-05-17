@@ -11,12 +11,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.BrailleEvent;
+import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.CellsPerLine;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.DocumentEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndDocumentEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndLineEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndPageEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndSectionEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndVolumeEvent;
+import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.LinesPerPage;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartDocumentEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartLineEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartPageEvent;
@@ -28,6 +30,7 @@ import org.testng.annotations.Test;
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.io.ByteSource;
 
 public class AbstractBrailloDocumentHandlerTest {
@@ -86,9 +89,14 @@ public class AbstractBrailloDocumentHandlerTest {
 		data.add(new Object[] { 40, 0, events, Arrays.stream(expectedBody).map(s -> s.substring(0, Math.min(40, s.length()))+ "\r\n").collect(Collectors.joining())});
 		data.add(new Object[] { 40, 1, events, Arrays.stream(expectedBody).map(s -> " " + s.substring(0, Math.min(39, s.length())) + "\r\n").collect(Collectors.joining())});
 		data.add(new Object[] { 40, 2, events, Arrays.stream(expectedBody).map(s -> "  " + s.substring(0, Math.min(38, s.length()))+ "\r\n").collect(Collectors.joining())});
+		data.add(new Object[] { 38, 2, events, Arrays.stream(expectedBody).map(s -> "  " + s.substring(0, Math.min(36, s.length()))+ "\r\n").collect(Collectors.joining())});
 		data.add(new Object[] { 40, 3, events, Arrays.stream(expectedBody).map(s -> "   " + s.substring(0, Math.min(37, s.length()))+ "\r\n").collect(Collectors.joining())});
 		data.add(new Object[] { 40, 5, events, Arrays.stream(expectedBody).map(s -> "     " + s.substring(0, Math.min(35, s.length()))+ "\r\n").collect(Collectors.joining())});
-		data.add(new Object[] { 38, 2, events, Arrays.stream(expectedBody).map(s -> "  " + s.substring(0, Math.min(36, s.length()))+ "\r\n").collect(Collectors.joining())});
+		events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(ImmutableSet.of(new CellsPerLine(40), new LinesPerPage(25))), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(Strings.repeat("\u2801\u2803", 25)), new EndLineEvent(), new StartLineEvent(), new BrailleEvent(Strings.repeat("\u2803", 25)), new EndLineEvent(), new StartLineEvent(), new BrailleEvent("\u2809"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		data.add(new Object[] { 40, 3, events, Arrays.stream(expectedBody).map(s -> "   " + s.substring(0, Math.min(37, s.length()))+ "\r\n").collect(Collectors.joining())});
+		data.add(new Object[] { 40, 5, events, Arrays.stream(expectedBody).map(s -> "     " + s.substring(0, Math.min(35, s.length()))+ "\r\n").collect(Collectors.joining())});
+		data.add(new Object[] { 42, 3, events, Arrays.stream(expectedBody).map(s -> "   " + s.substring(0, Math.min(39, s.length()))+ "\r\n").collect(Collectors.joining())});
+		data.add(new Object[] { 42, 5, events, Arrays.stream(expectedBody).map(s -> "     " + s.substring(0, Math.min(37, s.length()))+ "\r\n").collect(Collectors.joining())});
 		return data.iterator();
 	}
 	@Test(dataProvider="leftMarginProvider")
