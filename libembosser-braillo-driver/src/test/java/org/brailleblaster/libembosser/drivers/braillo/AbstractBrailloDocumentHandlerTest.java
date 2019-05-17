@@ -44,7 +44,7 @@ public class AbstractBrailloDocumentHandlerTest {
 	public Iterator<Object[]> basicAndCopiesProvider() {
 		List<Object[]> data = new ArrayList<>();
 		List<DocumentEvent> events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2801\u2800\u281e\u2811\u280c"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
-		final String expectedBody = "A TE/" + Strings.repeat("\r\n", 26) + "\r\n\f";
+		final String expectedBody = "A TE/\r\n\f";
 		data.add(new Object[] { new Braillo200DocumentHandler.Builder(), events, expectedBody });
 		data.add(new Object[] { new Braillo200DocumentHandler.Builder().setInterpoint(false).setCopies(1), events, expectedBody });
 		data.add(new Object[] { new Braillo200DocumentHandler.Builder().setInterpoint(false).setCopies(2), events, Strings.repeat(expectedBody, 2) });
@@ -54,7 +54,7 @@ public class AbstractBrailloDocumentHandlerTest {
 		data.add(new Object[] { new Braillo200DocumentHandler.Builder().setInterpoint(true).setCopies(2), events, Strings.repeat(interpointExpectedBody, 2) });
 		data.add(new Object[] { new Braillo200DocumentHandler.Builder().setInterpoint(true).setCopies(3), events, Strings.repeat(interpointExpectedBody, 3) });
 		events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2801\u2803"), new EndLineEvent(), new EndPageEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2803\u2809"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
-		final String multiPageBody = String.format("AB%s%sBC%s%s", Strings.repeat("\r\n", 26), "\r\n\f", Strings.repeat("\r\n",  26), "\r\n\f");
+		final String multiPageBody = String.format("AB%sBC%s", "\r\n\f", "\r\n\f");
 		data.add(new Object[] { new Braillo200DocumentHandler.Builder(), events, multiPageBody });
 		data.add(new Object[] { new Braillo200DocumentHandler.Builder().setInterpoint(false).setCopies(2), events, Strings.repeat(multiPageBody, 2) });
 		data.add(new Object[] { new Braillo200DocumentHandler.Builder().setInterpoint(true).setCopies(2), events, Strings.repeat(multiPageBody, 2) });
@@ -105,9 +105,9 @@ public class AbstractBrailloDocumentHandlerTest {
 		List<Object[]> data = new ArrayList<>();
 		List<DocumentEvent> events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2801"), new EndLineEvent(), new StartLineEvent(), new BrailleEvent("\u2803"), new EndLineEvent(), new StartLineEvent(), new BrailleEvent("\u2809"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		String expectedBody = "A\r\nB\r\nC\r\n";
-		data.add(new Object[] { 0, 28, events, String.format("%s%s%s", expectedBody, Strings.repeat("\r\n", 23), "\r\n\f")});
-		data.add(new Object[] { 1, 28, events, String.format("%s%s%s%s", "\r\n", expectedBody, Strings.repeat("\r\n", 22), "\r\n\f")});
-		data.add(new Object[] { 2, 28, events, String.format("%s%s%s%s", Strings.repeat("\r\n", 2), expectedBody, Strings.repeat("\r\n", 21), "\r\n\f")});
+		data.add(new Object[] { 0, 28, events, String.format("%s%s", expectedBody, "\f")});
+		data.add(new Object[] { 1, 28, events, String.format("%s%s%s", "\r\n", expectedBody, "\f")});
+		data.add(new Object[] { 2, 28, events, String.format("%s%s%s", Strings.repeat("\r\n", 2), expectedBody, "\f")});
 		return data.iterator();
 	}
 	@Test(dataProvider="topMarginProvider")
@@ -117,7 +117,7 @@ public class AbstractBrailloDocumentHandlerTest {
 			handler.onEvent(event);
 		}
 		String actual = handler.asByteSource().asCharSource(Charsets.US_ASCII).read();
-		assertThat(actual).contains(expectedBody).hasLineCount(lines);
+		assertThat(actual).contains(expectedBody);
 	}
 	
 }

@@ -190,8 +190,8 @@ public class Braillo200DocumentHandlerTest {
 		}
 		eventsBuilder.add(new EndDocumentEvent());
 		List<DocumentEvent> inputEvents = eventsBuilder.build();
-		data.add(new Object[] {handlerBuilder, false, inputEvents, Arrays.stream(outputPages).filter(p -> p.length > 0).map(p -> String.join("\r\n", p) + Strings.repeat("\r\n", 28 - p.length)).collect(Collectors.joining("\f"))});
-		data.add(new Object[] {handlerBuilder, true, inputEvents, Arrays.stream(outputPages).map(p -> p.length == 0 ? "\r\n" : String.join("\r\n", p) + Strings.repeat("\r\n", 28 - p.length)).collect(Collectors.joining("\f"))});
+		data.add(new Object[] {handlerBuilder, false, inputEvents, Arrays.stream(outputPages).filter(p -> p.length > 0).map(p -> String.join("\r\n", p)).collect(Collectors.joining("\r\n\f"))});
+		data.add(new Object[] {handlerBuilder, true, inputEvents, Arrays.stream(outputPages).map(p -> p.length == 0 ? "" : String.join("\r\n", p)).collect(Collectors.joining("\r\n\f"))});
 		return data.iterator();
 	}
 	@Test(dataProvider="interPointProvider")

@@ -3,8 +3,6 @@ package org.brailleblaster.libembosser.drivers.braillo;
 import org.brailleblaster.libembosser.drivers.generic.GenericTextDocumentHandler;
 import org.brailleblaster.libembosser.drivers.utils.DocumentToByteSourceHandler;
 
-import com.google.common.base.Charsets;
-import com.google.common.base.Strings;
 import com.google.common.io.ByteSource;
 
 public abstract class AbstractBrailloDocumentHandler implements DocumentToByteSourceHandler {
@@ -16,8 +14,7 @@ public abstract class AbstractBrailloDocumentHandler implements DocumentToByteSo
 				.setLeftMargin(leftMargin)
 				.setCellsPerLine(cellsPerLine - leftMargin - rightMargin)
 				.setLinesPerPage(linesPerPage - topMargin - bottomMargin)
-				.padWithBlankLines(true)
-				.setEndOfPage(String.format("%s\f", Strings.repeat("\r\n", bottomMargin + 1)).getBytes(Charsets.US_ASCII))
+				.setEndOfPage(new byte[] { '\r', '\n', '\f'})
 				.setInterpoint(interpoint)
 				.setCopies(copies)
 				.build();

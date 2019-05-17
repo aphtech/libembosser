@@ -47,13 +47,13 @@ public class Braillo200EmbosserTest {
 		List<Object[]> data = new ArrayList<>();
 		Braillo200Embosser embosser = new Braillo200Embosser("test.braillo", "Test Braillo", new Rectangle(new BigDecimal("279.0"), new BigDecimal("360.0")), new Rectangle(new BigDecimal("60.0"), new BigDecimal("100.0")), true);
 		List<DocumentEvent> events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2801\u2803\u2801"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
-		String expected = "ABA" + Strings.repeat("\r\n", 27) + "\f";
+		String expected = "ABA\r\n\f";
 		EmbossingAttributeSet attributes = new EmbossingAttributeSet(new Copies(1));
 		data.add(new Object[] {embosser, events, attributes, new String[] {expected}});
 		attributes = new EmbossingAttributeSet(new Copies(2));
 		data.add(new Object[] {embosser, events, attributes, new String[] {Strings.repeat(expected, 2)}});
 		attributes = new EmbossingAttributeSet(new PaperSize(new Rectangle("65.0", "250.0")));
-		data.add(new Object[] {embosser, events, attributes, new String[] {"\u001bA20", "\u001bB10", "ABA" + Strings.repeat("\r\n", 25) + "\f"}});
+		data.add(new Object[] {embosser, events, attributes, new String[] {"\u001bA20", "\u001bB10", "ABA\r\n\f"}});
 		attributes = new EmbossingAttributeSet(new PaperLayout(Layout.P1ONLY));
 		data.add(new Object[] {embosser, events, attributes, new String[] {"\u001bH0", "\u001bC0", "ABA"}});
 		attributes = new EmbossingAttributeSet(new PaperLayout(Layout.P2ONLY));
@@ -68,12 +68,14 @@ public class Braillo200EmbosserTest {
 		data.add(new Object[] {embosser, events, attributes, new String[] {"\r\n\r\nABA"}});
 		attributes = new EmbossingAttributeSet(new EmbossingAttribute[] {new PaperSize(new Rectangle(new BigDecimal("63.0"), new BigDecimal("103.0"))), new PaperMargins(new Margins(BigDecimal.ZERO, new BigDecimal("50"), BigDecimal.ZERO, new BigDecimal("81.0")))});
 		events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(Strings.repeat("\u2801\u2803\u2809", 3)), new EndLineEvent(), new StartLineEvent(), new BrailleEvent(Strings.repeat("\u2803\u2809\u2801", 3)), new EndLineEvent(), new StartLineEvent(), new BrailleEvent(Strings.repeat("\u2809\u2801\u2803", 3)), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
-		data.add(new Object[] {embosser, events, attributes, new String[] {"AB\r\nBC\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\f"}});
+		data.add(new Object[] {embosser, events, attributes, new String[] {"AB\r\nBC\r\n\f"}});
 		attributes = new EmbossingAttributeSet(new EmbossingAttribute[] {new PaperSize(new Rectangle(new BigDecimal("292"), new BigDecimal("279"))), new PaperMargins(new Margins(new BigDecimal("31.75"), new BigDecimal("12.3"), new BigDecimal("12.7"), new BigDecimal("12.7")))});
 		events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(Strings.repeat("\u2801\u2803\u2809", 20)), new EndLineEvent(), new StartLineEvent(), new BrailleEvent(Strings.repeat("\u2803\u2809\u2801", 20)), new EndLineEvent(), new StartLineEvent(), new BrailleEvent(Strings.repeat("\u2809\u2801\u2803", 20)), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
-		data.add(new Object[] {embosser, events, attributes, new String[] {"ABCABCABCABCABCABCABCABCABCABCABCABCABCABC\r\nBCABCABCABCABCABCABCABCABCABCABCABCABCABCA\r\nCABCABCABCABCABCABCABCABCABCABCABCABCABCAB\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\f"}});
+		data.add(new Object[] {embosser, events, attributes, new String[] {"ABCABCABCABCABCABCABCABCABCABCABCABCABCABC\r\nBCABCABCABCABCABCABCABCABCABCABCABCABCABCA\r\nCABCABCABCABCABCABCABCABCABCABCABCABCABCAB\r\n\f"}});
 		events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(ImmutableSet.of(new CellsPerLine(40), new LinesPerPage(25))), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(Strings.repeat("\u2801\u2803\u2809", 20)), new EndLineEvent(), new StartLineEvent(), new BrailleEvent(Strings.repeat("\u2803\u2809\u2801", 20)), new EndLineEvent(), new StartLineEvent(), new BrailleEvent(Strings.repeat("\u2809\u2801\u2803", 20)), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
-		data.add(new Object[] {embosser, events, attributes, new String[] {"ABCABCABCABCABCABCABCABCABCABCABCABCABCA\r\nBCABCABCABCABCABCABCABCABCABCABCABCABCAB\r\nCABCABCABCABCABCABCABCABCABCABCABCABCABC\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\f"}});
+		data.add(new Object[] {embosser, events, attributes, new String[] {"ABCABCABCABCABCABCABCABCABCABCABCABCABCA\r\nBCABCABCABCABCABCABCABCABCABCABCABCABCAB\r\nCABCABCABCABCABCABCABCABCABCABCABCABCABC\r\n\f"}});
+		events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(ImmutableSet.of(new CellsPerLine(40), new LinesPerPage(20))), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(Strings.repeat("\u2801\u2803\u2809", 20)), new EndLineEvent(), new StartLineEvent(), new BrailleEvent(Strings.repeat("\u2803\u2809\u2801", 20)), new EndLineEvent(), new StartLineEvent(), new BrailleEvent(Strings.repeat("\u2809\u2801\u2803", 20)), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		data.add(new Object[] {embosser, events, attributes, new String[] {"ABCABCABCABCABCABCABCABCABCABCABCABCABCA\r\nBCABCABCABCABCABCABCABCABCABCABCABCABCAB\r\nCABCABCABCABCABCABCABCABCABCABCABCABCABC\r\n\f"}});
 		return data.iterator();
 	}
 	@Test(dataProvider="basicDocumentProvider")
