@@ -113,14 +113,19 @@ public class AbstractBrailloDocumentHandlerTest {
 		List<Object[]> data = new ArrayList<>();
 		List<DocumentEvent> events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2801"), new EndLineEvent(), new StartLineEvent(), new BrailleEvent("\u2803"), new EndLineEvent(), new StartLineEvent(), new BrailleEvent("\u2809"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		String expectedBody = "A\r\nB\r\nC\r\n";
-		data.add(new Object[] { 0, 28, events, String.format("%s%s", expectedBody, "\f")});
-		data.add(new Object[] { 1, 28, events, String.format("%s%s%s", "\r\n", expectedBody, "\f")});
-		data.add(new Object[] { 2, 28, events, String.format("%s%s%s", Strings.repeat("\r\n", 2), expectedBody, "\f")});
+		data.add(new Object[] { 0, 11.0, events, String.format("%s%s", expectedBody, "\f")});
+		data.add(new Object[] { 1, 11.0, events, String.format("%s%s%s", "\r\n", expectedBody, "\f")});
+		data.add(new Object[] { 2, 11.0, events, String.format("%s%s%s", Strings.repeat("\r\n", 2), expectedBody, "\f")});
+		data.add(new Object[] { 25, 11.0, events, String.format("%s%s%s", Strings.repeat("\r\n", 25), "A\r\nB\r\n", "\f")});
+		events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(ImmutableSet.of(new CellsPerLine(40), new LinesPerPage(24))), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2801"), new EndLineEvent(), new StartLineEvent(), new BrailleEvent("\u2803"), new EndLineEvent(), new StartLineEvent(), new BrailleEvent("\u2809"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		data.add(new Object[] { 26, 11.0, events, String.format("%s%s%s", Strings.repeat("\r\n", 25), "A\r\nB\r\n", "\f")});
+		events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(ImmutableSet.of(new CellsPerLine(40), new LinesPerPage(2))), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2801"), new EndLineEvent(), new StartLineEvent(), new BrailleEvent("\u2803"), new EndLineEvent(), new StartLineEvent(), new BrailleEvent("\u2809"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		data.add(new Object[] { 2, 11.0, events, String.format("%s%s%s", "\r\n\r\n", "A\r\nB\r\n", "\f")});
 		return data.iterator();
 	}
 	@Test(dataProvider="topMarginProvider")
-	public void testSetTopMargin(int topMargin, int lines, List<DocumentEvent> events, String expectedBody) throws IOException {
-		AbstractBrailloDocumentHandler handler = new DummyBrailloDocumentHandler(42, 11.0, topMargin, 0, 0, 0, false, 1);
+	public void testSetTopMargin(int topMargin, double sheetLength, List<DocumentEvent> events, String expectedBody) throws IOException {
+		AbstractBrailloDocumentHandler handler = new DummyBrailloDocumentHandler(42, sheetLength, topMargin, 0, 0, 0, false, 1);
 		for (DocumentEvent event: events) {
 			handler.onEvent(event);
 		}

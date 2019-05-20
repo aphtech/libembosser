@@ -152,7 +152,7 @@ public class GenericTextDocumentHandler implements DocumentToByteSourceHandler {
 	private ByteArrayOutputStream output;
 	private final int initialBufferCapacity;
 	private final int maxCellsPerLine;
-	private final int defaultLinesPerPage;
+	private final int maxLinesPerPage;
 	private final boolean defaultInterpoint;
 	private final int defaultRowGap;
 	private int leftMargin;
@@ -174,7 +174,7 @@ public class GenericTextDocumentHandler implements DocumentToByteSourceHandler {
 		this.copies = copies;
 		this.bottomPadding = bottomPadding;
 		this.cellsPerLine = maxCellsPerLine;
-		defaultLinesPerPage = linesPerPage;
+		maxLinesPerPage = linesPerPage;
 		defaultInterpoint = interpoint;
 		defaultRowGap = 0;
 		this.leftMargin = leftMargin;
@@ -243,7 +243,7 @@ public class GenericTextDocumentHandler implements DocumentToByteSourceHandler {
 	public void startPage(Set<PageOption> options) {
 		optionStack.push(options);
 		// Get the linesPerPage
-		linesRemaining = optionStack.stream().flatMap(o -> o.stream()).filter(o -> o instanceof LinesPerPage).findFirst().map(o -> ((LinesPerPage)o).getValue()).orElse(defaultLinesPerPage) - 1;
+		linesRemaining = Math.min(maxLinesPerPage, optionStack.stream().flatMap(o -> o.stream()).filter(o -> o instanceof LinesPerPage).findFirst().map(o -> ((LinesPerPage)o).getValue()).orElse(maxLinesPerPage) - 1);
 		cellsPerLine = Math.min(maxCellsPerLine, optionStack.stream().flatMap(o -> o.stream()).filter(o -> o instanceof CellsPerLine).findFirst().map(o -> ((CellsPerLine)o).getValue()).orElse(maxCellsPerLine));
 		// Add the top margin
 		pendingLines = topMargin;
