@@ -98,7 +98,7 @@ public class AbstractBrailloDocumentHandlerTest {
 		data.add(new Object[] { 42, 3, events, Arrays.stream(expectedBody).map(s -> "   " + s.substring(0, Math.min(39, s.length()))+ "\r\n").collect(Collectors.joining())});
 		data.add(new Object[] { 42, 5, events, Arrays.stream(expectedBody).map(s -> "     " + s.substring(0, Math.min(37, s.length()))+ "\r\n").collect(Collectors.joining())});
 		events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(ImmutableSet.of(new CellsPerLine(38), new LinesPerPage(25))), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(Strings.repeat("\u2801\u2803", 25)), new EndLineEvent(), new StartLineEvent(), new BrailleEvent(Strings.repeat("\u2803", 25)), new EndLineEvent(), new StartLineEvent(), new BrailleEvent("\u2809"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
-		data.add(new Object[] { 40, 1, events, Arrays.stream(expectedBody).map(s -> "   " + s.substring(0, Math.min(38, s.length()))+ "\r\n").collect(Collectors.joining())});
+		data.add(new Object[] { 40, 1, events, Arrays.stream(expectedBody).map(s -> " " + s.substring(0, Math.min(38, s.length()))+ "\r\n").collect(Collectors.joining())});
 		return data.iterator();
 	}
 	@Test(dataProvider="leftMarginProvider")
