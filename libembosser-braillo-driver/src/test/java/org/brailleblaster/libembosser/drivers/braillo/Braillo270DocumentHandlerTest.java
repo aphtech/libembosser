@@ -5,14 +5,18 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.brailleblaster.libembosser.drivers.braillo.Braillo270DocumentHandler.Firmware;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.Streams;
 
 public class Braillo270DocumentHandlerTest {
 	@Test
@@ -67,22 +71,21 @@ public class Braillo270DocumentHandlerTest {
 		assertThat(header).contains(expected);
 	}
 	@DataProvider(name="invalidCellsPerLineProvider")
-	public Object[][] invalidCellsPerLineProvider() {
-		return new Object[][] {
-			{ -1 }, { -3 }, { 0 }, { 1 }, { 2 }, { 5 }, { 8 },
-			{ 10 }, { 13 }, {17 }, { 19 }, { 21 }, { 24 }, { 26 },
-			{ 43 }, { 44 }, { 46 }, { 49 }, { 50 }, { 57 }, { 67 }
-		};
+	public Iterator<Object[]> invalidCellsPerLineProvider() {
+		return Stream.of(-1, -3, 0, 1, 2, 5, 8,
+			10, 13, 17, 19, 21, 24, 26,
+			43, 44, 46, 49, 50, 57, 67)
+				.flatMap(o -> Arrays.stream(new Object[][] {{Firmware.V1_11, o}, {Firmware.V12_16, o}})).iterator();
 	}
 	@Test(dataProvider="invalidCellsPerLineProvider")
-	public void testInvalidCellsPerLineThrowsException(int cellsPerLine) {
-		final Braillo270DocumentHandler.Builder builder = new Braillo270DocumentHandler.Builder(Firmware.V1_11);
+	public void testInvalidCellsPerLineThrowsException(Firmware firmware, int cellsPerLine) {
+		final Braillo270DocumentHandler.Builder builder = new Braillo270DocumentHandler.Builder(firmware);
 		assertThatIllegalArgumentException().isThrownBy(() -> builder.setCellsPerLine(cellsPerLine)).withMessage("Cells per line invalid %s, valid range is 27 <= cells per line <= 42", cellsPerLine);
 	}
 	@DataProvider(name="invalidSheetLengthV1Provider")
 	public Object[][] invalidSheetLengthV1Provider() {
 		return new Object[][] {
-			{-3.5}, {-1.34}, {-1.21}, {-0.5}, {-0.12},
+				{-3.5}, {-1.34}, {-1.21}, {-0.5}, {-0.12},
 				{0.0}, {0.69}, {0.98}, {1.2}, {1.5},
 				{2.43}, {2.89}, {3.58}, {4.57}, {5.9}, {6.77}, {7.32},
 				{8.12}, {8.79}, {9.01}, {9.297}, {9.49}, {9.50},
