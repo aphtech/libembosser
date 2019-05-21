@@ -15,7 +15,7 @@ public class Braillo270DocumentHandler extends AbstractBrailloDocumentHandler {
 			public ByteSource getHeader(int cellsPerLine, double sheetLength, boolean interpoint) {
 				String cells = Integer.toHexString(cellsPerLine - 27).toUpperCase();
 				int sl = ((int)Math.ceil(sheetLength * 2)) - 20;
-				return ByteSource.wrap(String.format("\u001bE\u001bA\u001b6\u001b\u001E%1d\u001b\u001f%s\u001bS%S", sl, cells, interpoint? '1': '0').getBytes(Charsets.US_ASCII));
+				return ByteSource.wrap(String.format("\u001bE\u001bA\u001b6\u001b\u001E%1d\u001b\u001f%s", sl, cells).getBytes(Charsets.US_ASCII));
 			}
 		},
 		V12_16() {
@@ -28,7 +28,7 @@ public class Braillo270DocumentHandler extends AbstractBrailloDocumentHandler {
 			public ByteSource getHeader(int cellsPerLine, double sheetLength, boolean interpoint) {
 				String cells = Integer.toHexString(cellsPerLine - 27).toUpperCase();
 				int sl = ((int)Math.ceil(sheetLength * 2)) - 8;
-				return ByteSource.wrap(String.format("\u001bE\u001bA\u001b6\u001b\u001E%s\u001b\u001f%s", lengths[sl], cells).getBytes(Charsets.US_ASCII));
+				return ByteSource.wrap(String.format("\u001bE\u001bA\u001b6\u001b\u001E%s\u001b\u001f%s\u001bS%s", lengths[sl], cells, interpoint? '1': '0').getBytes(Charsets.US_ASCII));
 			}
 		};
 		public abstract ByteSource getHeader(int cellsPerLine, double sheetLength, boolean interpoint);
@@ -82,7 +82,7 @@ public class Braillo270DocumentHandler extends AbstractBrailloDocumentHandler {
 			this.rightMargin = rightMargin;
 			return this;
 		}
-		public Builder setInterpoint(boolean b) {
+		public Builder setInterpoint(boolean interpoint) {
 			this.interpoint = interpoint;
 			return this;
 		}
