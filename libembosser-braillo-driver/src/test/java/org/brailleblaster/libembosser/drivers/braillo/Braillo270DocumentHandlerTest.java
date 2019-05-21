@@ -200,4 +200,16 @@ public class Braillo270DocumentHandlerTest {
 		Braillo270DocumentHandler.Builder builder = new Braillo270DocumentHandler.Builder(Firmware.V1_11);
 		assertThatIllegalArgumentException().isThrownBy(() -> builder.setCopies(copies));
 	}
+	
+	@Test
+	public void testSetInterpointHeader() throws IOException {
+		Braillo270DocumentHandler handler = new Braillo270DocumentHandler.Builder(Firmware.V1_11).setInterpoint(false).build();
+		assertThat(handler.getHeader().asCharSource(Charsets.US_ASCII).read()).doesNotContain("\u001bS");
+		handler = new Braillo270DocumentHandler.Builder(Firmware.V1_11).setInterpoint(true).build();
+		assertThat(handler.getHeader().asCharSource(Charsets.US_ASCII).read()).doesNotContain("\u001bS");
+		handler = new Braillo270DocumentHandler.Builder(Firmware.V12_16).setInterpoint(false).build();
+		assertThat(handler.getHeader().asCharSource(Charsets.US_ASCII).read()).contains("\u001bS0");
+		handler = new Braillo270DocumentHandler.Builder(Firmware.V12_16).setInterpoint(true).build();
+		assertThat(handler.getHeader().asCharSource(Charsets.US_ASCII).read()).contains("\u001bS1");
+	}
 }

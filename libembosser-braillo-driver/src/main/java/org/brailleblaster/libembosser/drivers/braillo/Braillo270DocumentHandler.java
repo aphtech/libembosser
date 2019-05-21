@@ -15,7 +15,7 @@ public class Braillo270DocumentHandler extends AbstractBrailloDocumentHandler {
 			public ByteSource getHeader(int cellsPerLine, double sheetLength, boolean interpoint) {
 				String cells = Integer.toHexString(cellsPerLine - 27).toUpperCase();
 				int sl = ((int)Math.ceil(sheetLength * 2)) - 20;
-				return ByteSource.wrap(String.format("\u001bE\u001bA\u001b6\u001b\u001E%1d\u001b\u001f%s", sl, cells).getBytes(Charsets.US_ASCII));
+				return ByteSource.wrap(String.format("\u001bE\u001bA\u001b6\u001b\u001E%1d\u001b\u001f%s\u001bS%S", sl, cells, interpoint? '1': '0').getBytes(Charsets.US_ASCII));
 			}
 		},
 		V12_16() {
@@ -35,19 +35,20 @@ public class Braillo270DocumentHandler extends AbstractBrailloDocumentHandler {
 		public abstract boolean isValidSheetLength(double sheetLength);
 	}
 	public static class Builder {
-		private Firmware firmware;
+		private final Firmware firmware;
 		private int cellsPerLine = 40;
 		private double sheetLength = 11.0;
 		private int leftMargin = 0;
 		private int rightMargin = 0;
 		private int topMargin = 0;
 		private int bottomMargin = 0;
+		private boolean interpoint = true;
 		private int copies = 1;
 		public Builder(Firmware firmware) {
 			this.firmware = firmware;
 		}
 		public Braillo270DocumentHandler build() {
-			return new Braillo270DocumentHandler(firmware, cellsPerLine, sheetLength, topMargin, bottomMargin, leftMargin, rightMargin, false, copies);
+			return new Braillo270DocumentHandler(firmware, cellsPerLine, sheetLength, topMargin, bottomMargin, leftMargin, rightMargin, interpoint, copies);
 		}
 		public Builder setCopies(int copies) {
 			checkArgument(copies > 0);
@@ -79,6 +80,10 @@ public class Braillo270DocumentHandler extends AbstractBrailloDocumentHandler {
 		}
 		public Builder setRightMargin(int rightMargin) {
 			this.rightMargin = rightMargin;
+			return this;
+		}
+		public Builder setInterpoint(boolean b) {
+			this.interpoint = interpoint;
 			return this;
 		}
 	}
