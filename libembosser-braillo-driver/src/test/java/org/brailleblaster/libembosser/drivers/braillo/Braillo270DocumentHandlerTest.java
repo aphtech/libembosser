@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.brailleblaster.libembosser.drivers.braillo.Braillo270DocumentHandler.Firmware;
@@ -16,7 +15,6 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.google.common.base.Charsets;
-import com.google.common.collect.Streams;
 
 public class Braillo270DocumentHandlerTest {
 	@Test
@@ -211,5 +209,16 @@ public class Braillo270DocumentHandlerTest {
 		assertThat(handler.getHeader().asCharSource(Charsets.US_ASCII).read()).contains("\u001bS0");
 		handler = new Braillo270DocumentHandler.Builder(Firmware.V12_16).setInterpoint(true).build();
 		assertThat(handler.getHeader().asCharSource(Charsets.US_ASCII).read()).contains("\u001bS1");
+	}
+	@Test
+	public void testSetZFoldingHeader() throws IOException {
+		Braillo270DocumentHandler handler = new Braillo270DocumentHandler.Builder(Firmware.V1_11).setZFolding(false).build();
+		assertThat(handler.getHeader().asCharSource(Charsets.US_ASCII).read()).doesNotContain("\u001bQ");
+		handler = new Braillo270DocumentHandler.Builder(Firmware.V1_11).setZFolding(true).build();
+		assertThat(handler.getHeader().asCharSource(Charsets.US_ASCII).read()).doesNotContain("\u001bQ");
+		handler = new Braillo270DocumentHandler.Builder(Firmware.V12_16).setZFolding(false).build();
+		assertThat(handler.getHeader().asCharSource(Charsets.US_ASCII).read()).contains("\u001bQ0");
+		handler = new Braillo270DocumentHandler.Builder(Firmware.V12_16).setZFolding(true).build();
+		assertThat(handler.getHeader().asCharSource(Charsets.US_ASCII).read()).contains("\u001bQ1");
 	}
 }

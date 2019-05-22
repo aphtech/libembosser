@@ -12,7 +12,7 @@ public class Braillo270DocumentHandler extends AbstractBrailloDocumentHandler {
 				return 9.5 < sheetLength && sheetLength <= 14.0;
 			}
 			@Override
-			public ByteSource getHeader(int cellsPerLine, double sheetLength, boolean interpoint) {
+			public ByteSource getHeader(int cellsPerLine, double sheetLength, boolean interpoint, boolean zfolding) {
 				String cells = Integer.toHexString(cellsPerLine - 27).toUpperCase();
 				int sl = ((int)Math.ceil(sheetLength * 2)) - 20;
 				return ByteSource.wrap(String.format("\u001bE\u001bA\u001b6\u001b\u001E%1d\u001b\u001f%s", sl, cells).getBytes(Charsets.US_ASCII));
@@ -25,13 +25,13 @@ public class Braillo270DocumentHandler extends AbstractBrailloDocumentHandler {
 				return 3.5 < sheetLength && sheetLength <= 14.0;
 			}
 			@Override
-			public ByteSource getHeader(int cellsPerLine, double sheetLength, boolean interpoint) {
+			public ByteSource getHeader(int cellsPerLine, double sheetLength, boolean interpoint, boolean zfolding) {
 				String cells = Integer.toHexString(cellsPerLine - 27).toUpperCase();
 				int sl = ((int)Math.ceil(sheetLength * 2)) - 8;
-				return ByteSource.wrap(String.format("\u001bE\u001bA\u001b6\u001b\u001E%s\u001b\u001f%s\u001bS%s", lengths[sl], cells, interpoint? '1': '0').getBytes(Charsets.US_ASCII));
+				return ByteSource.wrap(String.format("\u001bE\u001bA\u001b6\u001b\u001E%s\u001b\u001f%s\u001bS%s\u001bQ%s", lengths[sl], cells, interpoint? '1': '0', zfolding? '1': '0').getBytes(Charsets.US_ASCII));
 			}
 		};
-		public abstract ByteSource getHeader(int cellsPerLine, double sheetLength, boolean interpoint);
+		public abstract ByteSource getHeader(int cellsPerLine, double sheetLength, boolean interpoint, boolean zfolding);
 		public abstract boolean isValidSheetLength(double sheetLength);
 	}
 	public static class Builder {
@@ -43,12 +43,13 @@ public class Braillo270DocumentHandler extends AbstractBrailloDocumentHandler {
 		private int topMargin = 0;
 		private int bottomMargin = 0;
 		private boolean interpoint = true;
+		private boolean zfolding = false;
 		private int copies = 1;
 		public Builder(Firmware firmware) {
 			this.firmware = firmware;
 		}
 		public Braillo270DocumentHandler build() {
-			return new Braillo270DocumentHandler(firmware, cellsPerLine, sheetLength, topMargin, bottomMargin, leftMargin, rightMargin, interpoint, copies);
+			return new Braillo270DocumentHandler(firmware, cellsPerLine, sheetLength, topMargin, bottomMargin, leftMargin, rightMargin, interpoint, zfolding, copies);
 		}
 		public Builder setCopies(int copies) {
 			checkArgument(copies > 0);
@@ -86,11 +87,15 @@ public class Braillo270DocumentHandler extends AbstractBrailloDocumentHandler {
 			this.interpoint = interpoint;
 			return this;
 		}
+		public Builder setZFolding(boolean zfolding) {
+			this.zfolding = zfolding;
+			return this;
+		}
 	}
 	private ByteSource headerSource;
-	private Braillo270DocumentHandler(Firmware firmware, int cellsPerLine, double sheetLength, int topMargin, int bottomMargin, int leftMargin, int rightMargin, boolean interpoint, int copies) {
+	private Braillo270DocumentHandler(Firmware firmware, int cellsPerLine, double sheetLength, int topMargin, int bottomMargin, int leftMargin, int rightMargin, boolean interpoint, boolean zfolding, int copies) {
 		super(cellsPerLine, sheetLength, topMargin, bottomMargin, leftMargin, rightMargin, interpoint, copies);
-		headerSource = firmware.getHeader(cellsPerLine, sheetLength, interpoint);
+		headerSource = firmware.getHeader(cellsPerLine, sheetLength, interpoint, zfolding);
 	}
 	@Override
 	protected ByteSource getHeader() {
