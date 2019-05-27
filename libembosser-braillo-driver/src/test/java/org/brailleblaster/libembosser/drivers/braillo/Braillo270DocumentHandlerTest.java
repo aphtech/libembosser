@@ -107,7 +107,7 @@ public class Braillo270DocumentHandlerTest {
 	@Test(dataProvider="invalidSheetLengthV12Provider")
 	public void testInvalidSheetLengthV12ThrowsException(double sheetLength) {
 		Braillo270DocumentHandler.Builder builder = new Braillo270DocumentHandler.Builder(Firmware.V12_16);
-		assertThatIllegalArgumentException().isThrownBy(() -> builder.setSheetlength(sheetLength)).withMessage("Sheet length invalid %s, valid range is 9.5 < sheet length <= 14.0", sheetLength);
+		assertThatIllegalArgumentException().isThrownBy(() -> builder.setSheetlength(sheetLength)).withMessage("Sheet length invalid %s, valid range is 3.5 < sheet length <= 14.0", sheetLength);
 	}
 	@DataProvider(name="sheetLengthProvider")
 	public Object[][] sheetLengthProvider() {

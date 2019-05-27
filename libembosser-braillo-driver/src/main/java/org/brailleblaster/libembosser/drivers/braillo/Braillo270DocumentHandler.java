@@ -6,11 +6,7 @@ import com.google.common.io.ByteSource;
 
 public class Braillo270DocumentHandler extends AbstractBrailloDocumentHandler {
 	public static enum Firmware {
-		V1_11() {
-			@Override
-			public boolean isValidSheetLength(double sheetLength) {
-				return 9.5 < sheetLength && sheetLength <= 14.0;
-			}
+		V1_11(9.5, 14.0) {
 			@Override
 			public ByteSource getHeader(int cellsPerLine, double sheetLength, boolean interpoint, boolean zfolding) {
 				String cells = Integer.toHexString(cellsPerLine - 27).toUpperCase();
@@ -18,12 +14,8 @@ public class Braillo270DocumentHandler extends AbstractBrailloDocumentHandler {
 				return ByteSource.wrap(String.format("\u001bE\u001bA\u001b6\u001b\u001E%1d\u001b\u001f%s", sl, cells).getBytes(Charsets.US_ASCII));
 			}
 		},
-		V12_16() {
+		V12_16(3.5, 14.0) {
 			String[] lengths = new String[] { "0", "1", "1", "2", "2", "3", "3", "4", "4", "5", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F" };
-			@Override
-			public boolean isValidSheetLength(double sheetLength) {
-				return 3.5 < sheetLength && sheetLength <= 14.0;
-			}
 			@Override
 			public ByteSource getHeader(int cellsPerLine, double sheetLength, boolean interpoint, boolean zfolding) {
 				String cells = Integer.toHexString(cellsPerLine - 27).toUpperCase();
@@ -31,8 +23,22 @@ public class Braillo270DocumentHandler extends AbstractBrailloDocumentHandler {
 				return ByteSource.wrap(String.format("\u001bE\u001bA\u001b6\u001b\u001E%s\u001b\u001f%s\u001bS%s\u001bQ%s", lengths[sl], cells, interpoint? '1': '0', zfolding? '1': '0').getBytes(Charsets.US_ASCII));
 			}
 		};
+		final private double minSheetLength;
+		final private double maxSheetLength;
+		private Firmware(double minSheet, double maxSheet) {
+			this.minSheetLength = minSheet;
+			this.maxSheetLength = maxSheet;
+		}
 		public abstract ByteSource getHeader(int cellsPerLine, double sheetLength, boolean interpoint, boolean zfolding);
-		public abstract boolean isValidSheetLength(double sheetLength);
+		public boolean isValidSheetLength(double sheetLength) {
+			return minSheetLength < sheetLength && sheetLength <= maxSheetLength;
+		}
+		public double getMinSheetLength() {
+			return minSheetLength;
+		}
+		public double getMaxSheetLength() {
+			return maxSheetLength;
+		}
 	}
 	public static class Builder {
 		private final Firmware firmware;
@@ -63,7 +69,7 @@ public class Braillo270DocumentHandler extends AbstractBrailloDocumentHandler {
 		}
 
 		public Builder setSheetlength(double sheetLength) {
-			checkArgument(firmware.isValidSheetLength(sheetLength), "Sheet length invalid %s, valid range is 9.5 < sheet length <= 14.0", sheetLength);
+			checkArgument(firmware.isValidSheetLength(sheetLength), "Sheet length invalid %s, valid range is %s < sheet length <= %s", sheetLength, firmware.getMinSheetLength(), firmware.getMaxSheetLength());
 			this.sheetLength = sheetLength;
 			return this;
 		}
