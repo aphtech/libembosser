@@ -89,7 +89,7 @@ public class Braillo200EmbosserTest {
 	}
 	@Test
 	public void checkSettingInterpointCapability() {
-		Braillo200Embosser embosser = new Braillo200Embosser("braillo.test", "Test Braillo", new Rectangle("279.", "279.0"), new Rectangle("100.0", "100.0"), false);
+		Braillo200Embosser embosser = new Braillo200Embosser("braillo.test", "Test Braillo", new Rectangle("279.0", "279.0"), new Rectangle("100.0", "100.0"), false);
 		assertFalse(embosser.supportsInterpoint());
 		embosser = new Braillo200Embosser("braillo.test", "Test Braillo", new Rectangle("279.", "279.0"), new Rectangle("100.0", "100.0"), true);
 		assertTrue(embosser.supportsInterpoint());
