@@ -19,6 +19,7 @@ public class BrailloEmbosserFactory implements EmbosserFactory {
 		eb.add(new Braillo200Embosser("libembosser.braillo.400sr", "Braillo 400SR", new Rectangle(BigDecimal.valueOf(330.0), BigDecimal.valueOf(356)), new Rectangle(BigDecimal.valueOf(140.0), BigDecimal.valueOf(102)), true));
 		eb.add(new Braillo200Embosser("libembosser.braillo.600", "Braillo 600", new Rectangle(BigDecimal.valueOf(330.0), BigDecimal.valueOf(356)), new Rectangle(BigDecimal.valueOf(140.0), BigDecimal.valueOf(102)), true));
 		eb.add(new Braillo200Embosser("libembosser.braillo.600sr", "Braillo 600SR", new Rectangle(BigDecimal.valueOf(330.0), BigDecimal.valueOf(356)), new Rectangle(BigDecimal.valueOf(140.0), BigDecimal.valueOf(102)), true));
+		eb.add(new Braillo270Embosser("libembosser.braillo.270v12", "Braillo 270", Braillo270DocumentHandler.Firmware.V12_16, new Rectangle("330.0", "356.0"), new Rectangle("165.0", "102.0"), true));
 		embossers = eb.build();
 	}
 
