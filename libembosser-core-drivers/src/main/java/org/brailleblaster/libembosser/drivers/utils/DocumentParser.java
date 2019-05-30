@@ -188,26 +188,41 @@ public class DocumentParser {
 		if (node instanceof Element) {
 			Optional<PEFElementType> elementType = PEFElementType.findElementType((Element)node);
 			if (elementType.isPresent()) {
+				Optional<DocumentHandler.CellsPerLine>cols;
+				Optional<DocumentHandler.Duplex> duplex;
+				Optional<DocumentHandler.RowGap> rowGap;
+				Optional<DocumentHandler.LinesPerPage> rows;
 				switch(elementType.get()) {
 				case BODY:
 					handler.onEvent(new StartDocumentEvent());
 					break;
 				case VOLUME:
-					Optional<DocumentHandler.CellsPerLine>cols = Optional.ofNullable(((Element) node).getAttribute("cols")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new DocumentHandler.CellsPerLine(v));
-					Optional<DocumentHandler.Duplex> duplex = Optional.ofNullable(((Element) node).getAttribute("duplex")).map(v -> v.toLowerCase()).flatMap(v -> v.equals("true")? Optional.of(new DocumentHandler.Duplex(true)) : v.equals("false")? Optional.of(new DocumentHandler.Duplex(false)) : Optional.empty());
-					Optional<DocumentHandler.RowGap>rowGap = Optional.ofNullable(((Element) node).getAttribute("rowgap")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new DocumentHandler.RowGap(v));
-					Optional<DocumentHandler.LinesPerPage>rows = Optional.ofNullable(((Element) node).getAttribute("rows")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new DocumentHandler.LinesPerPage(v));
-					Set<DocumentHandler.VolumeOption> options = Streams.concat(Streams.stream(cols), Streams.stream(duplex), Streams.stream(rowGap),  Streams.stream(rows)).collect(Collectors.toSet());
-					handler.onEvent(new StartVolumeEvent(options));
+					cols = Optional.ofNullable(((Element) node).getAttribute("cols")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new DocumentHandler.CellsPerLine(v));
+					duplex = Optional.ofNullable(((Element) node).getAttribute("duplex")).map(v -> v.toLowerCase()).flatMap(v -> v.equals("true")? Optional.of(new DocumentHandler.Duplex(true)) : v.equals("false")? Optional.of(new DocumentHandler.Duplex(false)) : Optional.empty());
+					rowGap = Optional.ofNullable(((Element) node).getAttribute("rowgap")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new DocumentHandler.RowGap(v));
+					rows = Optional.ofNullable(((Element) node).getAttribute("rows")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new DocumentHandler.LinesPerPage(v));
+					Set<DocumentHandler.VolumeOption> volOptions = Streams.concat(Streams.stream(cols), Streams.stream(duplex), Streams.stream(rowGap),  Streams.stream(rows)).collect(Collectors.toSet());
+					handler.onEvent(new StartVolumeEvent(volOptions));
 					break;
 				case SECTION:
-					handler.onEvent(new StartSectionEvent());;
+					cols = Optional.ofNullable(((Element) node).getAttribute("cols")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new DocumentHandler.CellsPerLine(v));
+					duplex = Optional.ofNullable(((Element) node).getAttribute("duplex")).map(v -> v.toLowerCase()).flatMap(v -> v.equals("true")? Optional.of(new DocumentHandler.Duplex(true)) : v.equals("false")? Optional.of(new DocumentHandler.Duplex(false)) : Optional.empty());
+					rowGap = Optional.ofNullable(((Element) node).getAttribute("rowgap")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new DocumentHandler.RowGap(v));
+					rows = Optional.ofNullable(((Element) node).getAttribute("rows")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new DocumentHandler.LinesPerPage(v));
+					Set<DocumentHandler.SectionOption> sectionOptions = Streams.concat(Streams.stream(cols), Streams.stream(duplex), Streams.stream(rowGap),  Streams.stream(rows)).collect(Collectors.toSet());
+					handler.onEvent(new StartSectionEvent(sectionOptions));;
 					break;
 				case PAGE:
-					handler.onEvent(new StartPageEvent());;
+					cols = Optional.ofNullable(((Element) node).getAttribute("cols")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new DocumentHandler.CellsPerLine(v));
+					rowGap = Optional.ofNullable(((Element) node).getAttribute("rowgap")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new DocumentHandler.RowGap(v));
+					rows = Optional.ofNullable(((Element) node).getAttribute("rows")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new DocumentHandler.LinesPerPage(v));
+					Set<DocumentHandler.PageOption> pageOptions = Streams.concat(Streams.stream(cols), Streams.stream(rowGap),  Streams.stream(rows)).collect(Collectors.toSet());
+					handler.onEvent(new StartPageEvent(pageOptions));;
 					break;
 				case ROW:
-					handler.onEvent(new StartLineEvent());
+					rowGap = Optional.ofNullable(((Element) node).getAttribute("rowgap")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new DocumentHandler.RowGap(v));
+					Set<DocumentHandler.RowOption> rowOptions = Streams.stream(rowGap).collect(Collectors.toSet());
+					handler.onEvent(new StartLineEvent(rowOptions));
 					NodeList children = node.getChildNodes();
 					StringBuilder sb = new StringBuilder();
 					for (int i = 0; i < children.getLength(); ++i) {

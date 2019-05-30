@@ -164,7 +164,7 @@ public interface DocumentHandler {
 			super(value);
 		}
 	}
-	final class RowGap extends BaseValueOption<Integer> implements DocumentOption, VolumeOption, SectionOption, RowOption {
+	final class RowGap extends BaseValueOption<Integer> implements DocumentOption, VolumeOption, SectionOption, PageOption, RowOption {
 		public RowGap(Integer value) {
 			super(value);
 		}

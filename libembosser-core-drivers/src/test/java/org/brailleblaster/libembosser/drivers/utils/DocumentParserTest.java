@@ -63,7 +63,7 @@ public class DocumentParserTest {
 					Optional<? extends Option> actualOption = actualOptions.stream().filter(o -> o.getClass().equals(expectedOption.getClass())).findFirst();
 					assertTrue(actualOption.isPresent());
 					if (expectedOption instanceof ValueOption) {
-						assertEquals(((ValueOption<?>)actualOption.get()).getValue(), ((ValueOption<?>)expectedOption).getValue());
+						assertEquals(((ValueOption<?>)actualOption.get()).getValue(), ((ValueOption<?>)expectedOption).getValue(), String.format("Values in option %s do not match", expectedOption.getClass().getCanonicalName()));
 					}
 				}
 			} else if (expectedEvent instanceof BrailleEvent) {
@@ -139,6 +139,9 @@ public class DocumentParserTest {
 		data.add(new Object[] {input, expectedEvents});
 		expectedEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(ImmutableSet.of(new DocumentHandler.CellsPerLine(40), new DocumentHandler.Duplex(false), new DocumentHandler.RowGap(0), new DocumentHandler.LinesPerPage(25))), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2820\u281e\u2811\u280c\u2800\u2819\u2815\u2809"), new EndLineEvent(), new StartLineEvent(), new BrailleEvent("\u2800\u280e\u2811\u2809\u2815\u281d\u2819\u2800\u2807\u2814\u2811"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new StartVolumeEvent(ImmutableSet.of(new DocumentHandler.CellsPerLine(38), new DocumentHandler.Duplex(true), new DocumentHandler.RowGap(0), new DocumentHandler.LinesPerPage(24))), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2820\u2801\u281d\u2815\u282e\u2817\u2800\u280f\u2801\u281b\u2811"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		input = Resources.asByteSource(Resources.getResource(this.getClass(), "multi_volume.pef"));
+		data.add(new Object[] {input, expectedEvents});
+		expectedEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(ImmutableSet.of(new DocumentHandler.CellsPerLine(40), new DocumentHandler.LinesPerPage(25), new DocumentHandler.Duplex(true), new DocumentHandler.RowGap(0))), new StartSectionEvent(ImmutableSet.of(new DocumentHandler.CellsPerLine(37), new DocumentHandler.LinesPerPage(24), new DocumentHandler.Duplex(false), new DocumentHandler.RowGap(1))), new StartPageEvent(ImmutableSet.of(new DocumentHandler.CellsPerLine(35), new DocumentHandler.LinesPerPage(22), new DocumentHandler.RowGap(3))), new StartLineEvent(ImmutableSet.of(new DocumentHandler.RowGap(4))), new BrailleEvent("\u2801"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		input = Resources.asByteSource(Resources.getResource(this.getClass(), "options.pef"));
 		data.add(new Object[] {input, expectedEvents});
 		return data.iterator();
 	}
