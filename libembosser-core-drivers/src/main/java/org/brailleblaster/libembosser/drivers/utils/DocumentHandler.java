@@ -174,5 +174,20 @@ public interface DocumentHandler {
 			super(value);
 		}
 	}
+	final class Indent extends BaseValueOption<Integer> implements GraphicOption {
+		public Indent(Integer indent) {
+			super(indent);
+		}
+	}
+	final class Width extends BaseValueOption<Integer> implements GraphicOption {
+		public Width(Integer width) {
+			super(width);
+		}
+	}
+	final class Height extends BaseValueOption implements GraphicOption {
+		public Height(Integer height) {
+			super(height);
+		}
+	}
 	public void onEvent(DocumentEvent event);
 }

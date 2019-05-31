@@ -25,6 +25,8 @@ import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndLineEvent
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndPageEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndSectionEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndVolumeEvent;
+import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.Height;
+import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.Indent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.Option;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.OptionEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartDocumentEvent;
@@ -34,6 +36,7 @@ import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartPageEve
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartSectionEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartVolumeEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.ValueOption;
+import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.Width;
 import org.brailleblaster.libembosser.drivers.utils.DocumentParser.ParseException;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -145,7 +148,7 @@ public class DocumentParserTest {
 		expectedEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(ImmutableSet.of(new DocumentHandler.CellsPerLine(40), new DocumentHandler.LinesPerPage(25), new DocumentHandler.Duplex(true), new DocumentHandler.RowGap(0))), new StartSectionEvent(ImmutableSet.of(new DocumentHandler.CellsPerLine(37), new DocumentHandler.LinesPerPage(24), new DocumentHandler.Duplex(false), new DocumentHandler.RowGap(1))), new StartPageEvent(ImmutableSet.of(new DocumentHandler.CellsPerLine(35), new DocumentHandler.LinesPerPage(22), new DocumentHandler.RowGap(3))), new StartLineEvent(ImmutableSet.of(new DocumentHandler.RowGap(4))), new BrailleEvent("\u2801"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		input = Resources.asByteSource(Resources.getResource(this.getClass(), "options.pef"));
 		data.add(new Object[] {input, expectedEvents});
-		expectedEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(ImmutableSet.of(new DocumentHandler.CellsPerLine(40), new DocumentHandler.LinesPerPage(25), new DocumentHandler.Duplex(false), new DocumentHandler.RowGap(0))), new StartSectionEvent(), new StartPageEvent(), new StartGraphicEvent(), new StartLineEvent(), new BrailleEvent("\u2801\u2803"), new EndLineEvent(), new EndGraphicEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		expectedEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(ImmutableSet.of(new DocumentHandler.CellsPerLine(40), new DocumentHandler.LinesPerPage(25), new DocumentHandler.Duplex(false), new DocumentHandler.RowGap(0))), new StartSectionEvent(), new StartPageEvent(), new StartGraphicEvent(), new StartLineEvent(), new BrailleEvent("\u2801\u2803"), new EndLineEvent(), new EndGraphicEvent(), new StartGraphicEvent(ImmutableSet.of(new Indent(1), new Width(33), new Height(10))), new EndGraphicEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		input = Resources.asByteSource(Resources.getResource(this.getClass(), "graphics.pef"));
 		data.add(new Object[] {input, expectedEvents});
 		return data.iterator();

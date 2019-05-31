@@ -14,6 +14,7 @@
 					<tg:graphic>
 						<row>&#x2801;&#x2803;</row>
 					</tg:graphic>
+					<tg:graphic indent="1" width="33" height="10"/>
 				</page>
 			</section>
 		</volume>

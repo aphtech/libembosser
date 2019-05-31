@@ -22,6 +22,7 @@ import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndLineEvent
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndPageEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndSectionEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndVolumeEvent;
+import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.GraphicOption;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartDocumentEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartGraphicEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartLineEvent;
@@ -37,6 +38,7 @@ import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
 import com.google.common.primitives.Ints;
 
@@ -237,7 +239,11 @@ public class DocumentParser {
 					result = false;
 					break;
 				case GRAPHIC:
-					handler.onEvent(new StartGraphicEvent());
+					Optional<DocumentHandler.Height> height = Optional.ofNullable(((Element)node).getAttribute("height")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new DocumentHandler.Height(v));
+					Optional<DocumentHandler.Indent> indent = Optional.ofNullable(((Element)node).getAttribute("indent")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new DocumentHandler.Indent(v));
+					Optional<DocumentHandler.Width> width = Optional.ofNullable(((Element)node).getAttribute("width")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new DocumentHandler.Width(v));
+					Set<GraphicOption> graphicOptions = Streams.concat(Streams.stream(height), Streams.stream(indent), Streams.stream(width)).collect(ImmutableSet.toImmutableSet());
+					handler.onEvent(new StartGraphicEvent(graphicOptions));
 					result = true;
 					break;
 				case HEAD:
