@@ -17,11 +17,13 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.BrailleEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndDocumentEvent;
+import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndGraphicEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndLineEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndPageEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndSectionEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndVolumeEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartDocumentEvent;
+import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartGraphicEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartLineEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartPageEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartSectionEvent;
@@ -234,6 +236,10 @@ public class DocumentParser {
 					handler.onEvent(new BrailleEvent(sb.toString().trim()));
 					result = false;
 					break;
+				case GRAPHIC:
+					handler.onEvent(new StartGraphicEvent());
+					result = false;
+					break;
 				case HEAD:
 					result = false;
 					break;
@@ -262,6 +268,9 @@ public class DocumentParser {
 					break;
 				case ROW:
 					handler.onEvent(new EndLineEvent());;
+					break;
+				case GRAPHIC:
+					handler.onEvent(new EndGraphicEvent());
 					break;
 				default:
 					break;

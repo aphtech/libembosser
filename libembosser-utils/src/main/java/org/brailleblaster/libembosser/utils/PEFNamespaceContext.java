@@ -12,6 +12,7 @@ import com.google.common.collect.ImmutableList;
 public class PEFNamespaceContext implements NamespaceContext {
 	public static final String DC_NAMESPACE = "http://purl.org/dc/elements/1.1/";
 	public static final String PEF_NAMESPACE = "http://www.daisy.org/ns/2008/pef";
+	public static final String TG_NAMESPACE = "http://www.aph.org/ns/tactile-graphics/1.0";
 	@Override
 	public String getNamespaceURI(String prefix) {
 		checkArgument(prefix != null, "Prefix cannot be null");

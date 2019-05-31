@@ -17,6 +17,7 @@ public enum PEFElementType {
 	DC_FORMAT(PEFNamespaceContext.DC_NAMESPACE, "format", ImmutableList.of(e -> "application/x-pef+xml".equals(e.getTextContent()))),
 	DC_IDENTIFIER(PEFNamespaceContext.DC_NAMESPACE, "identifier"),
 	BODY(PEFNamespaceContext.PEF_NAMESPACE, "body"),
+	GRAPHIC(PEFNamespaceContext.TG_NAMESPACE, "graphic"),
 	VOLUME(PEFNamespaceContext.PEF_NAMESPACE, "volume"),
 	SECTION(PEFNamespaceContext.PEF_NAMESPACE, "section"),
 	PAGE(PEFNamespaceContext.PEF_NAMESPACE, "page"),
