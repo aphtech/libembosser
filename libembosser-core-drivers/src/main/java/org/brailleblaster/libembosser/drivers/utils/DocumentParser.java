@@ -238,7 +238,7 @@ public class DocumentParser {
 					break;
 				case GRAPHIC:
 					handler.onEvent(new StartGraphicEvent());
-					result = false;
+					result = true;
 					break;
 				case HEAD:
 					result = false;

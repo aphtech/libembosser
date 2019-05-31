@@ -11,7 +11,9 @@
 		<volume cols="40" duplex="false" rowgap="0" rows="25">
 			<section>
 				<page>
-					<tg:graphic/>
+					<tg:graphic>
+						<row>&#x2801;&#x2803;</row>
+					</tg:graphic>
 				</page>
 			</section>
 		</volume>
