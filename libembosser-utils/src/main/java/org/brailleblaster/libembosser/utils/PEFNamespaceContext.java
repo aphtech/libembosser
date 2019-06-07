@@ -22,6 +22,8 @@ public class PEFNamespaceContext implements NamespaceContext {
 			return PEFNamespaceContext.PEF_NAMESPACE;
 		case "dc":
 			return PEFNamespaceContext.DC_NAMESPACE;
+		case "tg":
+			return PEFNamespaceContext.TG_NAMESPACE;
 		case XMLConstants.XMLNS_ATTRIBUTE:
 			return XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
 		case XMLConstants.XML_NS_PREFIX:
@@ -38,6 +40,8 @@ public class PEFNamespaceContext implements NamespaceContext {
 			return XMLConstants.DEFAULT_NS_PREFIX;
 		case PEFNamespaceContext.DC_NAMESPACE:
 			return "dc";
+		case PEFNamespaceContext.TG_NAMESPACE:
+			return "tg";
 		case XMLConstants.XML_NS_PREFIX:
 			return XMLConstants.XML_NS_URI;
 		case XMLConstants.XMLNS_ATTRIBUTE_NS_URI:
@@ -56,6 +60,9 @@ public class PEFNamespaceContext implements NamespaceContext {
 			break;
 		case PEFNamespaceContext.DC_NAMESPACE:
 			prefixes = ImmutableList.of("dc");
+			break;
+		case PEFNamespaceContext.TG_NAMESPACE:
+			prefixes = ImmutableList.of("tg");
 			break;
 		case XMLConstants.XML_NS_URI:
 			prefixes = ImmutableList.of(XMLConstants.XML_NS_PREFIX);

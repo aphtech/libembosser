@@ -4,6 +4,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.imageio.ImageIO;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -26,6 +28,7 @@ import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndPageEvent
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndSectionEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndVolumeEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.Height;
+import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.ImageOption;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.Indent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.Option;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.OptionEvent;
@@ -68,7 +71,13 @@ public class DocumentParserTest {
 					Optional<? extends Option> actualOption = actualOptions.stream().filter(o -> o.getClass().equals(expectedOption.getClass())).findFirst();
 					assertTrue(actualOption.isPresent());
 					if (expectedOption instanceof ValueOption) {
-						assertEquals(((ValueOption<?>)actualOption.get()).getValue(), ((ValueOption<?>)expectedOption).getValue(), String.format("Values in option %s do not match", expectedOption.getClass().getCanonicalName()));
+						Object expected = ((ValueOption<?>)expectedOption).getValue();
+						Object actual = ((ValueOption<?>)actualOption.get()).getValue();
+						if (actual instanceof BufferedImage && expected instanceof BufferedImage) {
+							assertImageEquals((BufferedImage)actual, (BufferedImage)expected);
+						} else {
+							assertEquals(actual, expected, String.format("Values in option %s do not match", expectedOption.getClass().getCanonicalName()));
+						}
 					}
 				}
 			} else if (expectedEvent instanceof BrailleEvent) {
@@ -125,7 +134,7 @@ public class DocumentParserTest {
 	}
 	
 	@DataProvider(name="pefProvider")
-	public Iterator<Object[]> pefProvider() {
+	public Iterator<Object[]> pefProvider() throws IOException {
 		List<Object[]> data = new ArrayList<>();
 		ImmutableList<DocumentEvent> expectedEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(ImmutableSet.of(new DocumentHandler.CellsPerLine(40), new DocumentHandler.Duplex(false), new DocumentHandler.RowGap(0), new DocumentHandler.LinesPerPage(25))), new StartSectionEvent(), new StartPageEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		ByteSource input = Resources.asByteSource(Resources.getResource(this.getClass(), "minimal.pef"));
@@ -148,7 +157,8 @@ public class DocumentParserTest {
 		expectedEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(ImmutableSet.of(new DocumentHandler.CellsPerLine(40), new DocumentHandler.LinesPerPage(25), new DocumentHandler.Duplex(true), new DocumentHandler.RowGap(0))), new StartSectionEvent(ImmutableSet.of(new DocumentHandler.CellsPerLine(37), new DocumentHandler.LinesPerPage(24), new DocumentHandler.Duplex(false), new DocumentHandler.RowGap(1))), new StartPageEvent(ImmutableSet.of(new DocumentHandler.CellsPerLine(35), new DocumentHandler.LinesPerPage(22), new DocumentHandler.RowGap(3))), new StartLineEvent(ImmutableSet.of(new DocumentHandler.RowGap(4))), new BrailleEvent("\u2801"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		input = Resources.asByteSource(Resources.getResource(this.getClass(), "options.pef"));
 		data.add(new Object[] {input, expectedEvents});
-		expectedEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(ImmutableSet.of(new DocumentHandler.CellsPerLine(40), new DocumentHandler.LinesPerPage(25), new DocumentHandler.Duplex(false), new DocumentHandler.RowGap(0))), new StartSectionEvent(), new StartPageEvent(), new StartGraphicEvent(), new StartLineEvent(), new BrailleEvent("\u2801\u2803"), new EndLineEvent(), new EndGraphicEvent(), new StartGraphicEvent(ImmutableSet.of(new Indent(1), new Width(33), new Height(10))), new EndGraphicEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		BufferedImage img = ImageIO.read(this.getClass().getResourceAsStream("APH_Logo.png"));
+		expectedEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(ImmutableSet.of(new DocumentHandler.CellsPerLine(40), new DocumentHandler.LinesPerPage(25), new DocumentHandler.Duplex(false), new DocumentHandler.RowGap(0))), new StartSectionEvent(), new StartPageEvent(), new StartGraphicEvent(), new StartLineEvent(), new BrailleEvent("\u2801\u2803"), new EndLineEvent(), new EndGraphicEvent(), new StartGraphicEvent(ImmutableSet.of(new ImageOption(img), new Indent(1), new Width(33), new Height(10))), new EndGraphicEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		input = Resources.asByteSource(Resources.getResource(this.getClass(), "graphics.pef"));
 		data.add(new Object[] {input, expectedEvents});
 		return data.iterator();
@@ -183,5 +193,22 @@ public class DocumentParserTest {
 			fail("Problem creating XML parser", e);
 		}
 		assertEqualEvents(expectedEvents, actualEvents);
+	}
+	public static void assertImageEquals(BufferedImage imageA, BufferedImage imageB) {
+		if (imageA.getWidth() != imageB.getWidth()) {
+			fail(String.format("Image widths do not match, expected %d but got %d", imageB.getWidth(), imageB.getWidth()));
+		}
+		if (imageA.getHeight() != imageB.getHeight()) {
+			fail(String.format("Image heights do not match, expected %d but got %d", imageB.getHeight(), imageB.getHeight()));
+		}
+		int width = imageA.getWidth();
+		int height = imageA.getHeight();
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				if (imageA.getRGB(x, y) != imageB.getRGB(x, y)) {
+					fail(String.format("Pixel %d,%d do not match, expected %d but found %d", x, y, imageB.getRGB(x, y), imageA.getRGB(x, y)));
+				}
+			}
+		}
 	}
 }

@@ -1,9 +1,14 @@
 package org.brailleblaster.libembosser.drivers.utils;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.util.Deque;
 import java.util.LinkedList;
@@ -11,9 +16,15 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.imageio.ImageIO;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.BrailleEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndDocumentEvent;
@@ -30,6 +41,7 @@ import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartPageEve
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartSectionEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartVolumeEvent;
 import org.brailleblaster.libembosser.utils.PEFElementType;
+import org.brailleblaster.libembosser.utils.PEFNamespaceContext;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -40,6 +52,7 @@ import org.xml.sax.SAXException;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
+import com.google.common.io.BaseEncoding;
 import com.google.common.primitives.Ints;
 
 public class DocumentParser {
@@ -160,6 +173,7 @@ public class DocumentParser {
 	}
 
 	private void processPefElement(Element pefNode, DocumentHandler handler) {
+		NodeList resourceNodes = getResourceNodes(pefNode);
 		Deque<Node> nodeStack = new LinkedList<>();
 		Node nextNode = pefNode;
 		boolean descend = true;
@@ -167,7 +181,7 @@ public class DocumentParser {
 			// Add any next node to the stack.
 			if (nextNode != null) {
 				nodeStack.push(nextNode);
-				descend = enterNode(nextNode, handler);
+				descend = enterNode(nextNode, resourceNodes, handler);
 			} else {
 				descend = false;
 			}
@@ -187,7 +201,7 @@ public class DocumentParser {
 			}
 		} while (!nodeStack.isEmpty());
 	}
-	private boolean enterNode(Node node, DocumentHandler handler) {
+	private boolean enterNode(Node node, NodeList resourceNodes, DocumentHandler handler) {
 		boolean result = true;
 		if (node instanceof Element) {
 			Optional<PEFElementType> elementType = PEFElementType.findElementType((Element)node);
@@ -239,10 +253,11 @@ public class DocumentParser {
 					result = false;
 					break;
 				case GRAPHIC:
+					Optional<DocumentHandler.ImageOption> img = Optional.ofNullable(((Element)node).getAttribute("idref")).flatMap(a -> findResourceById(resourceNodes, a)).flatMap(e -> loadImageFromElement(e)).map(i -> new DocumentHandler.ImageOption(i));
 					Optional<DocumentHandler.Height> height = Optional.ofNullable(((Element)node).getAttribute("height")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new DocumentHandler.Height(v));
 					Optional<DocumentHandler.Indent> indent = Optional.ofNullable(((Element)node).getAttribute("indent")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new DocumentHandler.Indent(v));
 					Optional<DocumentHandler.Width> width = Optional.ofNullable(((Element)node).getAttribute("width")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new DocumentHandler.Width(v));
-					Set<GraphicOption> graphicOptions = Streams.concat(Streams.stream(height), Streams.stream(indent), Streams.stream(width)).collect(ImmutableSet.toImmutableSet());
+					Set<GraphicOption> graphicOptions = Streams.concat(Streams.stream(img), Streams.stream(height), Streams.stream(indent), Streams.stream(width)).collect(ImmutableSet.toImmutableSet());
 					handler.onEvent(new StartGraphicEvent(graphicOptions));
 					result = true;
 					break;
@@ -283,5 +298,53 @@ public class DocumentParser {
 				}
 			});
 		}
+	}
+	private NodeList getResourceNodes(Element pefNode) {
+		try {
+			final XPathFactory factory = XPathFactory.newInstance();
+			final XPath xpath = factory.newXPath();
+			xpath.setNamespaceContext(new PEFNamespaceContext());
+			XPathExpression findGraphics = xpath.compile("/pef:pef/tg:images/tg:imageData");
+			return (NodeList)findGraphics.evaluate(pefNode, XPathConstants.NODESET);
+		} catch (XPathExpressionException e) {
+			return new NodeList() {
+				@Override
+				public Node item(int index) {
+					throw new IndexOutOfBoundsException(index);
+				}
+				@Override
+				public int getLength() {
+					return 0;
+				}
+			};
+		}
+	}
+	private Optional<Element> findResourceById(NodeList resources, String id) {
+		checkNotNull(resources, "Resources cannot be null");
+		checkNotNull(id, "ID cannot be null");
+		for (int i = 0; i < resources.getLength(); i++) {
+			Node n = resources.item(i);
+			if (n instanceof Element) {
+				Element e = (Element)n;
+				if (id.contentEquals(e.getAttribute("id"))) {
+					return Optional.of(e);
+				}
+			}
+		}
+		return Optional.empty();
+	}
+	private Optional<Image> loadImageFromElement(Element e) {
+		Optional<Image> result = Optional.empty();
+		if ("base64".equalsIgnoreCase(e.getAttribute("encoding"))) {
+			String s = e.getTextContent();
+			try {
+				InputStream input = BaseEncoding.base64().decodingStream(new StringReader(s));
+				BufferedImage img = ImageIO.read(input);
+				result = Optional.of(img);
+			} catch (IOException ex) {
+				// Cannot really do anything
+			}
+		}
+		return result;
 	}
 }

@@ -1,5 +1,6 @@
 package org.brailleblaster.libembosser.drivers.utils;
 
+import java.awt.Image;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
@@ -184,9 +185,14 @@ public interface DocumentHandler {
 			super(width);
 		}
 	}
-	final class Height extends BaseValueOption implements GraphicOption {
+	final class Height extends BaseValueOption<Integer> implements GraphicOption {
 		public Height(Integer height) {
 			super(height);
+		}
+	}
+	final class ImageOption extends BaseValueOption<Image> implements GraphicOption {
+		public ImageOption(Image image) {
+			super(image);
 		}
 	}
 	public void onEvent(DocumentEvent event);
