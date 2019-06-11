@@ -265,11 +265,23 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 				if (e instanceof StartLineEvent) {
 					h.startLine((StartLineEvent)e);
 				} else if (e instanceof StartGraphicEvent) {
-					
+					h.startGraphic((StartGraphicEvent)e);
 				} else if (e instanceof EndPageEvent) {
 					h.endPage((EndPageEvent)e);
 				} else if (ClassUtils.isInstanceOf(e, StartDocumentEvent.class, StartVolumeEvent.class, StartSectionEvent.class, StartPageEvent.class, BrailleEvent.class, EndLineEvent.class, EndGraphicEvent.class, EndSectionEvent.class, EndVolumeEvent.class, EndDocumentEvent.class)) {
 					throwInvalidStateException(e, "PAGE");
+				}
+			}
+		},
+		GRAPHIC {
+			@Override
+			void accept(DocumentToPrintableHandler h, DocumentEvent e) {
+				if (e instanceof StartLineEvent) {
+					
+				} else if (e instanceof EndGraphicEvent) {
+					h.endGraphic();
+				} else {
+					throwInvalidStateException(e, "GRAPHIC");
 				}
 			}
 		},
@@ -279,7 +291,7 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 				if (e instanceof BrailleEvent) {
 					h.addBraille((BrailleEvent)e);
 				} else if (e instanceof EndLineEvent) {
-					h.endLine((EndLineEvent)e);
+					h.endLine();
 				} else if (ClassUtils.isInstanceOf(e, StartDocumentEvent.class, StartVolumeEvent.class, StartSectionEvent.class, StartPageEvent.class, StartLineEvent.class, StartGraphicEvent.class, EndGraphicEvent.class, EndPageEvent.class, EndSectionEvent.class, EndVolumeEvent.class, EndDocumentEvent.class)) {
 					throwInvalidStateException(e, "LINE");
 				}
@@ -340,9 +352,14 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 	private void addBraille(BrailleEvent event) {
 		braille.append(event.getBraille());
 	}
-	private void endLine(EndLineEvent event) {
+	private void endLine() {
 		pageElements.add(new Row(braille.toString()));
 		stateStack.pop();
 	}
-
+	private void startGraphic(StartGraphicEvent event) {
+		stateStack.push(HandlerStates.GRAPHIC);
+	}
+	private void endGraphic() {
+		stateStack.pop();
+	}
 }

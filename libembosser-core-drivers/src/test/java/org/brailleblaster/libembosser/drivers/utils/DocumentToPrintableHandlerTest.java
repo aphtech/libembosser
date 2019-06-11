@@ -15,6 +15,7 @@ import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndPageEvent
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndSectionEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndVolumeEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartDocumentEvent;
+import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartGraphicEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartLineEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartPageEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartSectionEvent;
@@ -143,6 +144,19 @@ public class DocumentToPrintableHandlerTest {
 		data.add(new Object[] {createHandlerBuilder().build(), events, new StartPageEvent()});
 		data.add(new Object[] {createHandlerBuilder().build(), events, new EndPageEvent()});
 		data.add(new Object[] {createHandlerBuilder().build(), events, new StartLineEvent()});
+		// Tests for graphic level
+		events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartGraphicEvent());
+		data.add(new Object[] {createHandlerBuilder().build(), events, new StartDocumentEvent()});
+		data.add(new Object[] {createHandlerBuilder().build(), events, new EndDocumentEvent()});
+		data.add(new Object[] {createHandlerBuilder().build(), events, new StartVolumeEvent()});
+		data.add(new Object[] {createHandlerBuilder().build(), events, new EndVolumeEvent()});
+		data.add(new Object[] {createHandlerBuilder().build(), events, new StartSectionEvent()});
+		data.add(new Object[] {createHandlerBuilder().build(), events, new EndSectionEvent()});
+		data.add(new Object[] {createHandlerBuilder().build(), events, new StartPageEvent()});
+		data.add(new Object[] {createHandlerBuilder().build(), events, new EndPageEvent()});
+		data.add(new Object[] {createHandlerBuilder().build(), events, new StartGraphicEvent()});
+		data.add(new Object[] {createHandlerBuilder().build(), events, new EndLineEvent()});
+		data.add(new Object[] {createHandlerBuilder().build(), events, new BrailleEvent("Some text")});
 		return data.iterator();
 	}
 	@Test(dataProvider="invalidStateChangeProvider")
