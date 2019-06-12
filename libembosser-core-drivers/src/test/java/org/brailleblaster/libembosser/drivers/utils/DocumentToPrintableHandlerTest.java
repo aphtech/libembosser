@@ -177,7 +177,11 @@ public class DocumentToPrintableHandlerTest {
 		return new Object[][] {
 			{new DocumentToPrintableHandler.Page(), new DocumentToPrintableHandler.Page(), true},
 			{new DocumentToPrintableHandler.Page(), new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2801")), false},
-			{new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2801")), new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2801")), true}
+			{new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2801")), new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2801")), true},
+			{new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2803")), new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2801")), false},
+			{new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2811")), new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2811")), true},
+			{new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2801"), new DocumentToPrintableHandler.Row("\u2811")), new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2801"), new DocumentToPrintableHandler.Row("\u2811")), true},
+			{new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2801"), new DocumentToPrintableHandler.Row("\u2811")), new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2811"), new DocumentToPrintableHandler.Row("\u2801")), false},
 		};
 	}
 	@Test(dataProvider="pageEqualityProvider")
