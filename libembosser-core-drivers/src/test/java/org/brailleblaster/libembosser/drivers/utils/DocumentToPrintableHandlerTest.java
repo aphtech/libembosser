@@ -175,7 +175,9 @@ public class DocumentToPrintableHandlerTest {
 	@DataProvider(name="pageEqualityProvider")
 	public Object[][] pageEqualityProvider() {
 		return new Object[][] {
-			{new DocumentToPrintableHandler.Page(), new DocumentToPrintableHandler.Page(), true}
+			{new DocumentToPrintableHandler.Page(), new DocumentToPrintableHandler.Page(), true},
+			{new DocumentToPrintableHandler.Page(), new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2801")), false},
+			{new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2801")), new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2801")), true}
 		};
 	}
 	@Test(dataProvider="pageEqualityProvider")
