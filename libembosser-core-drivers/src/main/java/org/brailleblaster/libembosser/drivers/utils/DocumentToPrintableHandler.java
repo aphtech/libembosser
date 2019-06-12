@@ -163,7 +163,7 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 			return braille.equals(otherRow.braille);
 		}
 	}
-	static class Image implements PageElement {
+	static class Graphic implements PageElement {
 		
 	}
 	private static class DocPrintable implements Printable {
@@ -277,7 +277,7 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 			@Override
 			void accept(DocumentToPrintableHandler h, DocumentEvent e) {
 				if (e instanceof StartLineEvent) {
-					
+					h.startLine((StartLineEvent)e);
 				} else if (e instanceof EndGraphicEvent) {
 					h.endGraphic();
 				} else {
@@ -347,19 +347,31 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 	}
 	private void startLine(StartLineEvent event) {
 		stateStack.push(HandlerStates.LINE);
-		braille.delete(0, braille.length());
+		if (!isInGraphic()) {
+			braille.delete(0, braille.length());
+		}
 	}
 	private void addBraille(BrailleEvent event) {
-		braille.append(event.getBraille());
+		if (!isInGraphic()) {
+			braille.append(event.getBraille());
+		}
 	}
 	private void endLine() {
-		pageElements.add(new Row(braille.toString()));
+		if (!isInGraphic()) {
+			pageElements.add(new Row(braille.toString()));
+		}
 		stateStack.pop();
 	}
+	private boolean inGraphic = false;
 	private void startGraphic(StartGraphicEvent event) {
 		stateStack.push(HandlerStates.GRAPHIC);
+		inGraphic = true;
 	}
 	private void endGraphic() {
+		inGraphic = false;
 		stateStack.pop();
+	}
+	private boolean isInGraphic() {
+		return inGraphic;
 	}
 }

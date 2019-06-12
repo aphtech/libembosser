@@ -10,6 +10,7 @@ import java.util.List;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.BrailleEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.DocumentEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndDocumentEvent;
+import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndGraphicEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndLineEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndPageEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndSectionEvent;
@@ -60,6 +61,10 @@ public class DocumentToPrintableHandlerTest {
 		data.add(new Object[] {events, pages});
 		events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(row1), new EndLineEvent(), new EndPageEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(row2), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		pages = ImmutableList.of(new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row(row1)), new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row(row2)));
+		data.add(new Object[] {events, pages});
+		// Test alternative Braille for a graphic is not included on the page.
+		events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(row1), new EndLineEvent(), new StartGraphicEvent(), new StartLineEvent(), new BrailleEvent(row2), new EndLineEvent(), new EndGraphicEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		pages = ImmutableList.of(new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row(row1)));
 		data.add(new Object[] {events, pages});
 		return data.iterator();
 	}
