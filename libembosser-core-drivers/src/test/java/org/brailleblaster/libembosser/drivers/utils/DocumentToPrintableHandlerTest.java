@@ -1,6 +1,7 @@
 package org.brailleblaster.libembosser.drivers.utils;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.expectThrows;
 
 import java.util.ArrayList;
@@ -170,5 +171,19 @@ public class DocumentToPrintableHandlerTest {
 			handler.onEvent(event);
 		}
 		expectThrows(IllegalStateException.class, () -> handler.onEvent(errorEvent));
+	}
+	@DataProvider(name="pageEqualityProvider")
+	public Object[][] pageEqualityProvider() {
+		return new Object[][] {
+			{new DocumentToPrintableHandler.Page(), new DocumentToPrintableHandler.Page(), true}
+		};
+	}
+	@Test(dataProvider="pageEqualityProvider")
+	public void testPageEquality(DocumentToPrintableHandler.Page actualPage, DocumentToPrintableHandler.Page expectedPage, boolean equal) {
+		if (equal) {
+			assertEquals(actualPage, expectedPage);
+		} else {
+			assertNotEquals(actualPage, expectedPage);
+		}
 	}
 }
