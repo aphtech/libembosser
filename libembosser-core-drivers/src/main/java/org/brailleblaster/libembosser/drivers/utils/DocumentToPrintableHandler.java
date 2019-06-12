@@ -6,6 +6,7 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.font.TextAttribute;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
@@ -16,6 +17,7 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.brailleblaster.libembosser.spi.BrlCell;
@@ -164,7 +166,9 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 		}
 	}
 	static class Graphic implements PageElement {
-		
+		public Graphic(Image image) {
+			
+		}
 	}
 	private static class DocPrintable implements Printable {
 		private final List<Page> pages;
@@ -303,6 +307,7 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 	private List<Page> pages = new LinkedList<>();
 	private List<PageElement> pageElements = new LinkedList<>();
 	private StringBuilder braille = new StringBuilder();
+	private Optional<Graphic> graphic = Optional.empty();
 	private final LayoutHelper layoutHelper;
 	private final boolean duplex;
 	
@@ -362,16 +367,21 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 		}
 		stateStack.pop();
 	}
-	private boolean inGraphic = false;
 	private void startGraphic(StartGraphicEvent event) {
 		stateStack.push(HandlerStates.GRAPHIC);
-		inGraphic = true;
+		Image image = null;
+		for (GraphicOption option: event.getOptions()) {
+			if (option instanceof ImageOption) {
+				image = ((ImageOption)option).getValue();
+			}
+		}
+		graphic = Optional.ofNullable(image).map(i -> new Graphic(i));
 	}
 	private void endGraphic() {
-		inGraphic = false;
+		graphic = Optional.empty();
 		stateStack.pop();
 	}
 	private boolean isInGraphic() {
-		return inGraphic;
+		return graphic.isPresent();
 	}
 }
