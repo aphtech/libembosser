@@ -21,6 +21,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.brailleblaster.libembosser.spi.BrlCell;
+import org.brailleblaster.libembosser.utils.ImageUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -166,9 +167,32 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 		}
 	}
 	static class Graphic implements PageElement {
+		final private Image image;
 		public Graphic(Image image) {
-			
+			this.image = image;
 		}
+		public Image getImage() {
+			return image;
+		}
+		@Override
+		public int hashCode() {
+			return 31;
+		}
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (obj == null) {
+				return false;
+			}
+			if (getClass() != obj.getClass()) {
+				return false;
+			}
+			Graphic other = (Graphic) obj;
+			return ImageUtils.imageEquals(image, other.image);
+		}
+		
 	}
 	private static class DocPrintable implements Printable {
 		private final List<Page> pages;
@@ -378,6 +402,7 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 		graphic = Optional.ofNullable(image).map(i -> new Graphic(i));
 	}
 	private void endGraphic() {
+		graphic.ifPresent(pageElements::add);
 		graphic = Optional.empty();
 		stateStack.pop();
 	}

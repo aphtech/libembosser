@@ -5,6 +5,7 @@ import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.expectThrows;
 
 import java.awt.Image;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -58,7 +59,7 @@ public class DocumentToPrintableHandlerTest {
 		assertEquals(handler.getpageCount(), pages);
 	}
 	@DataProvider(name="rowProvider")
-	public Iterator<Object[]> rowProvider() {
+	public Iterator<Object[]> rowProvider() throws IOException {
 		List<Object[]> data = new ArrayList<>();
 		String row1 = "\u2801\u2803\u2800\u2811";
 		String row2 = "\u2811\u2800\u2803\u2800\u2801";
@@ -183,7 +184,8 @@ public class DocumentToPrintableHandlerTest {
 		expectThrows(IllegalStateException.class, () -> handler.onEvent(errorEvent));
 	}
 	@DataProvider(name="pageEqualityProvider")
-	public Object[][] pageEqualityProvider() {
+	public Object[][] pageEqualityProvider() throws IOException {
+		Image image1 = ImageIO.read(getClass().getResourceAsStream("/org/brailleblaster/libembosser/drivers/utils/APH_Logo.png"));
 		return new Object[][] {
 			{new DocumentToPrintableHandler.Page(), new DocumentToPrintableHandler.Page(), true},
 			{new DocumentToPrintableHandler.Page(), new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2801")), false},
@@ -192,6 +194,7 @@ public class DocumentToPrintableHandlerTest {
 			{new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2811")), new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2811")), true},
 			{new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2801"), new DocumentToPrintableHandler.Row("\u2811")), new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2801"), new DocumentToPrintableHandler.Row("\u2811")), true},
 			{new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2801"), new DocumentToPrintableHandler.Row("\u2811")), new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2811"), new DocumentToPrintableHandler.Row("\u2801")), false},
+			{new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Graphic(image1)), new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Graphic(image1)), true},
 		};
 	}
 	@Test(dataProvider="pageEqualityProvider")
