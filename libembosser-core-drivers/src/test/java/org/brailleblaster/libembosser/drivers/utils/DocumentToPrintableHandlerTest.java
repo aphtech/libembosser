@@ -23,6 +23,7 @@ import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndVolumeEve
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.ImageOption;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.Indent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.Height;
+import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.RowGap;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartDocumentEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartGraphicEvent;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartLineEvent;
@@ -80,6 +81,14 @@ public class DocumentToPrintableHandlerTest {
 		Image image1 = ImageIO.read(getClass().getResourceAsStream("/org/brailleblaster/libembosser/drivers/utils/APH_Logo.png"));
 		events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(row1), new EndLineEvent(), new StartGraphicEvent(ImmutableSet.of(new ImageOption(image1), new Indent(1), new Width(10), new Height(5))), new StartLineEvent(), new BrailleEvent(row2), new EndLineEvent(), new EndGraphicEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		pages = ImmutableList.of(new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row(row1), new DocumentToPrintableHandler.Graphic(image1, 10, 5, 1)));
+		data.add(new Object[] {events, pages});
+		// Test that when indent is not given it is set to 0
+		events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(row1), new EndLineEvent(), new StartGraphicEvent(ImmutableSet.of(new ImageOption(image1), new Width(10), new Height(5))), new StartLineEvent(), new BrailleEvent(row2), new EndLineEvent(), new EndGraphicEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		pages = ImmutableList.of(new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row(row1), new DocumentToPrintableHandler.Graphic(image1, 10, 5, 0)));
+		data.add(new Object[] {events, pages});
+		// Test that when height is not given the height from the rows is used.
+		events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(row1), new EndLineEvent(), new StartGraphicEvent(ImmutableSet.of(new ImageOption(image1), new Indent(1), new Width(10))), new StartLineEvent(), new BrailleEvent(row2), new EndLineEvent(), new StartLineEvent(ImmutableSet.of(new RowGap(2))), new BrailleEvent(row1), new EndLineEvent(), new EndGraphicEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		pages = ImmutableList.of(new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row(row1), new DocumentToPrintableHandler.Graphic(image1, 10, 4, 1)));
 		data.add(new Object[] {events, pages});
 		return data.iterator();
 	}

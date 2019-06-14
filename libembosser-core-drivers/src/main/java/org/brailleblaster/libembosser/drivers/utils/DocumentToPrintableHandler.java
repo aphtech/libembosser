@@ -18,6 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import org.brailleblaster.libembosser.spi.BrlCell;
@@ -278,6 +279,7 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 				if (e instanceof StartVolumeEvent) {
 					h.startVolume((StartVolumeEvent)e);
 				} else if (e instanceof EndDocumentEvent) {
+					h.optionStack.pop();
 					h.stateStack.pop();
 				} else if (ClassUtils.isInstanceOf(e, StartDocumentEvent.class, StartSectionEvent.class, StartPageEvent.class, StartLineEvent.class, BrailleEvent.class, EndLineEvent.class, StartGraphicEvent.class, EndGraphicEvent.class, EndPageEvent.class, EndSectionEvent.class, EndVolumeEvent.class)) {
 					throwInvalidStateException(e, "DOCUMENT");
@@ -289,7 +291,9 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 			void accept(DocumentToPrintableHandler h, DocumentEvent e) {
 				if (e instanceof StartSectionEvent) {
 					h.stateStack.push(HandlerStates.SECTION);
+					h.optionStack.push(((StartSectionEvent)e).getOptions());
 				} else if (e instanceof EndVolumeEvent) {
+					h.optionStack.pop();
 					h.stateStack.pop();
 				} else if (ClassUtils.isInstanceOf(e, StartDocumentEvent.class, StartVolumeEvent.class, StartPageEvent.class, StartLineEvent.class, BrailleEvent.class, EndLineEvent.class, StartGraphicEvent.class, EndGraphicEvent.class, EndPageEvent.class, EndSectionEvent.class, EndDocumentEvent.class)) {
 					throwInvalidStateException(e, "VOLUME");
@@ -302,6 +306,7 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 				if (e instanceof StartPageEvent) {
 					h.startPage((StartPageEvent)e);
 				} else if (e instanceof EndSectionEvent) {
+					h.optionStack.pop();
 					h.stateStack.pop();
 				} else if (ClassUtils.isInstanceOf(e, StartDocumentEvent.class, StartVolumeEvent.class, StartSectionEvent.class, StartLineEvent.class, BrailleEvent.class, EndLineEvent.class, StartGraphicEvent.class, EndGraphicEvent.class, EndPageEvent.class, EndVolumeEvent.class, EndDocumentEvent.class)) {
 					throwInvalidStateException(e, "SECTION");
@@ -349,10 +354,11 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 		abstract void accept(DocumentToPrintableHandler h, DocumentEvent e);
 	}
 	private Deque<HandlerStates> stateStack = new LinkedList<>();
+	final private Deque<Set<? extends Option>> optionStack = new LinkedList<>();
+	private int graphicHeight = 0;
 	private List<Page> pages = new LinkedList<>();
 	private List<PageElement> pageElements = new LinkedList<>();
 	private StringBuilder braille = new StringBuilder();
-	private Optional<Graphic> graphic = Optional.empty();
 	private final LayoutHelper layoutHelper;
 	private final boolean duplex;
 	
@@ -379,24 +385,30 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 	}
 	private void startDocument(StartDocumentEvent event) {
 		stateStack.push(HandlerStates.DOCUMENT);
+		optionStack.clear();
+		optionStack.push(event.getOptions());
 		pages.clear();
 	}
 	private void startVolume(StartVolumeEvent event) {
 		stateStack.push(HandlerStates.VOLUME);
+		optionStack.push(event.getOptions());
 		if (duplex && getpageCount() % 2 != 0) {
 			pages.add(new Page());
 		}
 	}
 	private void startPage(StartPageEvent event) {
 		stateStack.push(HandlerStates.PAGE);
+		optionStack.push(event.getOptions());
 		pageElements.clear();
 	}
 	private void endPage(EndPageEvent event) {
 		pages.add(new Page(pageElements.stream()));
+		optionStack.pop();
 		stateStack.pop();
 	}
 	private void startLine(StartLineEvent event) {
 		stateStack.push(HandlerStates.LINE);
+		optionStack.push(event.getOptions());
 		if (!isInGraphic()) {
 			braille.delete(0, braille.length());
 		}
@@ -407,40 +419,31 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 		}
 	}
 	private void endLine() {
-		if (!isInGraphic()) {
+		if (isInGraphic()) {
+			graphicHeight += optionStack.parallelStream().flatMap(options -> options.stream()).filter(o -> o instanceof RowGap).mapToInt(o -> ((RowGap)o).getValue()).findFirst().orElse(0) + 1;
+		} else {
 			pageElements.add(new Row(braille.toString()));
-		}
+		} 
+		optionStack.pop();
 		stateStack.pop();
 	}
 	private void startGraphic(StartGraphicEvent event) {
+		graphicHeight = 0;
 		stateStack.push(HandlerStates.GRAPHIC);
-		Image image = null;
-		int width = 0;
-		int height = 0;
-		int indent = 0;
-		for (GraphicOption option: event.getOptions()) {
-			if (option instanceof ImageOption) {
-				image = ((ImageOption)option).getValue();
-			} else if (option instanceof Height) {
-				height = ((Height)option).getValue();
-			} else if (option instanceof Indent) {
-				indent = ((Indent)option).getValue();
-			} else if (option instanceof Width) {
-				width = ((Width)option).getValue();
-			}
-		}
-		// Need to declare the below final variables so they can be used in the lambda.
-		final int w = width;
-		final int h = height;
-		final int ind = indent;
-		graphic = Optional.ofNullable(image).map(i -> new Graphic(i, w, h, ind));
+		optionStack.push(event.getOptions());
 	}
 	private void endGraphic() {
-		graphic.ifPresent(pageElements::add);
-		graphic = Optional.empty();
+		Optional<Image> graphic = optionStack.peek().stream().filter(o -> o instanceof ImageOption).map(o -> ((ImageOption)o).getValue()).findFirst();
+		if (graphic.isPresent()) {
+			int indent = optionStack.peek().stream().filter(o -> o instanceof Indent).mapToInt(o -> ((Indent)o).getValue()).findFirst().orElse(0);
+			int height = optionStack.peek().stream().filter(o -> o instanceof Height).mapToInt(o -> ((Height)o).getValue()).findFirst().orElse(graphicHeight);
+			int width = optionStack.peek().stream().filter(o -> o instanceof Width).mapToInt(o -> ((Width)o).getValue()).findFirst().orElse(0);
+			pageElements.add(new Graphic(graphic.get(), width, height, indent));
+		}
+		optionStack.pop();
 		stateStack.pop();
 	}
 	private boolean isInGraphic() {
-		return graphic.isPresent();
+		return optionStack.stream().flatMap(options -> options.stream()).anyMatch(o -> o instanceof ImageOption);
 	}
 }
