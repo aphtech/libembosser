@@ -168,15 +168,33 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 	}
 	static class Graphic implements PageElement {
 		final private Image image;
-		public Graphic(Image image) {
+		final private int width;
+		final private int height;
+		final private int indent;
+		public Graphic(Image image, int width, int height) {
+			this(image, width, height, 0);
+		}
+		public Graphic(Image image, int width, int height, int indent) {
 			this.image = image;
+			this.height = height;
+			this.indent = indent;
+			this.width = width;
 		}
 		public Image getImage() {
 			return image;
 		}
+		public int getHeight() {
+			return height;
+		}
+		public int getIndent() {
+			return indent;
+		}
+		public int getWidth() {
+			return width;
+		}
 		@Override
 		public int hashCode() {
-			return 31;
+			return 31 + height + indent + width;
 		}
 		@Override
 		public boolean equals(Object obj) {
@@ -190,6 +208,9 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 				return false;
 			}
 			Graphic other = (Graphic) obj;
+			if (height != other.height || indent != other.indent || width != other.width) {
+				return false;
+			}
 			return ImageUtils.imageEquals(image, other.image);
 		}
 		
@@ -394,12 +415,25 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 	private void startGraphic(StartGraphicEvent event) {
 		stateStack.push(HandlerStates.GRAPHIC);
 		Image image = null;
+		int width = 0;
+		int height = 0;
+		int indent = 0;
 		for (GraphicOption option: event.getOptions()) {
 			if (option instanceof ImageOption) {
 				image = ((ImageOption)option).getValue();
+			} else if (option instanceof Height) {
+				height = ((Height)option).getValue();
+			} else if (option instanceof Indent) {
+				indent = ((Indent)option).getValue();
+			} else if (option instanceof Width) {
+				width = ((Width)option).getValue();
 			}
 		}
-		graphic = Optional.ofNullable(image).map(i -> new Graphic(i));
+		// Need to declare the below final variables so they can be used in the lambda.
+		final int w = width;
+		final int h = height;
+		final int ind = indent;
+		graphic = Optional.ofNullable(image).map(i -> new Graphic(i, w, h, ind));
 	}
 	private void endGraphic() {
 		graphic.ifPresent(pageElements::add);
