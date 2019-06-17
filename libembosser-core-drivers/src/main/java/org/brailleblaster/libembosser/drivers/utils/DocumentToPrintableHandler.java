@@ -145,15 +145,23 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 	}
 	final static class Row implements PageElement {
 		private final String braille;
+		private final int rowgap;
 		Row(String braille) {
+			this(braille, 0);
+		}
+		Row(String braille, int rowgap) {
 			this.braille = braille;
+			this.rowgap = rowgap;
 		}
 		String getBraille() {
 			return braille;
 		}
+		int getRowgap() {
+			return rowgap;
+		}
 		@Override
 		public int hashCode() {
-			return braille.hashCode();
+			return braille.hashCode() + rowgap;
 		}
 		@Override
 		public boolean equals(Object obj) {
@@ -164,7 +172,7 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 				return false;
 			}
 			Row otherRow = (Row)obj;
-			return braille.equals(otherRow.braille);
+			return braille.equals(otherRow.braille) && rowgap == otherRow.rowgap;
 		}
 	}
 	static class Graphic implements PageElement {
@@ -253,7 +261,8 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 						AttributedString braille = new AttributedString(brlStr, brailleAttributes);
 						g2d.drawString(braille.getIterator(), (float) xPos, (float) yPos);
 					}
-					yPos += lineHeight;
+					// Remember rowgap is number of blank lines to follow the line, hence +1
+					yPos += lineHeight * (1 + ((Row)element).getRowgap());
 				}
 			}
 			return PAGE_EXISTS;
@@ -419,10 +428,11 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 		}
 	}
 	private void endLine() {
+		int rowgap = optionStack.parallelStream().flatMap(options -> options.stream()).filter(o -> o instanceof RowGap).mapToInt(o -> ((RowGap)o).getValue()).findFirst().orElse(0);
 		if (isInGraphic()) {
-			graphicHeight += optionStack.parallelStream().flatMap(options -> options.stream()).filter(o -> o instanceof RowGap).mapToInt(o -> ((RowGap)o).getValue()).findFirst().orElse(0) + 1;
+			graphicHeight += rowgap + 1;
 		} else {
-			pageElements.add(new Row(braille.toString()));
+			pageElements.add(new Row(braille.toString(), rowgap));
 		} 
 		optionStack.pop();
 		stateStack.pop();

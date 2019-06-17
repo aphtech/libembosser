@@ -70,6 +70,12 @@ public class DocumentToPrintableHandlerTest {
 		ImmutableList<DocumentEvent> events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(row1), new EndLineEvent(), new StartLineEvent(), new BrailleEvent(row2), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		ImmutableList<DocumentToPrintableHandler.Page> pages = ImmutableList.of(new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row(row1), new DocumentToPrintableHandler.Row(row2)));
 		data.add(new Object[] {events, pages});
+		events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(ImmutableSet.of(new RowGap(2))), new BrailleEvent(row1), new EndLineEvent(), new StartLineEvent(), new BrailleEvent(row2), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		pages = ImmutableList.of(new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row(row1, 2), new DocumentToPrintableHandler.Row(row2)));
+		data.add(new Object[] {events, pages});
+		events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(ImmutableSet.of(new RowGap(1))), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(ImmutableSet.of(new RowGap(2))), new BrailleEvent(row1), new EndLineEvent(), new StartLineEvent(), new BrailleEvent(row2), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		pages = ImmutableList.of(new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row(row1, 2), new DocumentToPrintableHandler.Row(row2, 1)));
+		data.add(new Object[] {events, pages});
 		events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(row1), new EndLineEvent(), new EndPageEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(row2), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		pages = ImmutableList.of(new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row(row1)), new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row(row2)));
 		data.add(new Object[] {events, pages});
@@ -203,6 +209,14 @@ public class DocumentToPrintableHandlerTest {
 			{new DocumentToPrintableHandler.Page(), new DocumentToPrintableHandler.Page(), true},
 			{new DocumentToPrintableHandler.Page(), new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2801")), false},
 			{new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2801")), new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2801")), true},
+			{new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2801")), new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2801", 0)), true},
+			{new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2801", 0)), new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2801", 0)), true},
+			{new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2801", 1)), new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2801", 1)), true},
+			{new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2801")), new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2801", 1)), false},
+			{new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2801")), new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2801", 2)), false},
+			{new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2801", 0)), new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2801", 2)), false},
+			{new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2801", 1)), new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2801", 2)), false},
+			{new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2801", 2)), new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2801", 2)), true},
 			{new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2803")), new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2801")), false},
 			{new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2811")), new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2811")), true},
 			{new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2801"), new DocumentToPrintableHandler.Row("\u2811")), new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row("\u2801"), new DocumentToPrintableHandler.Row("\u2811")), true},
