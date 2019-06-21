@@ -1,5 +1,10 @@
 package org.brailleblaster.libembosser.cli.commands;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -12,10 +17,13 @@ import javax.print.PrintServiceLookup;
 
 import org.brailleblaster.libembosser.EmbosserService;
 import org.brailleblaster.libembosser.cli.shell.InputReader;
+import org.brailleblaster.libembosser.spi.EmbossException;
 import org.brailleblaster.libembosser.spi.Embosser;
+import org.brailleblaster.libembosser.spi.EmbossingAttributeSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
+import org.springframework.shell.standard.ShellOption;
 
 import com.google.common.collect.ImmutableList;
 
@@ -30,6 +38,9 @@ public class EmbosserCommand {
 	@ShellMethod("Select the printer for embossing")
 	public String selectPrinter() {
 		PrintService[] printServices = PrintServiceLookup.lookupPrintServices(DocFlavor.INPUT_STREAM.AUTOSENSE, null);
+		if (printServices.length == 0) {
+			return "No printers attached";
+		}
 		List<String> printers = Arrays.stream(printServices).map(p -> p.getName()).collect(ImmutableList.toImmutableList());
 		int result = inputReader.selectFromList("Select your printer: ", "Select: ", printers, 0);
 		final String selPrinter = printers.get(result);
@@ -58,5 +69,31 @@ public class EmbosserCommand {
 	@ShellMethod("Show the selected embosser model")
 	public String showEmbosser() {
 		return embosser.map(e -> String.format("Selected embosser is %s %s", e.getManufacturer(), e.getModel())).orElse("No embosser selected");
+	}
+	@ShellMethod("Emboss a PEF document")
+	public String embossPef(@ShellOption({"-f", "--file"}) File inputFile) {
+		if (printer.isEmpty()) {
+			return "You must select a printer before embossing";
+		}
+		if (embosser.isEmpty()) {
+			return "You have not yet selected an embosser model";
+		}
+		final String printerName = printer.get();
+		Embosser outEmbosser = embosser.get();
+		PrintService[] printServices = PrintServiceLookup.lookupPrintServices(DocFlavor.INPUT_STREAM.AUTOSENSE, null);
+		Optional<PrintService> outPrinter = Arrays.stream(printServices).filter(p -> p.getName().contentEquals(printerName)).findFirst();
+		if (outPrinter.isEmpty()) {
+			return "Cannot locate the configured printer. Did you disconnect it or rename it?";
+		}
+		try (InputStream inStream = new FileInputStream(inputFile)) {
+			outEmbosser.embossPef(outPrinter.get(), inStream, new EmbossingAttributeSet());
+		} catch (FileNotFoundException e) {
+			return "Input file cannot be found";
+		} catch (EmbossException e) {
+			return "There was a problem when sending the document to the embosser.";
+		} catch (IOException e1) {
+			return "There was a problem reading the file";
+		}
+		return "Document has been submitted to the embosser";
 	}
 }
