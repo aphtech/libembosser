@@ -21,3 +21,7 @@ syntax: regexp
 ^libembosser-viewplus-driver/bin$
 syntax: regexp
 ^libembosser-cli/bin$
+syntax: regexp
+^spring-shell\.log$
+syntax: regexp
+^libembosser-cli/spring-shell\.log$
