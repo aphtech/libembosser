@@ -1,4 +1,4 @@
-package org.brailleblaster.libembosser.drivers.utils;
+package org.brailleblaster.libembosser.drivers.utilshandlers;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertSame;
@@ -7,7 +7,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.brailleblaster.libembosser.drivers.utils.DocumentHandler;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.DocumentEvent;
+import org.brailleblaster.libembosser.drivers.utils.handlers.PageFilterHandler;
 import org.brailleblaster.libembosser.embossing.attribute.PageRanges;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;

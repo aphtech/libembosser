@@ -246,6 +246,7 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 			double xPos = 0.0;
 			double yPos = brailleMetrics.getAscent() + pageFormat.getImageableY();
 			double lineHeight = brailleMetrics.getHeight() + layoutHelper.getLineSpacing();
+			double cellWidth = brailleMetrics.charWidth('\u2800');
 			if (layoutHelper instanceof InterpointLayoutHelper	&& (pageIndex % 2) == 1) {
 				// Calculate horizontal offset for back of page
 				xPos = ((InterpointLayoutHelper)layoutHelper).calculateBackMargin(desiredMargin, desiredMargin, pageFormat.getWidth());
@@ -263,6 +264,16 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 					}
 					// Remember rowgap is number of blank lines to follow the line, hence +1
 					yPos += lineHeight * (1 + ((Row)element).getRowgap());
+				} else if (element instanceof Graphic) {
+					final Graphic graphic = (Graphic)element;
+					final double height = lineHeight * graphic.getHeight();
+					final double width = cellWidth * graphic.getWidth();
+					final Image image = graphic.getImage();
+					final int imgWidth = image.getWidth(null);
+					final int imgHeight = image.getHeight(null);
+					final double scalingRatio = Math.min(width/(double)imgWidth, height/(double)imgHeight);
+					g2d.drawImage(image, (int)xPos, (int)yPos, (int)(imgWidth * scalingRatio), (int)(imgHeight * scalingRatio), 0, 0, imgWidth, imgHeight, null);
+					yPos += height;
 				}
 			}
 			return PAGE_EXISTS;

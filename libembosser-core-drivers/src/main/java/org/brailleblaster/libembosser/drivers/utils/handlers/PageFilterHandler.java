@@ -1,7 +1,8 @@
-package org.brailleblaster.libembosser.drivers.utils;
+package org.brailleblaster.libembosser.drivers.utils.handlers;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.brailleblaster.libembosser.drivers.utils.DocumentHandler;
 import org.brailleblaster.libembosser.embossing.attribute.PageRanges;
 
 /**

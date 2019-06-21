@@ -18,6 +18,7 @@ import javax.print.attribute.standard.Sides;
 
 import org.brailleblaster.libembosser.drivers.utils.DocumentParser.ParseException;
 import org.brailleblaster.libembosser.drivers.utils.DocumentToPrintableHandler.LayoutHelper;
+import org.brailleblaster.libembosser.drivers.utils.handlers.PageFilterHandler;
 import org.brailleblaster.libembosser.embossing.attribute.Copies;
 import org.brailleblaster.libembosser.embossing.attribute.PageRanges;
 import org.brailleblaster.libembosser.embossing.attribute.PaperLayout;

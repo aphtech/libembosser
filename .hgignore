@@ -19,3 +19,5 @@ syntax: regexp
 ^libembosser-braillo-driver/bin$
 syntax: regexp
 ^libembosser-viewplus-driver/bin$
+syntax: regexp
+^libembosser-cli/bin$

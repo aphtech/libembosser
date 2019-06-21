@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.util.Optional;
 
 import org.brailleblaster.libembosser.drivers.utils.BaseTextEmbosser;
-import org.brailleblaster.libembosser.drivers.utils.PageFilterByteSourceHandler;
+import org.brailleblaster.libembosser.drivers.utils.handlers.PageFilterByteSourceHandler;
 import org.brailleblaster.libembosser.embossing.attribute.BrailleCellType;
 import org.brailleblaster.libembosser.embossing.attribute.Copies;
 import org.brailleblaster.libembosser.embossing.attribute.PageRanges;

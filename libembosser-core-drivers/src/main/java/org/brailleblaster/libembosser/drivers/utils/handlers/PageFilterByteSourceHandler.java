@@ -1,5 +1,6 @@
-package org.brailleblaster.libembosser.drivers.utils;
+package org.brailleblaster.libembosser.drivers.utils.handlers;
 
+import org.brailleblaster.libembosser.drivers.utils.DocumentToByteSourceHandler;
 import org.brailleblaster.libembosser.embossing.attribute.PageRanges;
 
 import com.google.common.io.ByteSource;

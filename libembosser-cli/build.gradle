@@ -1,0 +1,48 @@
+plugins {
+	id 'org.springframework.boot' version '2.1.6.RELEASE'
+	id "application"
+	id "com.github.spotbugs" version "1.6.8"
+}
+
+apply plugin: 'io.spring.dependency-management'
+
+application {
+	mainClassName = 'org.brailleblaster.libembosser.cli.LibEmbosserCliApplication'
+}
+
+processResources {
+	expand(version: version)
+}
+
+dependencies {
+	implementation 'org.springframework.shell:spring-shell-starter:2.0.1.RELEASE'
+	implementation 'com.google.guava:guava:23.5-jre'
+	implementation project(':libembosser-api')
+	implementation project(':libembosser-utils')
+	implementation project(":libembosser-core-drivers")
+	implementation project(":libembosser-braillo-driver")
+	implementation project(":libembosser-viewplus-driver")
+	implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.testng:testng:6.13.1'
+	testImplementation 'org.assertj:assertj-core:3.11.1'
+}
+
+test {
+	useTestNG()
+}
+
+publishing {
+	publications {
+		shell(MavenPublication) {
+			artifact bootJar
+		}
+	}
+}
+
+tasks.withType(com.github.spotbugs.SpotBugsTask) {
+	reports {
+		xml.enabled = false
+		html.enabled = true
+	}
+}
