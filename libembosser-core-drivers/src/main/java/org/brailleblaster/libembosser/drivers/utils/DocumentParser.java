@@ -310,7 +310,7 @@ public class DocumentParser {
 			return new NodeList() {
 				@Override
 				public Node item(int index) {
-					throw new IndexOutOfBoundsException(index);
+					throw new IndexOutOfBoundsException(Integer.toString(index));
 				}
 				@Override
 				public int getLength() {
