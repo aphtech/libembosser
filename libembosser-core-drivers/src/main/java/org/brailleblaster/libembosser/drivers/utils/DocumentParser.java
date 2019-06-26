@@ -337,10 +337,9 @@ public class DocumentParser {
 		Optional<Image> result = Optional.empty();
 		if ("base64".equalsIgnoreCase(e.getAttribute("encoding"))) {
 			String s = e.getTextContent();
-			try {
-				InputStream input = BaseEncoding.base64().decodingStream(new StringReader(s));
+			try (InputStream input = BaseEncoding.base64().decodingStream(new StringReader(s))) {
 				BufferedImage img = ImageIO.read(input);
-				result = Optional.of(img);
+				result = Optional.ofNullable(img);
 			} catch (IOException ex) {
 				// Cannot really do anything
 			}
