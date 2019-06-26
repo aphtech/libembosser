@@ -72,17 +72,17 @@ public class EmbosserCommand {
 	}
 	@ShellMethod("Emboss a PEF document")
 	public String embossPef(@ShellOption({"-f", "--file"}) File inputFile) {
-		if (printer.isEmpty()) {
+		if (!printer.isPresent()) {
 			return "You must select a printer before embossing";
 		}
-		if (embosser.isEmpty()) {
+		if (!embosser.isPresent()) {
 			return "You have not yet selected an embosser model";
 		}
 		final String printerName = printer.get();
 		Embosser outEmbosser = embosser.get();
 		PrintService[] printServices = PrintServiceLookup.lookupPrintServices(DocFlavor.INPUT_STREAM.AUTOSENSE, null);
 		Optional<PrintService> outPrinter = Arrays.stream(printServices).filter(p -> p.getName().contentEquals(printerName)).findFirst();
-		if (outPrinter.isEmpty()) {
+		if (!outPrinter.isPresent()) {
 			return "Cannot locate the configured printer. Did you disconnect it or rename it?";
 		}
 		try (InputStream inStream = new FileInputStream(inputFile)) {
