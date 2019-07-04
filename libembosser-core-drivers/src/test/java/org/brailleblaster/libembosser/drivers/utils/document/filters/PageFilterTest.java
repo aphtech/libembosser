@@ -1,4 +1,4 @@
-package org.brailleblaster.libembosser.drivers.utilshandlers;
+package org.brailleblaster.libembosser.drivers.utils.document.filters;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertSame;
@@ -7,68 +7,79 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.DocumentEvent;
-import org.brailleblaster.libembosser.drivers.utils.handlers.PageFilterHandler;
+import org.brailleblaster.libembosser.drivers.utils.document.events.BrailleEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.DocumentEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.EndDocumentEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.EndLineEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.EndPageEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.EndSectionEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.EndVolumeEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.StartDocumentEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.StartLineEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.StartPageEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.StartSectionEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.StartVolumeEvent;
 import org.brailleblaster.libembosser.embossing.attribute.PageRanges;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-public class PageFilterHandlerTest {
+import com.google.common.collect.ImmutableList;
+
+public class PageFilterTest {
 	private Object[] createPageFilterDataEntry(String[][][][] inputBraille, PageRanges pages) {
 		int pageCounter = 0;
 		List<DocumentEvent> inputEvents = new ArrayList<>();
 		List<DocumentEvent> expectedEvents = new ArrayList<>();
-		DocumentEvent curEvent = new DocumentHandler.StartDocumentEvent();
+		DocumentEvent curEvent = new StartDocumentEvent();
 		inputEvents.add(curEvent);
 		expectedEvents.add(curEvent);
 		for (String[][][] vol: inputBraille) {
-			curEvent = new DocumentHandler.StartVolumeEvent();
+			curEvent = new StartVolumeEvent();
 			inputEvents.add(curEvent);
 			expectedEvents.add(curEvent);
 			for (String[][] section: vol) {
-				curEvent = new DocumentHandler.StartSectionEvent();
+				curEvent = new StartSectionEvent();
 				inputEvents.add(curEvent);
 				expectedEvents.add(curEvent);
 				for (String[] page: section) {
 					++pageCounter;
-					curEvent = new DocumentHandler.StartPageEvent();
+					curEvent = new StartPageEvent();
 					inputEvents.add(curEvent);
 					if (pages.contains(pageCounter)) {
 						expectedEvents.add(curEvent);
 					}
 					for (String row: page) {
-						curEvent = new DocumentHandler.StartLineEvent();
+						curEvent = new StartLineEvent();
 						inputEvents.add(curEvent);
 						if (pages.contains(pageCounter)) {
 							expectedEvents.add(curEvent);
 						}
-						curEvent = new DocumentHandler.BrailleEvent(row);
+						curEvent = new BrailleEvent(row);
 						inputEvents.add(curEvent);
 						if (pages.contains(pageCounter)) {
 							expectedEvents.add(curEvent);
 						}
-						curEvent = new DocumentHandler.EndLineEvent();
+						curEvent = new EndLineEvent();
 						inputEvents.add(curEvent);
 						if (pages.contains(pageCounter)) {
 							expectedEvents.add(curEvent);
 						}
 					}
-					curEvent = new DocumentHandler.EndPageEvent();
+					curEvent = new EndPageEvent();
 					inputEvents.add(curEvent);
 					if (pages.contains(pageCounter)) {
 						expectedEvents.add(curEvent);
 					}
 				}
-				curEvent = new DocumentHandler.EndSectionEvent();
+				curEvent = new EndSectionEvent();
 				inputEvents.add(curEvent);
 				expectedEvents.add(curEvent);
 			}
-			curEvent = new DocumentHandler.EndVolumeEvent();
+			curEvent = new EndVolumeEvent();
 			inputEvents.add(curEvent);
 			expectedEvents.add(curEvent);
 		}
-		curEvent = new DocumentHandler.EndDocumentEvent();
+		curEvent = new EndDocumentEvent();
 		inputEvents.add(curEvent);
 		expectedEvents.add(curEvent);
 		return new Object[] {inputEvents, pages, expectedEvents};
@@ -93,11 +104,9 @@ public class PageFilterHandlerTest {
 	}
 	@Test(dataProvider="filteredPagesProvider")
 	public void testPagesFilter(List<DocumentEvent> inputEvents, PageRanges pages, List<DocumentEvent> expectedEvents) {
-		List<DocumentEvent> actualEvents = new ArrayList<>();
-		PageFilterHandler<DocumentHandler> filter = new PageFilterHandler<DocumentHandler>(e -> actualEvents.add(e), pages);
-		for (DocumentEvent event: inputEvents) {
-			filter.onEvent(event);
-		}
+		
+		PageFilter filter = new PageFilter(pages);
+		List<DocumentEvent> actualEvents = ImmutableList.copyOf(filter.apply(inputEvents.iterator()));
 		assertEquals(actualEvents.size(), expectedEvents.size(), "Not got the expected number of events.");
 		for (int i = 0; i < actualEvents.size(); ++i) {
 			assertSame(actualEvents.get(i), expectedEvents.get(i), String.format("Events are not the same at index %d", i));

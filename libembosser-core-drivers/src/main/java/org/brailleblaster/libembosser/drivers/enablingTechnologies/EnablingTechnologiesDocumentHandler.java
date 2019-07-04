@@ -5,8 +5,9 @@ import static com.google.common.base.Preconditions.checkState;
 
 import java.math.BigDecimal;
 
-import org.brailleblaster.libembosser.drivers.generic.GenericTextDocumentHandler;
 import org.brailleblaster.libembosser.drivers.utils.DocumentToByteSourceHandler;
+import org.brailleblaster.libembosser.drivers.utils.document.GenericTextDocumentHandler;
+import org.brailleblaster.libembosser.drivers.utils.document.events.DocumentEvent;
 import org.brailleblaster.libembosser.spi.BrlCell;
 import org.brailleblaster.libembosser.spi.Layout;
 import com.google.common.collect.ImmutableMap;

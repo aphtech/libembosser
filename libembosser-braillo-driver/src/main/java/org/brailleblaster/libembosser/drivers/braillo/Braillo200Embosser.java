@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.brailleblaster.libembosser.drivers.utils.BaseTextEmbosser;
-import org.brailleblaster.libembosser.drivers.utils.handlers.PageFilterByteSourceHandler;
+import org.brailleblaster.libembosser.drivers.utils.document.filters.PageFilterByteSourceHandler;
 import org.brailleblaster.libembosser.embossing.attribute.Copies;
 import org.brailleblaster.libembosser.embossing.attribute.PageRanges;
 import org.brailleblaster.libembosser.embossing.attribute.PaperLayout;

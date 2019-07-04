@@ -12,25 +12,22 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.BrailleEvent;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.DocumentEvent;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndDocumentEvent;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndGraphicEvent;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndLineEvent;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndPageEvent;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndSectionEvent;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndVolumeEvent;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.ImageOption;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.Indent;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.Height;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.RowGap;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartDocumentEvent;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartGraphicEvent;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartLineEvent;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartPageEvent;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartSectionEvent;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartVolumeEvent;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.Width;
+import org.brailleblaster.libembosser.drivers.utils.document.events.BrailleEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.DocumentEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.EndDocumentEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.EndGraphicEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.EndLineEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.EndPageEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.EndSectionEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.EndVolumeEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.GraphicOption;
+import org.brailleblaster.libembosser.drivers.utils.document.events.RowGap;
+import org.brailleblaster.libembosser.drivers.utils.document.events.StartDocumentEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.StartGraphicEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.StartLineEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.StartPageEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.StartSectionEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.StartVolumeEvent;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -85,15 +82,15 @@ public class DocumentToPrintableHandlerTest {
 		data.add(new Object[] {events, pages});
 		// Test alternative Braille is not included when graphic has image
 		Image image1 = ImageIO.read(getClass().getResourceAsStream("/org/brailleblaster/libembosser/drivers/utils/APH_Logo.png"));
-		events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(row1), new EndLineEvent(), new StartGraphicEvent(ImmutableSet.of(new ImageOption(image1), new Indent(1), new Width(10), new Height(5))), new StartLineEvent(), new BrailleEvent(row2), new EndLineEvent(), new EndGraphicEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(row1), new EndLineEvent(), new StartGraphicEvent(ImmutableSet.of(new GraphicOption.ImageData(image1), new GraphicOption.Indent(1), new GraphicOption.Width(10), new GraphicOption.Height(5))), new StartLineEvent(), new BrailleEvent(row2), new EndLineEvent(), new EndGraphicEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		pages = ImmutableList.of(new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row(row1), new DocumentToPrintableHandler.Graphic(image1, 10, 5, 1)));
 		data.add(new Object[] {events, pages});
 		// Test that when indent is not given it is set to 0
-		events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(row1), new EndLineEvent(), new StartGraphicEvent(ImmutableSet.of(new ImageOption(image1), new Width(10), new Height(5))), new StartLineEvent(), new BrailleEvent(row2), new EndLineEvent(), new EndGraphicEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(row1), new EndLineEvent(), new StartGraphicEvent(ImmutableSet.of(new GraphicOption.ImageData(image1), new GraphicOption.Width(10), new GraphicOption.Height(5))), new StartLineEvent(), new BrailleEvent(row2), new EndLineEvent(), new EndGraphicEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		pages = ImmutableList.of(new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row(row1), new DocumentToPrintableHandler.Graphic(image1, 10, 5, 0)));
 		data.add(new Object[] {events, pages});
 		// Test that when height is not given the height from the rows is used.
-		events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(row1), new EndLineEvent(), new StartGraphicEvent(ImmutableSet.of(new ImageOption(image1), new Indent(1), new Width(10))), new StartLineEvent(), new BrailleEvent(row2), new EndLineEvent(), new StartLineEvent(ImmutableSet.of(new RowGap(2))), new BrailleEvent(row1), new EndLineEvent(), new EndGraphicEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(row1), new EndLineEvent(), new StartGraphicEvent(ImmutableSet.of(new GraphicOption.ImageData(image1), new GraphicOption.Indent(1), new GraphicOption.Width(10))), new StartLineEvent(), new BrailleEvent(row2), new EndLineEvent(), new StartLineEvent(ImmutableSet.of(new RowGap(2))), new BrailleEvent(row1), new EndLineEvent(), new EndGraphicEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		pages = ImmutableList.of(new DocumentToPrintableHandler.Page(new DocumentToPrintableHandler.Row(row1), new DocumentToPrintableHandler.Graphic(image1, 10, 4, 1)));
 		data.add(new Object[] {events, pages});
 		return data.iterator();

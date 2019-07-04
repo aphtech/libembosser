@@ -14,13 +14,32 @@ import java.awt.print.PrinterException;
 import java.text.AttributedString;
 import java.util.Arrays;
 import java.util.Deque;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
+import org.brailleblaster.libembosser.drivers.utils.document.events.BrailleEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.DocumentEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.EndDocumentEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.EndGraphicEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.EndLineEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.EndPageEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.EndSectionEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.EndVolumeEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.GraphicOption;
+import org.brailleblaster.libembosser.drivers.utils.document.events.Option;
+import org.brailleblaster.libembosser.drivers.utils.document.events.RowGap;
+import org.brailleblaster.libembosser.drivers.utils.document.events.StartDocumentEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.StartGraphicEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.StartLineEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.StartPageEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.StartSectionEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.StartVolumeEvent;
 import org.brailleblaster.libembosser.spi.BrlCell;
 import org.brailleblaster.libembosser.utils.ImageUtils;
 import org.slf4j.Logger;
@@ -28,7 +47,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
 
-public class DocumentToPrintableHandler implements DocumentHandler {
+public class DocumentToPrintableHandler implements DocumentHandler, Function<Iterator<DocumentEvent>, Printable> {
 	private static final Logger log = LoggerFactory.getLogger(DocumentToPrintableHandler.class);
 	public static class Builder {
 		private LayoutHelper layoutHelper;
@@ -454,17 +473,24 @@ public class DocumentToPrintableHandler implements DocumentHandler {
 		optionStack.push(event.getOptions());
 	}
 	private void endGraphic() {
-		Optional<Image> graphic = optionStack.peek().stream().filter(o -> o instanceof ImageOption).map(o -> ((ImageOption)o).getValue()).findFirst();
+		Optional<Image> graphic = optionStack.peek().stream().filter(o -> o instanceof GraphicOption.ImageData).map(o -> ((GraphicOption.ImageData)o).getValue()).findFirst();
 		if (graphic.isPresent()) {
-			int indent = optionStack.peek().stream().filter(o -> o instanceof Indent).mapToInt(o -> ((Indent)o).getValue()).findFirst().orElse(0);
-			int height = optionStack.peek().stream().filter(o -> o instanceof Height).mapToInt(o -> ((Height)o).getValue()).findFirst().orElse(graphicHeight);
-			int width = optionStack.peek().stream().filter(o -> o instanceof Width).mapToInt(o -> ((Width)o).getValue()).findFirst().orElse(0);
+			int indent = optionStack.peek().stream().filter(o -> o instanceof GraphicOption.Indent).mapToInt(o -> ((GraphicOption.Indent)o).getValue()).findFirst().orElse(0);
+			int height = optionStack.peek().stream().filter(o -> o instanceof GraphicOption.Height).mapToInt(o -> ((GraphicOption.Height)o).getValue()).findFirst().orElse(graphicHeight);
+			int width = optionStack.peek().stream().filter(o -> o instanceof GraphicOption.Width).mapToInt(o -> ((GraphicOption.Width)o).getValue()).findFirst().orElse(0);
 			pageElements.add(new Graphic(graphic.get(), width, height, indent));
 		}
 		optionStack.pop();
 		stateStack.pop();
 	}
 	private boolean isInGraphic() {
-		return optionStack.stream().flatMap(options -> options.stream()).anyMatch(o -> o instanceof ImageOption);
+		return optionStack.stream().flatMap(options -> options.stream()).anyMatch(o -> o instanceof GraphicOption.ImageData);
+	}
+	@Override
+	public Printable apply(Iterator<DocumentEvent> doc) {
+		while (doc.hasNext()) {
+			onEvent(doc.next());
+		}
+		return asPrintable();
 	}
 }

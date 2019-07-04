@@ -26,20 +26,28 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.BrailleEvent;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndDocumentEvent;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndGraphicEvent;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndLineEvent;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndPageEvent;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndSectionEvent;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndVolumeEvent;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.GraphicOption;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartDocumentEvent;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartGraphicEvent;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartLineEvent;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartPageEvent;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartSectionEvent;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartVolumeEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.BrailleEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.CellsPerLine;
+import org.brailleblaster.libembosser.drivers.utils.document.events.Duplex;
+import org.brailleblaster.libembosser.drivers.utils.document.events.EndDocumentEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.EndGraphicEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.EndLineEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.EndPageEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.EndSectionEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.EndVolumeEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.GraphicOption;
+import org.brailleblaster.libembosser.drivers.utils.document.events.LinesPerPage;
+import org.brailleblaster.libembosser.drivers.utils.document.events.PageOption;
+import org.brailleblaster.libembosser.drivers.utils.document.events.RowGap;
+import org.brailleblaster.libembosser.drivers.utils.document.events.RowOption;
+import org.brailleblaster.libembosser.drivers.utils.document.events.SectionOption;
+import org.brailleblaster.libembosser.drivers.utils.document.events.StartDocumentEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.StartGraphicEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.StartLineEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.StartPageEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.StartSectionEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.StartVolumeEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.VolumeOption;
 import org.brailleblaster.libembosser.utils.PEFElementType;
 import org.brailleblaster.libembosser.utils.PEFNamespaceContext;
 import org.w3c.dom.Document;
@@ -206,40 +214,40 @@ public class DocumentParser {
 		if (node instanceof Element) {
 			Optional<PEFElementType> elementType = PEFElementType.findElementType((Element)node);
 			if (elementType.isPresent()) {
-				Optional<DocumentHandler.CellsPerLine>cols;
-				Optional<DocumentHandler.Duplex> duplex;
-				Optional<DocumentHandler.RowGap> rowGap;
-				Optional<DocumentHandler.LinesPerPage> rows;
+				Optional<CellsPerLine>cols;
+				Optional<Duplex> duplex;
+				Optional<RowGap> rowGap;
+				Optional<LinesPerPage> rows;
 				switch(elementType.get()) {
 				case BODY:
 					handler.onEvent(new StartDocumentEvent());
 					break;
 				case VOLUME:
-					cols = Optional.ofNullable(((Element) node).getAttribute("cols")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new DocumentHandler.CellsPerLine(v));
-					duplex = Optional.ofNullable(((Element) node).getAttribute("duplex")).map(v -> v.toLowerCase()).flatMap(v -> v.equals("true")? Optional.of(new DocumentHandler.Duplex(true)) : v.equals("false")? Optional.of(new DocumentHandler.Duplex(false)) : Optional.empty());
-					rowGap = Optional.ofNullable(((Element) node).getAttribute("rowgap")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new DocumentHandler.RowGap(v));
-					rows = Optional.ofNullable(((Element) node).getAttribute("rows")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new DocumentHandler.LinesPerPage(v));
-					Set<DocumentHandler.VolumeOption> volOptions = Streams.concat(Streams.stream(cols), Streams.stream(duplex), Streams.stream(rowGap),  Streams.stream(rows)).collect(Collectors.toSet());
+					cols = Optional.ofNullable(((Element) node).getAttribute("cols")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new CellsPerLine(v));
+					duplex = Optional.ofNullable(((Element) node).getAttribute("duplex")).map(v -> v.toLowerCase()).flatMap(v -> v.equals("true")? Optional.of(new Duplex(true)) : v.equals("false")? Optional.of(new Duplex(false)) : Optional.empty());
+					rowGap = Optional.ofNullable(((Element) node).getAttribute("rowgap")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new RowGap(v));
+					rows = Optional.ofNullable(((Element) node).getAttribute("rows")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new LinesPerPage(v));
+					Set<VolumeOption> volOptions = Streams.concat(Streams.stream(cols), Streams.stream(duplex), Streams.stream(rowGap),  Streams.stream(rows)).collect(Collectors.toSet());
 					handler.onEvent(new StartVolumeEvent(volOptions));
 					break;
 				case SECTION:
-					cols = Optional.ofNullable(((Element) node).getAttribute("cols")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new DocumentHandler.CellsPerLine(v));
-					duplex = Optional.ofNullable(((Element) node).getAttribute("duplex")).map(v -> v.toLowerCase()).flatMap(v -> v.equals("true")? Optional.of(new DocumentHandler.Duplex(true)) : v.equals("false")? Optional.of(new DocumentHandler.Duplex(false)) : Optional.empty());
-					rowGap = Optional.ofNullable(((Element) node).getAttribute("rowgap")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new DocumentHandler.RowGap(v));
-					rows = Optional.ofNullable(((Element) node).getAttribute("rows")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new DocumentHandler.LinesPerPage(v));
-					Set<DocumentHandler.SectionOption> sectionOptions = Streams.concat(Streams.stream(cols), Streams.stream(duplex), Streams.stream(rowGap),  Streams.stream(rows)).collect(Collectors.toSet());
+					cols = Optional.ofNullable(((Element) node).getAttribute("cols")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new CellsPerLine(v));
+					duplex = Optional.ofNullable(((Element) node).getAttribute("duplex")).map(v -> v.toLowerCase()).flatMap(v -> v.equals("true")? Optional.of(new Duplex(true)) : v.equals("false")? Optional.of(new Duplex(false)) : Optional.empty());
+					rowGap = Optional.ofNullable(((Element) node).getAttribute("rowgap")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new RowGap(v));
+					rows = Optional.ofNullable(((Element) node).getAttribute("rows")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new LinesPerPage(v));
+					Set<SectionOption> sectionOptions = Streams.concat(Streams.stream(cols), Streams.stream(duplex), Streams.stream(rowGap),  Streams.stream(rows)).collect(Collectors.toSet());
 					handler.onEvent(new StartSectionEvent(sectionOptions));;
 					break;
 				case PAGE:
-					cols = Optional.ofNullable(((Element) node).getAttribute("cols")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new DocumentHandler.CellsPerLine(v));
-					rowGap = Optional.ofNullable(((Element) node).getAttribute("rowgap")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new DocumentHandler.RowGap(v));
-					rows = Optional.ofNullable(((Element) node).getAttribute("rows")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new DocumentHandler.LinesPerPage(v));
-					Set<DocumentHandler.PageOption> pageOptions = Streams.concat(Streams.stream(cols), Streams.stream(rowGap),  Streams.stream(rows)).collect(Collectors.toSet());
+					cols = Optional.ofNullable(((Element) node).getAttribute("cols")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new CellsPerLine(v));
+					rowGap = Optional.ofNullable(((Element) node).getAttribute("rowgap")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new RowGap(v));
+					rows = Optional.ofNullable(((Element) node).getAttribute("rows")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new LinesPerPage(v));
+					Set<PageOption> pageOptions = Streams.concat(Streams.stream(cols), Streams.stream(rowGap),  Streams.stream(rows)).collect(Collectors.toSet());
 					handler.onEvent(new StartPageEvent(pageOptions));;
 					break;
 				case ROW:
-					rowGap = Optional.ofNullable(((Element) node).getAttribute("rowgap")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new DocumentHandler.RowGap(v));
-					Set<DocumentHandler.RowOption> rowOptions = Streams.stream(rowGap).collect(Collectors.toSet());
+					rowGap = Optional.ofNullable(((Element) node).getAttribute("rowgap")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new RowGap(v));
+					Set<RowOption> rowOptions = Streams.stream(rowGap).collect(Collectors.toSet());
 					handler.onEvent(new StartLineEvent(rowOptions));
 					NodeList children = node.getChildNodes();
 					StringBuilder sb = new StringBuilder();
@@ -253,10 +261,10 @@ public class DocumentParser {
 					result = false;
 					break;
 				case GRAPHIC:
-					Optional<DocumentHandler.ImageOption> img = Optional.ofNullable(((Element)node).getAttribute("idref")).flatMap(a -> findResourceById(resourceNodes, a)).flatMap(e -> loadImageFromElement(e)).map(i -> new DocumentHandler.ImageOption(i));
-					Optional<DocumentHandler.Height> height = Optional.ofNullable(((Element)node).getAttribute("height")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new DocumentHandler.Height(v));
-					Optional<DocumentHandler.Indent> indent = Optional.ofNullable(((Element)node).getAttribute("indent")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new DocumentHandler.Indent(v));
-					Optional<DocumentHandler.Width> width = Optional.ofNullable(((Element)node).getAttribute("width")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new DocumentHandler.Width(v));
+					Optional<GraphicOption.ImageData> img = Optional.ofNullable(((Element)node).getAttribute("idref")).flatMap(a -> findResourceById(resourceNodes, a)).flatMap(e -> loadImageFromElement(e)).map(i -> new GraphicOption.ImageData(i));
+					Optional<GraphicOption.Height> height = Optional.ofNullable(((Element)node).getAttribute("height")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new GraphicOption.Height(v));
+					Optional<GraphicOption.Indent> indent = Optional.ofNullable(((Element)node).getAttribute("indent")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new GraphicOption.Indent(v));
+					Optional<GraphicOption.Width> width = Optional.ofNullable(((Element)node).getAttribute("width")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new GraphicOption.Width(v));
 					Set<GraphicOption> graphicOptions = Streams.concat(Streams.stream(img), Streams.stream(height), Streams.stream(indent), Streams.stream(width)).collect(ImmutableSet.toImmutableSet());
 					handler.onEvent(new StartGraphicEvent(graphicOptions));
 					result = true;

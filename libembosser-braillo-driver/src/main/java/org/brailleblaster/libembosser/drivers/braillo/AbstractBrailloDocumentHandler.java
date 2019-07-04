@@ -1,7 +1,8 @@
 package org.brailleblaster.libembosser.drivers.braillo;
 
-import org.brailleblaster.libembosser.drivers.generic.GenericTextDocumentHandler;
 import org.brailleblaster.libembosser.drivers.utils.DocumentToByteSourceHandler;
+import org.brailleblaster.libembosser.drivers.utils.document.GenericTextDocumentHandler;
+import org.brailleblaster.libembosser.drivers.utils.document.events.DocumentEvent;
 
 import com.google.common.io.ByteSource;
 

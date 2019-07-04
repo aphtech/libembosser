@@ -1,4 +1,4 @@
-package org.brailleblaster.libembosser.drivers.generic;
+package org.brailleblaster.libembosser.drivers.utils.document;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -6,19 +6,43 @@ import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 
 import org.brailleblaster.libembosser.drivers.utils.ClassUtils;
 import org.brailleblaster.libembosser.drivers.utils.DocumentToByteSourceHandler;
+import org.brailleblaster.libembosser.drivers.utils.document.events.BrailleEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.CellsPerLine;
+import org.brailleblaster.libembosser.drivers.utils.document.events.DocumentEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.DocumentOption;
+import org.brailleblaster.libembosser.drivers.utils.document.events.Duplex;
+import org.brailleblaster.libembosser.drivers.utils.document.events.EndDocumentEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.EndLineEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.EndPageEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.EndSectionEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.EndVolumeEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.LinesPerPage;
+import org.brailleblaster.libembosser.drivers.utils.document.events.Option;
+import org.brailleblaster.libembosser.drivers.utils.document.events.PageOption;
+import org.brailleblaster.libembosser.drivers.utils.document.events.RowGap;
+import org.brailleblaster.libembosser.drivers.utils.document.events.RowOption;
+import org.brailleblaster.libembosser.drivers.utils.document.events.SectionOption;
+import org.brailleblaster.libembosser.drivers.utils.document.events.StartDocumentEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.StartLineEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.StartPageEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.StartSectionEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.StartVolumeEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.VolumeOption;
 import org.brailleblaster.libembosser.utils.BrailleMapper;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.ByteSource;
 
-public class GenericTextDocumentHandler implements DocumentToByteSourceHandler {
+public class GenericTextDocumentHandler implements DocumentToByteSourceHandler, Function<Iterator<DocumentEvent>, ByteSource> {
 	private static void throwInvalidStateException(DocumentEvent event, String state) {
 		throw new IllegalStateException(String.format("Invalid event %s for state %s", event.getClass().getName(), state));
 	}
@@ -315,5 +339,13 @@ public class GenericTextDocumentHandler implements DocumentToByteSourceHandler {
 			sources.add(ByteSource.wrap(outputBytes));
 		}
 		return ByteSource.concat(sources);
+	}
+
+	@Override
+	public ByteSource apply(Iterator<DocumentEvent> doc) {
+		while (doc.hasNext()) {
+			onEvent(doc.next());
+		}
+		return asByteSource();
 	}
 }

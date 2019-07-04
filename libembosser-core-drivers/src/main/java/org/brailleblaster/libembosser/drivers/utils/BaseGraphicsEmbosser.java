@@ -6,7 +6,11 @@ import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.io.InputStream;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 import javax.print.DocFlavor;
 import javax.print.PrintService;
@@ -18,7 +22,8 @@ import javax.print.attribute.standard.Sides;
 
 import org.brailleblaster.libembosser.drivers.utils.DocumentParser.ParseException;
 import org.brailleblaster.libembosser.drivers.utils.DocumentToPrintableHandler.LayoutHelper;
-import org.brailleblaster.libembosser.drivers.utils.handlers.PageFilterHandler;
+import org.brailleblaster.libembosser.drivers.utils.document.events.DocumentEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.filters.PageFilter;
 import org.brailleblaster.libembosser.embossing.attribute.Copies;
 import org.brailleblaster.libembosser.embossing.attribute.PageRanges;
 import org.brailleblaster.libembosser.embossing.attribute.PaperLayout;
@@ -73,15 +78,15 @@ public abstract class BaseGraphicsEmbosser implements Embosser {
 		emboss(embosserDevice, brf, attributes, new DocumentParser()::parseBrf);
 	}
 	private <T> void emboss(PrintService ps, T input, EmbossingAttributeSet attributes, ThrowingBiConsumer<T, DocumentHandler, ParseException> parseMethod) throws EmbossException {
-		PageRanges pages = Optional.ofNullable((PageRanges)attributes.get(PageRanges.class)).orElseGet(() -> new PageRanges());
-		PageFilterHandler<DocumentToPrintableHandler> pageFilteredHandler = new PageFilterHandler<DocumentToPrintableHandler>(new DocumentToPrintableHandler.Builder().setLayoutHelper(getLayoutHelper(BrlCell.NLS)).build(), pages);
+		List<DocumentEvent> events = new LinkedList<>();
 		try {
-			parseMethod.accept(input, pageFilteredHandler);
+			parseMethod.accept(input, events::add);
 		} catch (ParseException e) {
 			throw new RuntimeException("Problem parsing document", e);
 		}
-		DocumentToPrintableHandler handler = pageFilteredHandler.getDelegate();
-		Printable printable = handler.asPrintable();
+		PageRanges pages = Optional.ofNullable((PageRanges)attributes.get(PageRanges.class)).orElseGet(() -> new PageRanges());
+		Function<Iterator<DocumentEvent>, Printable> transform = new PageFilter(pages).andThen(new DocumentToPrintableHandler.Builder().setLayoutHelper(getLayoutHelper(BrlCell.NLS)).build());
+		Printable printable = transform.apply(events.iterator());
 		PrinterJob printJob = PrinterJob.getPrinterJob();
 		printJob.setJobName("BrailleBlasterEmboss");
 		Optional.ofNullable(attributes.get(Copies.class)).map(v -> ((org.brailleblaster.libembosser.embossing.attribute.Copies)v).getValue()).ifPresent(v -> printJob.setCopies(v));

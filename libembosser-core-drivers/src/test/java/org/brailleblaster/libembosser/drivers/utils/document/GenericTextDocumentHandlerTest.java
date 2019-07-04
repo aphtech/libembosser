@@ -1,4 +1,4 @@
-package org.brailleblaster.libembosser.drivers.generic;
+package org.brailleblaster.libembosser.drivers.utils.document;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.expectThrows;
@@ -12,19 +12,20 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.BrailleEvent;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.DocumentEvent;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.Duplex;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndDocumentEvent;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndLineEvent;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndPageEvent;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndSectionEvent;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.EndVolumeEvent;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartDocumentEvent;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartLineEvent;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartPageEvent;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartSectionEvent;
-import org.brailleblaster.libembosser.drivers.utils.DocumentHandler.StartVolumeEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.GenericTextDocumentHandler;
+import org.brailleblaster.libembosser.drivers.utils.document.events.BrailleEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.DocumentEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.Duplex;
+import org.brailleblaster.libembosser.drivers.utils.document.events.EndDocumentEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.EndLineEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.EndPageEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.EndSectionEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.EndVolumeEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.StartDocumentEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.StartLineEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.StartPageEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.StartSectionEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.events.StartVolumeEvent;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
