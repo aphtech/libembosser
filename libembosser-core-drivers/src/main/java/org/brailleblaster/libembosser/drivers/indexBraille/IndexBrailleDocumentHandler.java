@@ -5,7 +5,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.OptionalInt;
 
-import org.brailleblaster.libembosser.drivers.utils.DocumentToByteSourceHandler;
+import org.brailleblaster.libembosser.drivers.utils.document.ByteSourceHandlerToFunctionAdapter;
 import org.brailleblaster.libembosser.drivers.utils.document.GenericTextDocumentHandler;
 import org.brailleblaster.libembosser.drivers.utils.document.events.DocumentEvent;
 import org.brailleblaster.libembosser.spi.Layout;
@@ -15,7 +15,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Streams;
 import com.google.common.io.ByteSource;
 
-public class IndexBrailleDocumentHandler implements DocumentToByteSourceHandler {
+public class IndexBrailleDocumentHandler implements ByteSourceHandlerToFunctionAdapter {
 	public static class Builder {
 		private int leftMargin = 0;
 		private int topMargin = 0;

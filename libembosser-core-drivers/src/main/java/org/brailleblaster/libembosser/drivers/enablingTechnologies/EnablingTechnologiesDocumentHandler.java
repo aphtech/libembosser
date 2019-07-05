@@ -5,11 +5,12 @@ import static com.google.common.base.Preconditions.checkState;
 
 import java.math.BigDecimal;
 
-import org.brailleblaster.libembosser.drivers.utils.DocumentToByteSourceHandler;
+import org.brailleblaster.libembosser.drivers.utils.document.ByteSourceHandlerToFunctionAdapter;
 import org.brailleblaster.libembosser.drivers.utils.document.GenericTextDocumentHandler;
 import org.brailleblaster.libembosser.drivers.utils.document.events.DocumentEvent;
 import org.brailleblaster.libembosser.spi.BrlCell;
 import org.brailleblaster.libembosser.spi.Layout;
+
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -18,7 +19,7 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteSource;
 import com.google.common.io.ByteStreams;
 
-public class EnablingTechnologiesDocumentHandler implements DocumentToByteSourceHandler {
+public class EnablingTechnologiesDocumentHandler implements ByteSourceHandlerToFunctionAdapter {
 	public static class Builder {
 		private int leftMargin = 0;
 		private int cellsPerLine = 40;

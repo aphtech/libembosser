@@ -4,12 +4,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigDecimal;
 import java.util.EnumSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
+import java.util.function.Function;
 
 import org.brailleblaster.libembosser.drivers.utils.BaseTextEmbosser;
-import org.brailleblaster.libembosser.drivers.utils.document.filters.PageFilterByteSourceHandler;
+import org.brailleblaster.libembosser.drivers.utils.document.events.DocumentEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.filters.PageFilter;
 import org.brailleblaster.libembosser.embossing.attribute.Copies;
 import org.brailleblaster.libembosser.embossing.attribute.PageRanges;
 import org.brailleblaster.libembosser.embossing.attribute.PaperLayout;
@@ -22,6 +25,7 @@ import org.brailleblaster.libembosser.spi.Margins;
 import org.brailleblaster.libembosser.spi.Rectangle;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.io.ByteSource;
 
 public class IndexBrailleEmbosser extends BaseTextEmbosser {
 	private final int maxCellsPerLine;
@@ -45,7 +49,7 @@ public class IndexBrailleEmbosser extends BaseTextEmbosser {
 		return supportedSides.stream().anyMatch(e -> e.isDoubleSide());
 	}
 	
-	protected PageFilterByteSourceHandler createHandler(EmbossingAttributeSet attributes) {
+	protected Function<Iterator<DocumentEvent>, ByteSource> createHandler(EmbossingAttributeSet attributes) {
 		// For now assume NLS Braille cell type.
 		BrlCell cell = BrlCell.NLS;
 		Optional<Rectangle> paperOption = Optional.ofNullable(attributes.get(PaperSize.class)).map(v -> ((PaperSize)v).getValue());
@@ -89,9 +93,9 @@ public class IndexBrailleEmbosser extends BaseTextEmbosser {
 		Optional.ofNullable(attributes.get(PaperLayout.class)).map(v -> ((PaperLayout)v).getValue()).ifPresent(v -> builder.setPaperMode(getDuplexValue(v)));
 		paperOption.map(p -> paperSizes.getOrDefault(paper, null)).ifPresent(p -> builder.setPaper(OptionalInt.of(p)));
 		Optional.ofNullable(attributes.get(Copies.class)).ifPresent(v -> builder.setCopies(((Copies)v).getValue()));
-		IndexBrailleDocumentHandler handler = builder.build();
+		Function<Iterator<DocumentEvent>, ByteSource> handler = builder.build();
 		PageRanges pages = Optional.ofNullable((PageRanges)(attributes.get(PageRanges.class))).orElseGet(() -> new PageRanges());
-		return new PageFilterByteSourceHandler(handler, pages);
+		return new PageFilter(pages).andThen(handler);
 	}
 	/**
 	 * Get the numeric value of the sides mode.

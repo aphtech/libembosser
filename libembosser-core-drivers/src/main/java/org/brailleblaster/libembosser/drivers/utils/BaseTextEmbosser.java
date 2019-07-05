@@ -2,7 +2,11 @@ package org.brailleblaster.libembosser.drivers.utils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import javax.print.Doc;
@@ -16,6 +20,7 @@ import javax.print.event.PrintJobEvent;
 import javax.print.event.PrintJobListener;
 
 import org.brailleblaster.libembosser.drivers.utils.DocumentParser.ParseException;
+import org.brailleblaster.libembosser.drivers.utils.document.events.DocumentEvent;
 import org.brailleblaster.libembosser.spi.EmbossException;
 import org.brailleblaster.libembosser.spi.Embosser;
 import org.brailleblaster.libembosser.spi.EmbossingAttributeSet;
@@ -23,6 +28,8 @@ import org.brailleblaster.libembosser.spi.Notification;
 import org.brailleblaster.libembosser.spi.Rectangle;
 import org.brailleblaster.libembosser.utils.EmbossToStreamPrintServiceFactory;
 import org.w3c.dom.Document;
+
+import com.google.common.io.ByteSource;
 
 public abstract class BaseTextEmbosser implements Embosser {
 	private StreamPrintServiceFactory streamPrintServiceFactory = new EmbossToStreamPrintServiceFactory();
@@ -65,7 +72,7 @@ public abstract class BaseTextEmbosser implements Embosser {
 	public Rectangle getMinimumPaper() {
 		return minimumPaper;
 	}
-	abstract protected DocumentToByteSourceHandler createHandler(EmbossingAttributeSet attributes);
+	abstract protected Function<Iterator<DocumentEvent>, ByteSource> createHandler(EmbossingAttributeSet attributes);
 	@Override
 	public void embossPef(PrintService embosserDevice, Document pef, EmbossingAttributeSet attributes)
 			throws EmbossException {
@@ -86,15 +93,16 @@ public abstract class BaseTextEmbosser implements Embosser {
 		DocumentParser parser = new DocumentParser();
 		emboss(embosserDevice, brf, parser::parseBrf, createHandler(attributes));
 	}
-	protected <T> boolean emboss(PrintService embosserDevice, T input, ThrowingBiConsumer<T, DocumentHandler, ParseException> parseMethod, DocumentToByteSourceHandler handler) throws EmbossException {
+	protected <T> boolean emboss(PrintService embosserDevice, T input, ThrowingBiConsumer<T, DocumentHandler, ParseException> parseMethod, Function<Iterator<DocumentEvent>, ByteSource> handler) throws EmbossException {
+		List<DocumentEvent> events = new LinkedList<>();
 		try {
-			parseMethod.accept(input, handler);
+			parseMethod.accept(input, events::add);
 		} catch (ParseException e) {
 			throw new EmbossException(e);
 		}
 		InputStream embosserStream;
 		try {
-			embosserStream = handler.asByteSource().openStream();
+			embosserStream = handler.apply(events.iterator()).openStream();
 		} catch (IOException e) {
 			throw new EmbossException(e);
 		}

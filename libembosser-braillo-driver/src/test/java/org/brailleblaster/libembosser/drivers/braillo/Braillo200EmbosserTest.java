@@ -3,11 +3,13 @@ package org.brailleblaster.libembosser.drivers.braillo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Function;
 
 import org.brailleblaster.libembosser.drivers.utils.document.events.BrailleEvent;
 import org.brailleblaster.libembosser.drivers.utils.document.events.CellsPerLine;
@@ -23,7 +25,6 @@ import org.brailleblaster.libembosser.drivers.utils.document.events.StartLineEve
 import org.brailleblaster.libembosser.drivers.utils.document.events.StartPageEvent;
 import org.brailleblaster.libembosser.drivers.utils.document.events.StartSectionEvent;
 import org.brailleblaster.libembosser.drivers.utils.document.events.StartVolumeEvent;
-import org.brailleblaster.libembosser.drivers.utils.DocumentToByteSourceHandler;
 import org.brailleblaster.libembosser.embossing.attribute.Copies;
 import org.brailleblaster.libembosser.embossing.attribute.PaperLayout;
 import org.brailleblaster.libembosser.embossing.attribute.PaperMargins;
@@ -40,6 +41,7 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.io.ByteSource;
 
 public class Braillo200EmbosserTest {
 	@DataProvider(name="basicDocumentProvider")
@@ -80,11 +82,8 @@ public class Braillo200EmbosserTest {
 	}
 	@Test(dataProvider="basicDocumentProvider")
 	public void testBasicDocumentEmbossing(Braillo200Embosser embosser, List<DocumentEvent> events, EmbossingAttributeSet attributes, String[] expected) throws IOException {
-		DocumentToByteSourceHandler handler = embosser.createHandler(attributes);
-		for (DocumentEvent event : events) {
-			handler.onEvent(event);
-		}
-		String actual = handler.asByteSource().asCharSource(Charsets.US_ASCII).read();
+		Function<Iterator<DocumentEvent>, ByteSource> handler = embosser.createHandler(attributes);
+		String actual = handler.apply(events.iterator()).asCharSource(Charsets.US_ASCII).read();
 		assertThat(actual).contains(expected);
 	}
 	@Test

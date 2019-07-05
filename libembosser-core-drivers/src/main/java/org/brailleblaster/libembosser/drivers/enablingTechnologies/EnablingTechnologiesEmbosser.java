@@ -1,10 +1,13 @@
 package org.brailleblaster.libembosser.drivers.enablingTechnologies;
 
 import java.math.BigDecimal;
+import java.util.Iterator;
 import java.util.Optional;
+import java.util.function.Function;
 
 import org.brailleblaster.libembosser.drivers.utils.BaseTextEmbosser;
-import org.brailleblaster.libembosser.drivers.utils.document.filters.PageFilterByteSourceHandler;
+import org.brailleblaster.libembosser.drivers.utils.document.events.DocumentEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.filters.PageFilter;
 import org.brailleblaster.libembosser.embossing.attribute.BrailleCellType;
 import org.brailleblaster.libembosser.embossing.attribute.Copies;
 import org.brailleblaster.libembosser.embossing.attribute.PageRanges;
@@ -17,6 +20,8 @@ import org.brailleblaster.libembosser.spi.Layout;
 import org.brailleblaster.libembosser.spi.Margins;
 import org.brailleblaster.libembosser.spi.Rectangle;
 
+import com.google.common.io.ByteSource;
+
 public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 	private boolean interpoint;
 
@@ -26,7 +31,7 @@ public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 	}
 
 
-	protected PageFilterByteSourceHandler createHandler(EmbossingAttributeSet attributes) {
+	protected Function<Iterator<DocumentEvent>, ByteSource> createHandler(EmbossingAttributeSet attributes) {
 		BrlCell cell = Optional.ofNullable(attributes.get(BrailleCellType.class)).map(v -> ((BrailleCellType)v).getValue()).orElse(BrlCell.NLS);
 		Rectangle paper = Optional.ofNullable(attributes.get(PaperSize.class)).map(v -> ((PaperSize)v).getValue()).orElse(getMaximumPaper());
 		Margins margins = Optional.ofNullable(attributes.get(PaperMargins.class)).map(v -> ((PaperMargins)v).getValue()).orElse(Margins.NO_MARGINS);
@@ -52,9 +57,9 @@ public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 		if (EnablingTechnologiesDocumentHandler.supportedCellTypes().contains(cell)) {
 			builder.setCell(cell);
 		}
-		EnablingTechnologiesDocumentHandler handler = builder.build();
+		Function<Iterator<DocumentEvent>, ByteSource> handler = builder.build();
 		PageRanges pages = Optional.ofNullable((PageRanges)(attributes.get(PageRanges.class))).orElseGet(() -> new PageRanges());
-		return new PageFilterByteSourceHandler(handler, pages);
+		return new PageFilter(pages).andThen(handler);
 	}
 
 	@Override

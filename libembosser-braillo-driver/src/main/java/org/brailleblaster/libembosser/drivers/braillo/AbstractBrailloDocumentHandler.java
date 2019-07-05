@@ -1,12 +1,12 @@
 package org.brailleblaster.libembosser.drivers.braillo;
 
-import org.brailleblaster.libembosser.drivers.utils.DocumentToByteSourceHandler;
+import org.brailleblaster.libembosser.drivers.utils.document.ByteSourceHandlerToFunctionAdapter;
 import org.brailleblaster.libembosser.drivers.utils.document.GenericTextDocumentHandler;
 import org.brailleblaster.libembosser.drivers.utils.document.events.DocumentEvent;
 
 import com.google.common.io.ByteSource;
 
-public abstract class AbstractBrailloDocumentHandler implements DocumentToByteSourceHandler {
+public abstract class AbstractBrailloDocumentHandler implements ByteSourceHandlerToFunctionAdapter {
 	private GenericTextDocumentHandler handler;
 	protected AbstractBrailloDocumentHandler(int cellsPerLine, double sheetLength, int topMargin, int bottomMargin, int leftMargin, int rightMargin, boolean interpoint, int copies) {
 		int linesPerPage = (int)Math.floor(sheetLength * 2.54);

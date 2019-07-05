@@ -1,11 +1,14 @@
 package org.brailleblaster.libembosser.drivers.braillo;
 
 import java.math.BigDecimal;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 import org.brailleblaster.libembosser.drivers.utils.BaseTextEmbosser;
-import org.brailleblaster.libembosser.drivers.utils.document.filters.PageFilterByteSourceHandler;
+import org.brailleblaster.libembosser.drivers.utils.document.events.DocumentEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.filters.PageFilter;
 import org.brailleblaster.libembosser.embossing.attribute.Copies;
 import org.brailleblaster.libembosser.embossing.attribute.PageRanges;
 import org.brailleblaster.libembosser.embossing.attribute.PaperLayout;
@@ -18,6 +21,7 @@ import org.brailleblaster.libembosser.spi.Margins;
 import org.brailleblaster.libembosser.spi.Rectangle;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.io.ByteSource;
 
 public class Braillo200Embosser extends BaseTextEmbosser {
 	private static final List<Layout> ZFOLDING_LAYOUTS = ImmutableList.of(Layout.Z_FOLDING_DOUBLE_HORIZONTAL, Layout.Z_FOLDING_DOUBLE_VERTICAL, Layout.Z_FOLDING_SINGLE_HORIZONTAL, Layout.Z_FOLDING_SINGLE_VERTICAL);
@@ -27,7 +31,7 @@ public class Braillo200Embosser extends BaseTextEmbosser {
 		super(id, "Braillo", model, maxPaper, minPaper);
 		this.interpoint = interpoint;
 	}
-	protected PageFilterByteSourceHandler createHandler(EmbossingAttributeSet attributes) {
+	protected Function<Iterator<DocumentEvent>, ByteSource> createHandler(EmbossingAttributeSet attributes) {
 		final Optional<PaperLayout> pageLayout = Optional.ofNullable((PaperLayout)(attributes.get(PaperLayout.class)));
 		boolean interpoint = pageLayout.map(l -> l.getValue().isDoubleSide()).orElse(false);
 		boolean zfolding = pageLayout.map(l -> l.getValue()).filter(l -> ZFOLDING_LAYOUTS.contains(l)).isPresent();
@@ -48,7 +52,7 @@ public class Braillo200Embosser extends BaseTextEmbosser {
 			cellsPerLine = 10;
 		}
 		int copies = Optional.ofNullable((Copies)(attributes.get(Copies.class))).map(c -> c.getValue()).orElse(1);
-		Braillo200DocumentHandler handler = new Braillo200DocumentHandler.Builder()
+		Function<Iterator<DocumentEvent>, ByteSource> handler = new Braillo200DocumentHandler.Builder()
 				.setCopies(copies)
 				.setInterpoint(interpoint)
 				.setZFolding(zfolding)
@@ -60,7 +64,7 @@ public class Braillo200Embosser extends BaseTextEmbosser {
 				.setRightMargin(rightMargin)
 				.build();
 		PageRanges pages = Optional.ofNullable((PageRanges)(attributes.get(PageRanges.class))).orElseGet(() -> new PageRanges());
-		return new PageFilterByteSourceHandler(handler, pages);
+		return new PageFilter(pages).andThen(handler);
 	}
 
 	@Override
