@@ -26,9 +26,11 @@ public class InterpointGraphicTransform implements Function<Iterator<DocumentEve
 		boolean pageHasGraphic = false;
 		boolean prevPageHasGraphic = false;
 		boolean pageHasContent = false;
+		int pageCounter = 0;
 		while (input.hasNext()) {
 			final DocumentEvent event = input.next();
 			if (event instanceof StartPageEvent) {
+				pageCounter++;
 				page.clear();
 				inPage = true;
 				pageHasGraphic = false;
@@ -46,7 +48,8 @@ public class InterpointGraphicTransform implements Function<Iterator<DocumentEve
 				page.add(event);
 			}
 			if (event instanceof EndPageEvent) {
-				if (prevPageHasGraphic && pageHasContent) {
+				if ((pageHasGraphic && pageCounter % 2 == 0) ||
+						(prevPageHasGraphic && pageHasContent)) {
 					output.add(new StartPageEvent());
 					output.add(new EndPageEvent());
 				}
