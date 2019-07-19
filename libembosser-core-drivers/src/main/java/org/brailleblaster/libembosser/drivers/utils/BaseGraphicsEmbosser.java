@@ -87,12 +87,12 @@ public abstract class BaseGraphicsEmbosser implements Embosser {
 		}
 		PrintRequestAttribute duplex = Optional.ofNullable((org.brailleblaster.libembosser.embossing.attribute.PaperLayout)attributes.get(PaperLayout.class)).filter(p -> supportsInterpoint()).map(p -> p.getValue().isDoubleSide() ? Sides.DUPLEX : Sides.ONE_SIDED).orElse(Sides.ONE_SIDED);
 		PageRanges pages = Optional.ofNullable((PageRanges)attributes.get(PageRanges.class)).orElseGet(() -> new PageRanges());
-		Function<Iterator<DocumentEvent>, Printable> transform = new PageFilter(pages);
+		Function<Iterator<DocumentEvent>, Iterator<DocumentEvent>> transform = new PageFilter(pages);
 		if (duplex.equals(Sides.DUPLEX)) {
 			transform = transform.andThen(new InterpointGraphicTransform());
 		}
-		transform = transform.andThen(new DocumentToPrintableHandler.Builder().setLayoutHelper(getLayoutHelper(BrlCell.NLS)).build());
-		Printable printable = transform.apply(events.iterator());
+		Function<Iterator<DocumentEvent>, Printable> handler = transform.andThen(new DocumentToPrintableHandler.Builder().setLayoutHelper(getLayoutHelper(BrlCell.NLS)).build());
+		Printable printable = handler.apply(events.iterator());
 		PrinterJob printJob = PrinterJob.getPrinterJob();
 		printJob.setJobName("BrailleBlasterEmboss");
 		Optional.ofNullable(attributes.get(Copies.class)).map(v -> ((org.brailleblaster.libembosser.embossing.attribute.Copies)v).getValue()).ifPresent(v -> printJob.setCopies(v));
