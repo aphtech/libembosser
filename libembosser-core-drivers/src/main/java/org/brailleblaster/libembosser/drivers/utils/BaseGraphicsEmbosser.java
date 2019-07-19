@@ -23,6 +23,7 @@ import javax.print.attribute.standard.Sides;
 import org.brailleblaster.libembosser.drivers.utils.DocumentParser.ParseException;
 import org.brailleblaster.libembosser.drivers.utils.DocumentToPrintableHandler.LayoutHelper;
 import org.brailleblaster.libembosser.drivers.utils.document.events.DocumentEvent;
+import org.brailleblaster.libembosser.drivers.utils.document.filters.InterpointGraphicTransform;
 import org.brailleblaster.libembosser.drivers.utils.document.filters.PageFilter;
 import org.brailleblaster.libembosser.embossing.attribute.Copies;
 import org.brailleblaster.libembosser.embossing.attribute.PageRanges;
@@ -84,13 +85,17 @@ public abstract class BaseGraphicsEmbosser implements Embosser {
 		} catch (ParseException e) {
 			throw new RuntimeException("Problem parsing document", e);
 		}
+		PrintRequestAttribute duplex = Optional.ofNullable((org.brailleblaster.libembosser.embossing.attribute.PaperLayout)attributes.get(PaperLayout.class)).filter(p -> supportsInterpoint()).map(p -> p.getValue().isDoubleSide() ? Sides.DUPLEX : Sides.ONE_SIDED).orElse(Sides.ONE_SIDED);
 		PageRanges pages = Optional.ofNullable((PageRanges)attributes.get(PageRanges.class)).orElseGet(() -> new PageRanges());
-		Function<Iterator<DocumentEvent>, Printable> transform = new PageFilter(pages).andThen(new DocumentToPrintableHandler.Builder().setLayoutHelper(getLayoutHelper(BrlCell.NLS)).build());
+		Function<Iterator<DocumentEvent>, Printable> transform = new PageFilter(pages);
+		if (duplex.equals(Sides.DUPLEX)) {
+			transform = transform.andThen(new InterpointGraphicTransform());
+		}
+		transform = transform.andThen(new DocumentToPrintableHandler.Builder().setLayoutHelper(getLayoutHelper(BrlCell.NLS)).build());
 		Printable printable = transform.apply(events.iterator());
 		PrinterJob printJob = PrinterJob.getPrinterJob();
 		printJob.setJobName("BrailleBlasterEmboss");
 		Optional.ofNullable(attributes.get(Copies.class)).map(v -> ((org.brailleblaster.libembosser.embossing.attribute.Copies)v).getValue()).ifPresent(v -> printJob.setCopies(v));
-		PrintRequestAttribute duplex = Optional.ofNullable((org.brailleblaster.libembosser.embossing.attribute.PaperLayout)attributes.get(PaperLayout.class)).filter(p -> supportsInterpoint()).map(p -> p.getValue().isDoubleSide() ? Sides.DUPLEX : Sides.ONE_SIDED).orElse(Sides.ONE_SIDED);
 		try {
 			printJob.setPrintService(ps);
 			PageFormat pf = printJob.defaultPage();
