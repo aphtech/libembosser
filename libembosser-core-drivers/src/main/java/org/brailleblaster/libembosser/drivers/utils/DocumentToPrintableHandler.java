@@ -291,7 +291,9 @@ public class DocumentToPrintableHandler implements DocumentHandler, Function<Ite
 					final int imgWidth = image.getWidth(null);
 					final int imgHeight = image.getHeight(null);
 					final double scalingRatio = Math.min(width/(double)imgWidth, height/(double)imgHeight);
-					g2d.drawImage(image, (int)xPos, (int)yPos, (int)(imgWidth * scalingRatio), (int)(imgHeight * scalingRatio), 0, 0, imgWidth, imgHeight, null);
+					// Remember Braille/strings is from baseline, graphics from top left corner.
+					// Therefore for graphics move to top of line.
+					g2d.drawImage(image, (int)xPos, (int)yPos - brailleMetrics.getAscent(), (int)(imgWidth * scalingRatio), (int)(imgHeight * scalingRatio), null);
 					yPos += height;
 				}
 			}
