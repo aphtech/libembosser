@@ -2,6 +2,7 @@ package org.brailleblaster.libembosser.drivers;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
+import static org.testng.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -18,6 +19,7 @@ import javax.print.StreamPrintService;
 import javax.print.StreamPrintServiceFactory;
 
 import org.brailleblaster.libembosser.EmbosserService;
+import org.brailleblaster.libembosser.drivers.generic.GenericGraphicsEmbosser;
 import org.brailleblaster.libembosser.embossing.attribute.Copies;
 import org.brailleblaster.libembosser.embossing.attribute.PaperLayout;
 import org.brailleblaster.libembosser.embossing.attribute.PaperMargins;
@@ -185,5 +187,10 @@ public class CoreDriversTest {
 		}
 		byte[] outBytes = out.toByteArray();
 		assertEquals(outBytes, expected, String.format("Output did not match, output expected: %s was: %s", Arrays.toString(expected), Arrays.toString(outBytes)));
+	}
+	@Test
+	public void genericGraphicsSupportsInterpoint() {
+		GenericGraphicsEmbosser e = new GenericGraphicsEmbosser();
+		assertTrue(e.supportsInterpoint(), "Generic graphics embosser should support interpoint");
 	}
 }

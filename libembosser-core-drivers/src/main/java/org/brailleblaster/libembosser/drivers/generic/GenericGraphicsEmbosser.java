@@ -28,7 +28,7 @@ public class GenericGraphicsEmbosser extends BaseGraphicsEmbosser {
 
 	@Override
 	public boolean supportsInterpoint() {
-		return false;
+		return true;
 	}
 
 	@Override
