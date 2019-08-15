@@ -23,6 +23,8 @@ public class ViewPlusEmbosserFactory implements EmbosserFactory {
 				.add(new ViewPlusEmbosser("libembosser.vp.max", "Max", new Rectangle("101", "20"), new Rectangle("356", "610"), false))
 				.add(new ViewPlusEmbosser("libembosser.vp.cub", "Cub", new Rectangle("77", "20"), new Rectangle("216", "610"), false))
 				.add(new ViewPlusEmbosser("libembosser.vp.cub_jr", "Cub JR.", new Rectangle("77", "20"), new Rectangle("216", "610"), false))
+				.add(new ViewPlusEmbosser("libembosser.vp.tiger_pro", "Tiger Pro", new Rectangle("77", "20"), new Rectangle("432", "610"), false))
+				.add(new ViewPlusEmbosser("libembosser.vp.emfuse", "EmFuse", new Rectangle("102", "254"), new Rectangle("328", "457"), true))
 				.add(new ViewPlusEmbosser("libembosser.vp.braille_buddy", "IRIE", "Braille Buddy", new Rectangle("77", "20"), new Rectangle("216", "610"), false))
 				.add(new ViewPlusEmbosser("libembosser.vp.braille_sheet_120", "IRIE", "Braille Sheet 120", new Rectangle("176", "20"), new Rectangle("305", "432"), true))
 				.add(new ViewPlusEmbosser("libembosser.vp.braille_trac_120", "IRIE", "Braille Trac 120", new Rectangle("176", "20"), new Rectangle("325", "610"), true))
