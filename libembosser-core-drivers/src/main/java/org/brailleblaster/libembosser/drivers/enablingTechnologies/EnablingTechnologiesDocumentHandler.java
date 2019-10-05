@@ -1,6 +1,7 @@
 package org.brailleblaster.libembosser.drivers.enablingTechnologies;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import java.math.BigDecimal;
@@ -20,6 +21,9 @@ import com.google.common.io.ByteSource;
 import com.google.common.io.ByteStreams;
 
 public class EnablingTechnologiesDocumentHandler implements ByteSourceHandlerToFunctionAdapter {
+	public static enum Model {
+		BASIC, ADVANCED
+	};
 	public static class Builder {
 		private int leftMargin = 0;
 		private int cellsPerLine = 40;
@@ -29,9 +33,14 @@ public class EnablingTechnologiesDocumentHandler implements ByteSourceHandlerToF
 		private int pageLength = 11;
 		private Layout paperMode = Layout.INTERPOINT;
 		private BrlCell cell = BrlCell.NLS;
+		private Model model = Model.ADVANCED;
 		
 		public EnablingTechnologiesDocumentHandler build() {
-			return new EnablingTechnologiesDocumentHandler(leftMargin, cellsPerLine, topMargin, pageLength, linesPerPage, cell, paperMode, copies);
+			return new EnablingTechnologiesDocumentHandler(model, leftMargin, cellsPerLine, topMargin, pageLength, linesPerPage, cell, paperMode, copies);
+		}
+		public Builder setModel(Model model) {
+			this.model = checkNotNull(model);
+			return this;
 		}
 
 		public Builder setCellsPerLine(int cellsPerLine) {
@@ -116,7 +125,7 @@ public class EnablingTechnologiesDocumentHandler implements ByteSourceHandlerToF
 
 	private ByteSource headerSource;
 	private GenericTextDocumentHandler handler;
-	private EnablingTechnologiesDocumentHandler(int leftMargin, int cellsPerLine, int topMargin, int pageLength, int linesPerPage, BrlCell cell, Layout duplex, int copies) {
+	private EnablingTechnologiesDocumentHandler(Model model, int leftMargin, int cellsPerLine, int topMargin, int pageLength, int linesPerPage, BrlCell cell, Layout duplex, int copies) {
 		final int totalLines = topMargin + linesPerPage;
 		final int maxLines = cell.getLinesForHeight(new BigDecimal(pageLength).multiply(new BigDecimal("25.4")));
 		checkState(isNumberArgValid(totalLines) && totalLines <= maxLines, "The sum of top margin and lines per page must be less than %s which is the maximum for page length %s, topMargin=%s, linesPerPage=%s, total=%s", maxLines, pageLength, topMargin, linesPerPage, totalLines);
@@ -130,18 +139,24 @@ public class EnablingTechnologiesDocumentHandler implements ByteSourceHandlerToF
 				.setCopies(copies)
 				.build();
 		// Build the header
-		ByteArrayDataOutput headerOutput = ByteStreams.newDataOutput(100);
-		headerOutput.write(new byte[] {0x1b, '@'}); // Reset
-		headerOutput.write(new byte[] {0x1b, 'A', '@', '@'}); // Set Braille tables
-		headerOutput.write(new byte[] {0x1b, 'K', '@'}); // Set 6-dot mode
-		headerOutput.write(new byte[] {0x1b, 'W', '@'}); // Line wrapping
-		headerOutput.write(new byte[] {0x1b, 'i', DUPLEX_MAPPING.get(duplex)}); // Interpoint mode
-		headerOutput.write(new byte[] {0x1b, 's', CELL_MAPPING.get(cell)}); // Braille cell type
-		headerOutput.write(new byte[] {0x1b, 'L', NUMBER_MAPPING[leftMargin + 1]}); // Set left margin
-		headerOutput.write(new byte[] {0x1b, 'R', NUMBER_MAPPING[cellsPerLine]}); // Set cells per line
-		headerOutput.write(new byte[] {0x1b, 'T', NUMBER_MAPPING[pageLength]});
-		headerOutput.write(new byte[] {0x1b, 'Q', NUMBER_MAPPING[totalLines]}); // Set lines per page, include top margin as this needs padding
-		this.headerSource = ByteSource.wrap(headerOutput.toByteArray());
+		switch (model) {
+		case ADVANCED:
+			ByteArrayDataOutput headerOutput = ByteStreams.newDataOutput(100);
+			headerOutput.write(new byte[] { 0x1b, '@' }); // Reset
+			headerOutput.write(new byte[] { 0x1b, 'A', '@', '@' }); // Set Braille tables
+			headerOutput.write(new byte[] { 0x1b, 'K', '@' }); // Set 6-dot mode
+			headerOutput.write(new byte[] { 0x1b, 'W', '@' }); // Line wrapping
+			headerOutput.write(new byte[] { 0x1b, 'i', DUPLEX_MAPPING.get(duplex) }); // Interpoint mode
+			headerOutput.write(new byte[] { 0x1b, 's', CELL_MAPPING.get(cell) }); // Braille cell type
+			headerOutput.write(new byte[] { 0x1b, 'L', NUMBER_MAPPING[leftMargin + 1] }); // Set left margin
+			headerOutput.write(new byte[] { 0x1b, 'R', NUMBER_MAPPING[cellsPerLine] }); // Set cells per line
+			headerOutput.write(new byte[] { 0x1b, 'T', NUMBER_MAPPING[pageLength] });
+			headerOutput.write(new byte[] { 0x1b, 'Q', NUMBER_MAPPING[totalLines] }); // Set lines per page, include top margin as this needs padding
+			this.headerSource = ByteSource.wrap(headerOutput.toByteArray());
+			break;
+			default:
+				this.headerSource = ByteSource.empty();
+		}
 	}
 
 	@Override
