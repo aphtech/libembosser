@@ -128,7 +128,25 @@ public class GenericTextDocumentHandler implements ByteSourceHandlerToFunctionAd
 		private byte[] endOfLine = new byte[] {'\r','\n'};
 		private byte[] endOfPage = new byte[] {'\f'};
 		private boolean padWithBlanks = false;
-		public Builder setEndOfLine(byte[] endOfLine) {
+		private byte[] header = new byte[0];
+		private byte[] footer = new byte[0];
+		public Builder setHeader(byte[] header) {
+			checkNotNull(header);
+			this.header = Arrays.copyOf(header, header.length);
+			return this;
+		}
+		public byte[] getHeader() {
+			return Arrays.copyOf(header, header.length);
+		}
+		public Builder setFooter(byte[] footer) {
+			checkNotNull(footer);
+			this.footer = Arrays.copyOf(footer, footer.length);
+			return this;
+		}
+		public byte[] getfooter() {
+			return Arrays.copyOf(footer, footer.length);
+		}
+		public Builder setEndOfLine(byte[] edOfLine) {
 			checkNotNull(endOfLine);
 			this.endOfLine = Arrays.copyOf(endOfLine, endOfLine.length);
 			return this;
@@ -167,7 +185,7 @@ public class GenericTextDocumentHandler implements ByteSourceHandlerToFunctionAd
 			return this;
 		}
 		public GenericTextDocumentHandler build() {
-			return new GenericTextDocumentHandler(leftMargin, topMargin, cellsPerLine, linesPerPage, endOfLine, endOfPage, padWithBlanks, interpoint, copies);
+			return new GenericTextDocumentHandler(leftMargin, topMargin, cellsPerLine, linesPerPage, endOfLine, endOfPage, padWithBlanks, interpoint, copies, header, footer);
 		}
 	}
 	private ByteArrayOutputStream output;
@@ -189,8 +207,10 @@ public class GenericTextDocumentHandler implements ByteSourceHandlerToFunctionAd
 	private final boolean bottomPadding;
 	private int pendingLines;
 	private boolean rightPage = true;
+	private final ByteSource header;
+	private final ByteSource footer;
 
-	private GenericTextDocumentHandler(int leftMargin, int topMargin, int cellsPerLine, int linesPerPage, byte[] endOfLine, byte[] endOfPage, boolean bottomPadding, boolean interpoint, int copies) {
+	private GenericTextDocumentHandler(int leftMargin, int topMargin, int cellsPerLine, int linesPerPage, byte[] endOfLine, byte[] endOfPage, boolean bottomPadding, boolean interpoint, int copies, byte[] header, byte[] footer) {
 		maxCellsPerLine = cellsPerLine;
 		this.copies = copies;
 		this.bottomPadding = bottomPadding;
@@ -204,6 +224,8 @@ public class GenericTextDocumentHandler implements ByteSourceHandlerToFunctionAd
 		output = new ByteArrayOutputStream(initialBufferCapacity);
 		newLineBytes = endOfLine;
 		newPageBytes = endOfPage;
+		this.header = ByteSource.wrap(header);
+		this.footer = ByteSource.wrap(footer);
 	}
 	
 	@Override
@@ -331,10 +353,12 @@ public class GenericTextDocumentHandler implements ByteSourceHandlerToFunctionAd
 	@Override
 	public ByteSource asByteSource() {
 		final byte[] outputBytes = output.toByteArray();
-		List<ByteSource> sources = new ArrayList<>();
+		final List<ByteSource> sources = new ArrayList<>(copies +2);
+		sources.add(header);
 		for (int i = 0; i < copies; i++) {
 			sources.add(ByteSource.wrap(outputBytes));
 		}
+		sources.add(footer);
 		return ByteSource.concat(sources);
 	}
 }

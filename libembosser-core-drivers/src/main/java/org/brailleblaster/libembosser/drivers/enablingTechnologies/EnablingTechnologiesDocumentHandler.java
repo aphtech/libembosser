@@ -137,6 +137,7 @@ public class EnablingTechnologiesDocumentHandler implements ByteSourceHandlerToF
 				.setEndOfPage(new byte[] {'\r', '\n', '\f'})
 				.setInterpoint(duplex.isDoubleSide())
 				.setCopies(copies)
+				.setFooter(new byte[] { 0x1a })
 				.build();
 		// Build the header
 		switch (model) {
