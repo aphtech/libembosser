@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Locale;
 
-import org.brailleblaster.libembosser.drivers.generic.GenericTextEmbosser;
 import org.brailleblaster.libembosser.spi.Embosser;
 import org.brailleblaster.libembosser.spi.EmbosserFactory;
 import org.brailleblaster.libembosser.spi.Rectangle;
@@ -20,22 +19,22 @@ public class ETFactory implements EmbosserFactory {
 	private final List<Embosser> embossers;
 	public ETFactory() {
 		embossers = ImmutableList.<Embosser>builder()
-				.add(new EnablingTechnologiesEmbosser("libembosser.et.phoenix_gold", "Phoenix Gold", TWELVE_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, false))
-				.add(new EnablingTechnologiesEmbosser("libembosser.et.phoenix_silver", "Phoenix  silver", TWELVE_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, false))
-				.add(new EnablingTechnologiesEmbosser("libembosser.et.cyclone", "Cyclone", TWELVE_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, false))
-				.add(new EnablingTechnologiesEmbosser("libembosser.et.trident", "Trident", TWELVE_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, true))
-				.add(new EnablingTechnologiesEmbosser("libembosser.et.bookmaker", "BookMaker", TWELVE_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, true))
-				.add(new EnablingTechnologiesEmbosser("libembosser.et.braille_express", "Braille Express", TWELVE_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, true))
-				.add(new EnablingTechnologiesEmbosser("libembosser.et.thomas", "Thomas", FIFTEEN_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, false))
-				.add(new EnablingTechnologiesEmbosser("libembosser.et.thomas_pro", "Thomas Pro", FIFTEEN_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, false))
-				.add(new EnablingTechnologiesEmbosser("libembosser.et.juliet_classic", "Juliet Classic", FIFTEEN_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, true))
-				.add(new EnablingTechnologiesEmbosser("libembosser.et.juliet_pro", "Juliet Pro", FIFTEEN_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, true))
-				.add(new EnablingTechnologiesEmbosser("libembosser.et.juliet_pro60", "Juliet Pro60", FIFTEEN_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, true))
-				.add(new EnablingTechnologiesEmbosser("libembosser.et.et", "ET", FIFTEEN_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, true))
-				.add(new EnablingTechnologiesEmbosser("libembosser.et.romeo_attache", "Romeo Attach\u00e9", EIGHT_AND_HALF_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, false))
-				.add(new EnablingTechnologiesEmbosser("libembosser.et.romeo_attache_pro", "Romeo Attach\u00e9 Pro", EIGHT_AND_HALF_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, false))
-				.add(new EnablingTechnologiesEmbosser("libembosser.et.romeo_pro50", "Romeo Pro50", THIRTEEN_AND_QUARTER_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, false))
-				.add(new EnablingTechnologiesEmbosser("libembosser.et.romeo_25", "Romeo25", THIRTEEN_AND_QUARTER_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, false))
+				.add(new EnablingTechnologiesEmbosser(Model.PHOENIX_GOLD, TWELVE_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, false))
+				.add(new EnablingTechnologiesEmbosser(Model.PHOENIX_SILVER, TWELVE_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, false))
+				.add(new EnablingTechnologiesEmbosser(Model.CYCLONE, TWELVE_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, false))
+				.add(new EnablingTechnologiesEmbosser(Model.TRIDENT, TWELVE_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, true))
+				.add(new EnablingTechnologiesEmbosser(Model.BOOK_MAKER, TWELVE_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, true))
+				.add(new EnablingTechnologiesEmbosser(Model.BRAILLE_EXPRESS, TWELVE_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, true))
+				.add(new EnablingTechnologiesEmbosser(Model.THOMAS, FIFTEEN_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, false))
+				.add(new EnablingTechnologiesEmbosser(Model.THOMAS_PRO, FIFTEEN_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, false))
+				.add(new EnablingTechnologiesEmbosser(Model.JULIET_CLASSIC, FIFTEEN_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, true))
+				.add(new EnablingTechnologiesEmbosser(Model.JULIET_PRO, FIFTEEN_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, true))
+				.add(new EnablingTechnologiesEmbosser(Model.JULIET_PRO60, FIFTEEN_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, true))
+				.add(new EnablingTechnologiesEmbosser(Model.ET, FIFTEEN_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, true))
+				.add(new EnablingTechnologiesEmbosser(Model.ROMEO_ATTACHE, EIGHT_AND_HALF_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, false))
+				.add(new EnablingTechnologiesEmbosser(Model.ROMEO_ATTACHE_PRO, EIGHT_AND_HALF_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, false))
+				.add(new EnablingTechnologiesEmbosser(Model.ROMEO_PRO50, THIRTEEN_AND_QUARTER_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, false))
+				.add(new EnablingTechnologiesEmbosser(Model.ROMEO25, THIRTEEN_AND_QUARTER_BY_FOURTEEN_PAPER, ONE_AND_HALF_BY_THREE_PAPER, false))
 				.build();
 	}
 

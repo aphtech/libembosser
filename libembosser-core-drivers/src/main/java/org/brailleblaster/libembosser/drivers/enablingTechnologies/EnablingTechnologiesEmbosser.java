@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.Optional;
 import java.util.function.Function;
 
-import org.brailleblaster.libembosser.drivers.enablingTechnologies.EnablingTechnologiesDocumentHandler.Model;
 import org.brailleblaster.libembosser.drivers.utils.BaseTextEmbosser;
 import org.brailleblaster.libembosser.drivers.utils.document.events.DocumentEvent;
 import org.brailleblaster.libembosser.drivers.utils.document.filters.PageFilter;
@@ -25,10 +24,12 @@ import com.google.common.io.ByteSource;
 
 public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 	private boolean interpoint;
+	private final Model embosserModel;
 
-	public EnablingTechnologiesEmbosser(String id, String model, Rectangle maxPaper, Rectangle minPaper, boolean interpoint) {
-		super(id, "Enabling Technologies", model, maxPaper, minPaper);
+	public EnablingTechnologiesEmbosser(Model embosserModel, Rectangle maxPaper, Rectangle minPaper, boolean interpoint) {
+		super(embosserModel.getId(), "Enabling Technologies", embosserModel.getName(), maxPaper, minPaper);
 		this.interpoint = interpoint;
+		this.embosserModel = embosserModel;
 	}
 
 
@@ -52,13 +53,7 @@ public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 		}
 		int linesPerPage = cell.getLinesForHeight(paper.getHeight().subtract(margins.getTop()).subtract(margins.getBottom()));
 		EnablingTechnologiesDocumentHandler.Builder builder = new EnablingTechnologiesDocumentHandler.Builder();
-		switch (getId()) {
-		case "libembosser.et.phoenix_gold":
-			builder.setModel(Model.ADVANCED);
-			break;
-			default:
-				builder.setModel(Model.BASIC);
-		}
+		builder.setModel(embosserModel);
 		Optional.ofNullable(attributes.get(Copies.class)).ifPresent(v -> builder.setCopies(((Copies)v).getValue()));
 		builder.setLeftMargin(leftMargin).setCellsPerLine(rightMargin).setPageLength(paperHeight).setLinesPerPage(linesPerPage).setTopMargin(topMargin);
 		builder.setPapermode(Optional.ofNullable(attributes.get(PaperLayout.class)).filter(v -> interpoint).map(v -> ((PaperLayout)v).getValue()).filter(EnablingTechnologiesDocumentHandler.supportedDuplexModes()::contains).orElse(Layout.P1ONLY));

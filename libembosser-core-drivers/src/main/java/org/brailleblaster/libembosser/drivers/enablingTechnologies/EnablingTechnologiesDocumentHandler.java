@@ -21,9 +21,6 @@ import com.google.common.io.ByteSource;
 import com.google.common.io.ByteStreams;
 
 public class EnablingTechnologiesDocumentHandler implements ByteSourceHandlerToFunctionAdapter {
-	public static enum Model {
-		BASIC, ADVANCED
-	};
 	public static class Builder {
 		private int leftMargin = 0;
 		private int cellsPerLine = 40;
@@ -33,7 +30,7 @@ public class EnablingTechnologiesDocumentHandler implements ByteSourceHandlerToF
 		private int pageLength = 11;
 		private Layout paperMode = Layout.INTERPOINT;
 		private BrlCell cell = BrlCell.NLS;
-		private Model model = Model.ADVANCED;
+		private Model model = Model.PHOENIX_GOLD;
 		
 		public EnablingTechnologiesDocumentHandler build() {
 			return new EnablingTechnologiesDocumentHandler(model, leftMargin, cellsPerLine, topMargin, pageLength, linesPerPage, cell, paperMode, copies);
@@ -134,14 +131,15 @@ public class EnablingTechnologiesDocumentHandler implements ByteSourceHandlerToF
 				.setCellsPerLine(cellsPerLine)
 				.setTopMargin(topMargin)
 				.setLinesPerPage(linesPerPage)
-				.setEndOfPage(new byte[] {'\r', '\n', '\f'})
+				.setEndOfLine(model.getLineEnd())
+				.setEndOfPage(model.getPageEnd())
 				.setInterpoint(duplex.isDoubleSide())
 				.setCopies(copies)
-				.setFooter(new byte[] { 0x1a })
+				.setFooter(model.getDocEnd())
 				.build();
 		// Build the header
 		switch (model) {
-		case ADVANCED:
+		case PHOENIX_GOLD:
 			ByteArrayDataOutput headerOutput = ByteStreams.newDataOutput(100);
 			headerOutput.write(new byte[] { 0x1b, '@' }); // Reset
 			headerOutput.write(new byte[] { 0x1b, 'A', '@', '@' }); // Set Braille tables
