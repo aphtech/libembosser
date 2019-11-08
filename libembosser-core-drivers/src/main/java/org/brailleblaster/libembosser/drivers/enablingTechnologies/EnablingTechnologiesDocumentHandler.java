@@ -138,24 +138,24 @@ public class EnablingTechnologiesDocumentHandler implements ByteSourceHandlerToF
 				.setFooter(model.getDocEnd())
 				.build();
 		// Build the header
-		switch (model) {
-		case PHOENIX_GOLD:
-			ByteArrayDataOutput headerOutput = ByteStreams.newDataOutput(100);
-			headerOutput.write(new byte[] { 0x1b, '@' }); // Reset
-			headerOutput.write(new byte[] { 0x1b, 'A', '@', '@' }); // Set Braille tables
-			headerOutput.write(new byte[] { 0x1b, 'K', '@' }); // Set 6-dot mode
-			headerOutput.write(new byte[] { 0x1b, 'W', '@' }); // Line wrapping
-			headerOutput.write(new byte[] { 0x1b, 'i', DUPLEX_MAPPING.get(duplex) }); // Interpoint mode
-			headerOutput.write(new byte[] { 0x1b, 's', CELL_MAPPING.get(cell) }); // Braille cell type
-			headerOutput.write(new byte[] { 0x1b, 'L', NUMBER_MAPPING[leftMargin + 1] }); // Set left margin
-			headerOutput.write(new byte[] { 0x1b, 'R', NUMBER_MAPPING[cellsPerLine] }); // Set cells per line
-			headerOutput.write(new byte[] { 0x1b, 'T', NUMBER_MAPPING[pageLength] });
-			headerOutput.write(new byte[] { 0x1b, 'Q', NUMBER_MAPPING[totalLines] }); // Set lines per page, include top margin as this needs padding
-			this.headerSource = ByteSource.wrap(headerOutput.toByteArray());
-			break;
-			default:
-				this.headerSource = ByteSource.empty();
-		}
+		ByteArrayDataOutput headerOutput = ByteStreams.newDataOutput(100);
+		headerOutput.write(new byte[] { 0x1b, 'A', '@', '@' }); // Set Braille tables
+		headerOutput.write(new byte[] { 0x1b, 'K', '@' }); // Set 6-dot mode
+		headerOutput.write(new byte[] { 0x1b, 'W', '@' }); // Line wrapping
+		//switch (model) {
+		//case PHOENIX_GOLD:
+		//	headerOutput.write(new byte[] { 0x1b, 'i', DUPLEX_MAPPING.get(duplex) }); // Interpoint mode
+		//	headerOutput.write(new byte[] { 0x1b, 's', CELL_MAPPING.get(cell) }); // Braille cell type
+		//	headerOutput.write(new byte[] { 0x1b, 'L', NUMBER_MAPPING[leftMargin + 1] }); // Set left margin
+		//	headerOutput.write(new byte[] { 0x1b, 'R', NUMBER_MAPPING[cellsPerLine] }); // Set cells per line
+		//	headerOutput.write(new byte[] { 0x1b, 'T', NUMBER_MAPPING[pageLength] });
+		//	headerOutput.write(new byte[] { 0x1b, 'Q', NUMBER_MAPPING[totalLines] }); // Set lines per page, include top margin as this needs padding
+		//	this.headerSource = ByteSource.wrap(headerOutput.toByteArray());
+		//	break;
+			//default:
+			//	this.headerSource = ByteSource.empty();
+		//}
+		this.headerSource = ByteSource.wrap(headerOutput.toByteArray());
 	}
 
 	@Override
