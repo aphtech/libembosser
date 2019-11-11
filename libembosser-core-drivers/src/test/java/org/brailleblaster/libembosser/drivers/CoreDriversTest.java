@@ -125,49 +125,49 @@ public class CoreDriversTest {
 		String testBrf = "  ,\"h is \"s text4\n,text on a new l9e4";
 		List<Object[]> data = new ArrayList<>();
 		// Basic single page, single copy.
-		byte[] expectedOutput = "\u001b\u0044BT0,MC1,DP1,BI0,CH49,TM0,LP60;  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f".getBytes(Charsets.US_ASCII);
+		byte[] expectedOutput = "\u001b\u0044BT0,MC1,DP1,BI0,CH49,TM0,LP60;  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f\u001a".getBytes(Charsets.US_ASCII);
 		EmbossingAttributeSet attrs = new EmbossingAttributeSet();
 		data.add(new Object[] {"libembosser.ib.Romeo60", testBrf, attrs, expectedOutput});
 		data.add(new Object[] {"libembosser.ib.Juliet120", testBrf, attrs, expectedOutput});
-		expectedOutput = "\u001b\u0044BT0,MC1,DP1,BI0,CH49,TM0,LP43;  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f".getBytes(Charsets.US_ASCII);
+		expectedOutput = "\u001b\u0044BT0,MC1,DP1,BI0,CH49,TM0,LP43;  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f\u001a".getBytes(Charsets.US_ASCII);
 		data.add(new Object[] {"libembosser.ib.BasicDV5", testBrf, attrs, expectedOutput});
-		expectedOutput = "\u001b\u0044BT0,MC1,DP1,BI0,CH48,TM0,LP59;  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f".getBytes(Charsets.US_ASCII);
+		expectedOutput = "\u001b\u0044BT0,MC1,DP1,BI0,CH48,TM0,LP59;  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f\u001a".getBytes(Charsets.US_ASCII);
 		data.add(new Object[] {"libembosser.ib.EverestDV5", testBrf, attrs, expectedOutput});
 		
 		//Interpoint and margins
-		expectedOutput = "\u001b\u0044BT0,MC1,DP2,BI2,CH49,TM1,LP59;  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f\f".getBytes(Charsets.US_ASCII);
+		expectedOutput = "\u001b\u0044BT0,MC1,DP2,BI2,CH49,TM1,LP59;  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f\f\u001a".getBytes(Charsets.US_ASCII);
 		attrs = new EmbossingAttributeSet(new EmbossingAttribute[] {new PaperLayout(Layout.INTERPOINT), new PaperMargins(new Margins(new BigDecimal("13"), BigDecimal.ZERO, BigDecimal.TEN, BigDecimal.ZERO))});
 		data.add(new Object[] {"libembosser.ib.Romeo60", testBrf, attrs, expectedOutput});
 		data.add(new Object[] {"libembosser.ib.Juliet120", testBrf, attrs, expectedOutput});
-		expectedOutput = "\u001b\u0044BT0,MC1,DP2,BI2,CH49,TM1,LP42;  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f\f".getBytes(Charsets.US_ASCII);
+		expectedOutput = "\u001b\u0044BT0,MC1,DP2,BI2,CH49,TM1,LP42;  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f\f\u001a".getBytes(Charsets.US_ASCII);
 		data.add(new Object[] {"libembosser.ib.BasicDV5", testBrf, attrs, expectedOutput});
-		expectedOutput = "\u001b\u0044BT0,MC1,DP2,BI2,CH45,TM1,LP58;  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f\f".getBytes(Charsets.US_ASCII);
+		expectedOutput = "\u001b\u0044BT0,MC1,DP2,BI2,CH45,TM1,LP58;  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f\f\u001a".getBytes(Charsets.US_ASCII);
 		data.add(new Object[] {"libembosser.ib.EverestDV5", testBrf, attrs, expectedOutput});
 		
 		// Interpoint
-		expectedOutput = "\u001b\u0044BT0,MC1,DP2,BI0,CH49,TM0,LP60;  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f\f".getBytes(Charsets.US_ASCII);
+		expectedOutput = "\u001b\u0044BT0,MC1,DP2,BI0,CH49,TM0,LP60;  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f\f\u001a".getBytes(Charsets.US_ASCII);
 		attrs = new EmbossingAttributeSet(new PaperLayout(Layout.INTERPOINT));
 		data.add(new Object[] {"libembosser.ib.Romeo60", testBrf, attrs, expectedOutput});
 		data.add(new Object[] {"libembosser.ib.Juliet120", testBrf, attrs, expectedOutput});
-		expectedOutput = "\u001b\u0044BT0,MC1,DP2,BI0,CH49,TM0,LP43;  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f\f".getBytes(Charsets.US_ASCII);
+		expectedOutput = "\u001b\u0044BT0,MC1,DP2,BI0,CH49,TM0,LP43;  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f\f\u001a".getBytes(Charsets.US_ASCII);
 		data.add(new Object[] {"libembosser.ib.BasicDV5", testBrf, attrs, expectedOutput});
-		expectedOutput = "\u001b\u0044BT0,MC1,DP2,BI0,CH48,TM0,LP59;  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f\f".getBytes(Charsets.US_ASCII);
+		expectedOutput = "\u001b\u0044BT0,MC1,DP2,BI0,CH48,TM0,LP59;  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f\f\u001a".getBytes(Charsets.US_ASCII);
 		data.add(new Object[] {"libembosser.ib.EverestDV5", testBrf, attrs, expectedOutput});
 		
 		// Sending of paper size (PA) command
 		attrs = new EmbossingAttributeSet(new org.brailleblaster.libembosser.embossing.attribute.PaperSize(PaperSize.LETTER.getSize()));
-		expectedOutput = "\u001b\u0044BT0,MC1,DP1,PA1,BI0,CH34,TM0,LP27;  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f".getBytes(Charsets.US_ASCII);
+		expectedOutput = "\u001b\u0044BT0,MC1,DP1,PA1,BI0,CH34,TM0,LP27;  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f\u001a".getBytes(Charsets.US_ASCII);
 		data.add(new Object[] {"libembosser.ib.Juliet120", testBrf, attrs, expectedOutput});
 		data.add(new Object[] {"libembosser.ib.Romeo60", testBrf, attrs, expectedOutput});
 		
 		// Multiple copies
 		attrs = new EmbossingAttributeSet(new Copies(2));
-		expectedOutput = "\u001b\u0044BT0,MC2,DP1,BI0,CH49,TM0,LP60;  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f".getBytes(Charsets.US_ASCII);
+		expectedOutput = "\u001b\u0044BT0,MC2,DP1,BI0,CH49,TM0,LP60;  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f\u001a".getBytes(Charsets.US_ASCII);
 		data.add(new Object[] {"libembosser.ib.Romeo60", testBrf, attrs, expectedOutput});
 		data.add(new Object[] {"libembosser.ib.Juliet120", testBrf, attrs, expectedOutput});
-		expectedOutput = "\u001b\u0044BT0,MC2,DP1,BI0,CH49,TM0,LP43;  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f".getBytes(Charsets.US_ASCII);
+		expectedOutput = "\u001b\u0044BT0,MC2,DP1,BI0,CH49,TM0,LP43;  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f\u001a".getBytes(Charsets.US_ASCII);
 		data.add(new Object[] {"libembosser.ib.BasicDV5", testBrf, attrs, expectedOutput});
-		expectedOutput = "\u001b\u0044BT0,MC2,DP1,BI0,CH48,TM0,LP59;  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f".getBytes(Charsets.US_ASCII);
+		expectedOutput = "\u001b\u0044BT0,MC2,DP1,BI0,CH48,TM0,LP59;  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f\u001a".getBytes(Charsets.US_ASCII);
 		data.add(new Object[] {"libembosser.ib.EverestDV5", testBrf, attrs, expectedOutput});
 		return data;
 	}

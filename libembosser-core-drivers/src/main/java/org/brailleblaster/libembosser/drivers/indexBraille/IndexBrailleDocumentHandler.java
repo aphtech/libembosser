@@ -74,6 +74,7 @@ public class IndexBrailleDocumentHandler implements ByteSourceHandlerToFunctionA
 				.setLinesPerPage(linesPerPage)
 				.setCopies(1) // Our header will provide the copies escape sequence, so no data duplication needed.
 				.setInterpoint(paperMode.isDoubleSide())
+				.setFooter(new byte[] {0x1a})
 				.build();
 		String paperParam = Streams.stream(paperSize).mapToObj(v -> String.format("PA%d,", v)).findFirst().orElse("");
 		String headerString = String.format("\u001bDBT0,MC%d,DP%d,%sBI%d,CH%d,TM%d,LP%d;", copies, PAPER_MODE_MAPPINGS.get(paperMode), paperParam, leftMargin, cellsPerLine, topMargin, linesPerPage);
