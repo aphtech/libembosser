@@ -135,13 +135,14 @@ public class CoreDriversTest {
 		data.add(new Object[] {"libembosser.ib.EverestDV5", testBrf, attrs, expectedOutput});
 		
 		//Interpoint and margins
-		expectedOutput = "\u001b\u0044BT0,MC1,DP2,BI2,CH49,TM1,LP59;  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f\f\u001a".getBytes(Charsets.US_ASCII);
+		// 2019-11-12: For now Index Braille embossers ignore margins.
+		expectedOutput = "\u001b\u0044BT0,MC1,DP2,BI0,CH49,TM0,LP59;  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f\f\u001a".getBytes(Charsets.US_ASCII);
 		attrs = new EmbossingAttributeSet(new EmbossingAttribute[] {new PaperLayout(Layout.INTERPOINT), new PaperMargins(new Margins(new BigDecimal("13"), BigDecimal.ZERO, BigDecimal.TEN, BigDecimal.ZERO))});
 		data.add(new Object[] {"libembosser.ib.Romeo60", testBrf, attrs, expectedOutput});
 		data.add(new Object[] {"libembosser.ib.Juliet120", testBrf, attrs, expectedOutput});
-		expectedOutput = "\u001b\u0044BT0,MC1,DP2,BI2,CH49,TM1,LP42;  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f\f\u001a".getBytes(Charsets.US_ASCII);
+		expectedOutput = "\u001b\u0044BT0,MC1,DP2,BI0,CH49,TM0,LP42;  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f\f\u001a".getBytes(Charsets.US_ASCII);
 		data.add(new Object[] {"libembosser.ib.BasicDV5", testBrf, attrs, expectedOutput});
-		expectedOutput = "\u001b\u0044BT0,MC1,DP2,BI2,CH45,TM1,LP58;  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f\f\u001a".getBytes(Charsets.US_ASCII);
+		expectedOutput = "\u001b\u0044BT0,MC1,DP2,BI0,CH45,TM0,LP58;  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f\f\u001a".getBytes(Charsets.US_ASCII);
 		data.add(new Object[] {"libembosser.ib.EverestDV5", testBrf, attrs, expectedOutput});
 		
 		// Interpoint

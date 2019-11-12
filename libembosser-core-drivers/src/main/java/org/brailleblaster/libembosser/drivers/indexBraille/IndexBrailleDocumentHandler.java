@@ -77,7 +77,8 @@ public class IndexBrailleDocumentHandler implements ByteSourceHandlerToFunctionA
 				.setFooter(new byte[] {0x1a})
 				.build();
 		String paperParam = Streams.stream(paperSize).mapToObj(v -> String.format("PA%d,", v)).findFirst().orElse("");
-		String headerString = String.format("\u001bDBT0,MC%d,DP%d,%sBI%d,CH%d,TM%d,LP%d;", copies, PAPER_MODE_MAPPINGS.get(paperMode), paperParam, leftMargin, cellsPerLine, topMargin, linesPerPage);
+		// 2019-11-12: For now we are ignoring the margins for Index embossers.
+		String headerString = String.format("\u001bDBT0,MC%d,DP%d,%sBI%d,CH%d,TM%d,LP%d;", copies, PAPER_MODE_MAPPINGS.get(paperMode), paperParam, 0, cellsPerLine, 0, linesPerPage);
 		header = ByteSource.wrap(headerString.getBytes(Charsets.US_ASCII));
 	}
 	@Override
