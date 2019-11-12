@@ -129,7 +129,7 @@ public class EnablingTechnologiesDocumentHandler implements ByteSourceHandlerToF
 		this.handler = new GenericTextDocumentHandler.Builder()
 				.setLeftMargin(0)
 				.setCellsPerLine(cellsPerLine)
-				.setTopMargin(topMargin)
+				.setTopMargin(0)
 				.setLinesPerPage(linesPerPage)
 				.setEndOfLine(model.getLineEnd())
 				.setEndOfPage(model.getPageEnd())
@@ -142,6 +142,13 @@ public class EnablingTechnologiesDocumentHandler implements ByteSourceHandlerToF
 		headerOutput.write(new byte[] { 0x1b, 'A', '@', '@' }); // Set Braille tables
 		headerOutput.write(new byte[] { 0x1b, 'K', '@' }); // Set 6-dot mode
 		headerOutput.write(new byte[] { 0x1b, 'W', '@' }); // Line wrapping
+		headerOutput.write(new byte[] { 0x1b, 'i', DUPLEX_MAPPING.get(duplex) }); // Interpoint mode
+		headerOutput.write(new byte[] { 0x1b, 's', CELL_MAPPING.get(cell) }); // Braille cell type
+		headerOutput.write(new byte[] {0x1b, 'L', 'A'}); // Left margin, always set to first cell
+		headerOutput.write(new byte[] { 0x1b, 'R', NUMBER_MAPPING[cellsPerLine] }); // Set cells per line
+		headerOutput.write(new byte[] { 0x1b, 'T', NUMBER_MAPPING[pageLength] });
+		headerOutput.write(new byte[] { 0x1b, 'Q', NUMBER_MAPPING[totalLines] }); // Set lines per page, include top margin as this needs padding
+		
 		//switch (model) {
 		//case PHOENIX_GOLD:
 		//	headerOutput.write(new byte[] { 0x1b, 'i', DUPLEX_MAPPING.get(duplex) }); // Interpoint mode
