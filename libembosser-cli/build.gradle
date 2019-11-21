@@ -1,7 +1,7 @@
 plugins {
 	id 'org.springframework.boot' version '2.1.6.RELEASE'
 	id "application"
-	id "com.github.spotbugs" version "1.6.8"
+	id "com.github.spotbugs" version "2.0.1"
 }
 
 apply plugin: 'io.spring.dependency-management'

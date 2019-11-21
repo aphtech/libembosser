@@ -1,13 +1,13 @@
 plugins {
 	id "java-library"
-	id "com.github.spotbugs" version "1.6.8"
+	id "com.github.spotbugs" version "2.0.1"
 }
 
 dependencies {
 	implementation 'com.google.guava:guava:23.5-jre'
 	api project(':libembosser-api')
-	compileOnly 'com.github.spotbugs:spotbugs-annotations:3.1.10'
-	testCompile 'org.testng:testng:6.13.1'
+	compileOnly 'com.github.spotbugs:spotbugs-annotations:4.0.0-beta4'
+	testImplementation 'org.testng:testng:6.13.1'
 }
 
 test {
