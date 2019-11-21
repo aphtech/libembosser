@@ -146,9 +146,9 @@ public class GenericTextDocumentHandler implements ByteSourceHandlerToFunctionAd
 		public byte[] getfooter() {
 			return Arrays.copyOf(footer, footer.length);
 		}
-		public Builder setEndOfLine(byte[] edOfLine) {
-			checkNotNull(endOfLine);
-			this.endOfLine = Arrays.copyOf(endOfLine, endOfLine.length);
+		public Builder setEndOfLine(byte[] eol) {
+			checkNotNull(eol);
+			this.endOfLine = Arrays.copyOf(eol, eol.length);
 			return this;
 		}
 		public Builder setEndOfPage(byte[] endOfPage) {

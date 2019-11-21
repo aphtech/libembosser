@@ -79,6 +79,9 @@ public class CoreDriversTest {
 		data.add(new Object[] {"libembosser.et.phoenix_silver", testBrf, attrs, Bytes.concat(expectedHeader, expectedOutput)});
 		data.add(new Object[] {"libembosser.et.cyclone", testBrf, attrs, Bytes.concat(expectedHeader, expectedOutput)});
 		data.add(new Object[] {"libembosser.et.trident", testBrf, attrs, Bytes.concat(expectedHeader, expectedOutput)});
+		expectedHeader = "\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bLA\u001bRb\u001bTN\u001bQc".getBytes(Charsets.US_ASCII);
+		expectedOutput = "  ,\"H IS \"S TEXT4\n,TEXT ON A NEW L9E4\n\f".getBytes(Charsets.US_ASCII);
+		data.add(new Object[] {"libembosser.et.romeo_attache", testBrf, attrs, Bytes.concat(expectedHeader, expectedOutput)});
 		
 		// Paper size
 		expectedHeader = "\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bLA\u001bRb\u001bTK\u001bQ[".getBytes(Charsets.US_ASCII);
