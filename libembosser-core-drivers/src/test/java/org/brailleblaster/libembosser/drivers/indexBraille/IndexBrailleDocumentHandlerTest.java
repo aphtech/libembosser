@@ -40,7 +40,7 @@ public class IndexBrailleDocumentHandlerTest {
 	@DataProvider(name="handlerProvider")
 	public Iterator<Object[]> handlerProvider() {
 		List<Object[]> data = new ArrayList<>();
-		final String basicHeader = "\u001bDBT0,MC1,DP1,BI%d,CH%d,TM%d,LP%d;";
+		final String basicHeader = "\u001bDBT0,LS50,TD0,PN0,MC1,DP1,BI%d,CH%d,TM%d,LP%d;";
 		final ImmutableList<DocumentEvent> minimalDocumentInput = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		final String minimalDocumentOutput = basicHeader.concat("\f\u001a");
 		data.add(new Object[] {createHandlerBuilder().build(), minimalDocumentInput, String.format(minimalDocumentOutput, 0, 40, 0, 25)});
@@ -73,7 +73,7 @@ public class IndexBrailleDocumentHandlerTest {
 		// 2019-11-12: For now margins are ignored for Index embossers
 		data.add(new Object[] {createHandlerBuilder().setLeftMargin(3).setTopMargin(2).build(), multiPageDocumentInput, String.format(basicHeader, 0, 40, 0, 25) + Arrays.stream(multiPageDocumentOutputStrings).map(s -> String.format("%s%s", s, "\f")).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString().concat("\u001a")});
 		// Multiple copy tests
-		final String copiesHeader = "\u001bDBT0,MC%d,DP1,BI%d,CH%d,TM%d,LP%d;%s";
+		final String copiesHeader = "\u001bDBT0,LS50,TD0,PN0,MC%d,DP1,BI%d,CH%d,TM%d,LP%d;%s";
 		data.add(new Object[] {createHandlerBuilder().setCopies(2).build(), multiPageDocumentInput, String.format(copiesHeader, 2, 0, 40, 0, 25, Arrays.stream(multiPageDocumentOutputStrings).map(s -> s.concat("\f")).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString()).concat("\u001a")});
 		data.add(new Object[] {createHandlerBuilder().setCopies(2).setLinesPerPage(30).build(), multiPageDocumentInput, String.format(copiesHeader, 2, 0, 40, 0, 30, Arrays.stream(multiPageDocumentOutputStrings).map(s -> s.concat("\f")).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString()).concat("\u001a")});
 		data.add(new Object[] {createHandlerBuilder().setCopies(4).build(), multiPageDocumentInput, String.format(copiesHeader, 4, 0, 40, 0, 25, Arrays.stream(multiPageDocumentOutputStrings).map(s -> s.concat("\f")).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString()).concat("\u001a")});
@@ -84,7 +84,7 @@ public class IndexBrailleDocumentHandlerTest {
 		
 		// Test that duplex volumes start on a right page
 		final ImmutableList<DocumentEvent> duplexVolumesEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2801"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2803"), new EndLineEvent(), new EndPageEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u280f\u2801\u281b\u2811\u2800\u283c\u2803"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2809"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
-		final String duplexHeaderString = "\u001bDBT0,MC1,DP%s,BI0,CH40,TM0,LP25;%s";
+		final String duplexHeaderString = "\u001bDBT0,LS50,TD0,PN0,MC1,DP%s,BI0,CH40,TM0,LP25;%s";
 		final String duplexVolumesString = String.format(duplexHeaderString, '2', "VOL #A\f\fVOL #B\fPAGE #B\fVOL #C\f\f\u001a");
 		IndexBrailleDocumentHandler.Builder builder = createHandlerBuilder().setPaperMode(Layout.INTERPOINT);
 		data.add(new Object[] {builder.build(), duplexVolumesEvents, duplexVolumesString});
@@ -123,7 +123,7 @@ public class IndexBrailleDocumentHandlerTest {
 		final ImmutableList<DocumentEvent> basicDocumentInput = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(",a te/ docu;t4"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		// Test the paper format
 		final String basicDocumentOutput = ",A TE/ DOCU;T4\f";
-		final String paperFormatHeader = "\u001bDBT0,MC1,DP%d,BI0,CH40,TM0,LP25;%s";
+		final String paperFormatHeader = "\u001bDBT0,LS50,TD0,PN0,MC1,DP%d,BI0,CH40,TM0,LP25;%s";
 		data.add(new Object[] {createHandlerBuilder(), Layout.P1ONLY, basicDocumentInput, String.format(paperFormatHeader, 1, basicDocumentOutput).concat("\u001a")});
 		data.add(new Object[] {createHandlerBuilder(), Layout.P2ONLY, basicDocumentInput, String.format(paperFormatHeader, 1, basicDocumentOutput).concat("\u001a")});
 		data.add(new Object[] {createHandlerBuilder(), Layout.INTERPOINT, basicDocumentInput, String.format(paperFormatHeader, 2, basicDocumentOutput + "\f").concat("\u001a")});
@@ -170,12 +170,13 @@ public class IndexBrailleDocumentHandlerTest {
 		List<Object[]> data = new ArrayList<>();
 		final ImmutableList<DocumentEvent> basicDocumentInput = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(",a te/ docu;t4"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		final String basicDocumentOutput = ",A TE/ DOCU;T4\f";
-		final String paperSizeHeader = "\u001bDBT0,MC1,DP1,%sBI0,CH40,TM0,LP25;%s";
+		final String paperSizeHeader = "\u001bDBT0,LS50,TD0,PN0,MC1,DP1,%sBI0,CH40,TM0,LP25;%s";
+		// 25/11/2019: Removing the paper size command.
 		data.add(new Object[] {createHandlerBuilder(), OptionalInt.empty(), basicDocumentInput, String.format(paperSizeHeader, "", basicDocumentOutput).concat("\u001a")});
-		data.add(new Object[] {createHandlerBuilder(), OptionalInt.of(0), basicDocumentInput, String.format(paperSizeHeader, "PA0,", basicDocumentOutput).concat("\u001a")});
-		data.add(new Object[] {createHandlerBuilder(), OptionalInt.of(1), basicDocumentInput, String.format(paperSizeHeader, "PA1,", basicDocumentOutput).concat("\u001a")});
-		data.add(new Object[] {createHandlerBuilder(), OptionalInt.of(2), basicDocumentInput, String.format(paperSizeHeader, "PA2,", basicDocumentOutput).concat("\u001a")});
-		data.add(new Object[] {createHandlerBuilder(), OptionalInt.of(3), basicDocumentInput, String.format(paperSizeHeader, "PA3,", basicDocumentOutput).concat("\u001a")});
+		data.add(new Object[] {createHandlerBuilder(), OptionalInt.of(0), basicDocumentInput, String.format(paperSizeHeader, "", basicDocumentOutput).concat("\u001a")});
+		data.add(new Object[] {createHandlerBuilder(), OptionalInt.of(1), basicDocumentInput, String.format(paperSizeHeader, "", basicDocumentOutput).concat("\u001a")});
+		data.add(new Object[] {createHandlerBuilder(), OptionalInt.of(2), basicDocumentInput, String.format(paperSizeHeader, "", basicDocumentOutput).concat("\u001a")});
+		data.add(new Object[] {createHandlerBuilder(), OptionalInt.of(3), basicDocumentInput, String.format(paperSizeHeader, "", basicDocumentOutput).concat("\u001a")});
 		return data.iterator();
 	}
 	@Test(dataProvider="paperSizeProvider")
