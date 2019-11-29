@@ -84,9 +84,10 @@ public class IndexBrailleEmbosser extends BaseTextEmbosser {
 		final int bindingMargin = OptionalInt.of(BrlCell.NLS.getCellsForWidth(leftMargin)).stream().filter(i -> i + cellsPerLine <= maxCellsPerLine).findFirst().orElseGet(() -> maxCellsPerLine - cellsPerLine);
 		
 		// Index protocol takes top margin in number of lines.
-		int topLines = cell.getLinesForHeight(topMargin);
+		final int topLines = cell.getLinesForHeight(topMargin);
 		// Index protocol requires lines per page to be specified if giving top margin
-		int linesPerPage = cell.getLinesForHeight(paper.getHeight().subtract(topMargin).subtract(bottomMargin));
+		final int linesPerPage = cell.getLinesForHeight(paper.getHeight().subtract(topMargin).subtract(bottomMargin));
+		
 		IndexBrailleDocumentHandler.Builder builder = new IndexBrailleDocumentHandler.Builder();
 		builder.setLeftMargin(bindingMargin)
 				.setCellsPerLine(cellsPerLine)
