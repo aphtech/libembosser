@@ -73,14 +73,16 @@ public class IndexBrailleEmbosser extends BaseTextEmbosser {
 		if (BigDecimal.ZERO.compareTo(bottomMargin) > 0) {
 			bottomMargin = BigDecimal.ZERO;
 		}
+		
+		// Get the number of cells per line
+		final int cellsPerLine = Math.min(
+				cell.getCellsForWidth(paper.getWidth().subtract(leftMargin).subtract(rightMargin)),
+				maxCellsPerLine);
 		// The Index protocol seems to have no way to set all the Braille cell types, therefore we will assume it uses the standard NLS cell.
 		// Get left margin in number of cells
 		// Index only allows defining binding margin, so we will assume left margin is always the binding margin.
-		int bindingMargin = BrlCell.NLS.getCellsForWidth(leftMargin);
-		// Get the number of cells per line
-		int cellsPerLine = Math.min(
-				cell.getCellsForWidth(paper.getWidth().subtract(leftMargin).subtract(rightMargin)),
-				maxCellsPerLine);
+		final int bindingMargin = OptionalInt.of(BrlCell.NLS.getCellsForWidth(leftMargin)).stream().filter(i -> i + cellsPerLine <= maxCellsPerLine).findFirst().orElseGet(() -> maxCellsPerLine - cellsPerLine);
+		
 		// Index protocol takes top margin in number of lines.
 		int topLines = cell.getLinesForHeight(topMargin);
 		// Index protocol requires lines per page to be specified if giving top margin

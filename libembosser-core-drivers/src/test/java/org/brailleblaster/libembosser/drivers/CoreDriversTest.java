@@ -139,13 +139,14 @@ public class CoreDriversTest {
 		
 		//Interpoint and margins
 		// 2019-11-12: For now Index Braille embossers ignore margins.
-		expectedOutput = "\u001b\u0044BT0,LS50,TD0,PN0,MC1,DP2,BI0,CH49,TM0,LP59;  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f\f\u001a".getBytes(Charsets.US_ASCII);
-		attrs = new EmbossingAttributeSet(new EmbossingAttribute[] {new PaperLayout(Layout.INTERPOINT), new PaperMargins(new Margins(new BigDecimal("13"), BigDecimal.ZERO, BigDecimal.TEN, BigDecimal.ZERO))});
+		// 2019/11/26: Re-enable margins as not thought to be cause of problem.
+		expectedOutput = "\u001b\u0044BT0,LS50,TD0,PN0,MC1,DP2,BI2,CH45,TM1,LP26;  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f\f\u001a".getBytes(Charsets.US_ASCII);
+		attrs = new EmbossingAttributeSet(new EmbossingAttribute[] {new PaperLayout(Layout.INTERPOINT), new org.brailleblaster.libembosser.embossing.attribute.PaperSize(PaperSize.BRAILLE_11_5X11.getSize()), new PaperMargins(new Margins(new BigDecimal("13"), BigDecimal.ZERO, BigDecimal.TEN, BigDecimal.ZERO))});
 		data.add(new Object[] {"libembosser.ib.Romeo60", testBrf, attrs, expectedOutput});
 		data.add(new Object[] {"libembosser.ib.Juliet120", testBrf, attrs, expectedOutput});
-		expectedOutput = "\u001b\u0044BT0,LS50,TD0,PN0,MC1,DP2,BI0,CH49,TM0,LP42;  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f\f\u001a".getBytes(Charsets.US_ASCII);
+		// expectedOutput = "\u001b\u0044BT0,LS50,TD0,PN0,MC1,DP2,BI2,CH31,TM1,LP26;  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f\f\u001a".getBytes(Charsets.US_ASCII);
 		data.add(new Object[] {"libembosser.ib.BasicDV5", testBrf, attrs, expectedOutput});
-		expectedOutput = "\u001b\u0044BT0,LS50,TD0,PN0,MC1,DP2,BI0,CH45,TM0,LP58;  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f\f\u001a".getBytes(Charsets.US_ASCII);
+		// expectedOutput = "\u001b\u0044BT0,LS50,TD0,PN0,MC1,DP2,BI2,CH46,TM1,LP59;  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f\f\u001a".getBytes(Charsets.US_ASCII);
 		data.add(new Object[] {"libembosser.ib.EverestDV5", testBrf, attrs, expectedOutput});
 		
 		// Interpoint

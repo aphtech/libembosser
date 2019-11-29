@@ -71,7 +71,8 @@ public class IndexBrailleDocumentHandlerTest {
 		data.add(new Object[] {createHandlerBuilder().setLinesPerPage(30).build(), multiPageDocumentInput, String.format(basicHeader, 0, 40, 0, 30) + String.join("\f", multiPageDocumentOutputStrings) + "\f\u001a"});
 		// Tests for margins
 		// 2019-11-12: For now margins are ignored for Index embossers
-		data.add(new Object[] {createHandlerBuilder().setLeftMargin(3).setTopMargin(2).build(), multiPageDocumentInput, String.format(basicHeader, 0, 40, 0, 25) + Arrays.stream(multiPageDocumentOutputStrings).map(s -> String.format("%s%s", s, "\f")).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString().concat("\u001a")});
+		// 2019/11/26: Re-enable the margins, not thought to be the cause of problems.
+		data.add(new Object[] {createHandlerBuilder().setLeftMargin(3).setTopMargin(2).build(), multiPageDocumentInput, String.format(basicHeader, 3, 40, 2, 25) + Arrays.stream(multiPageDocumentOutputStrings).map(s -> String.format("%s%s", s, "\f")).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString().concat("\u001a")});
 		// Multiple copy tests
 		final String copiesHeader = "\u001bDBT0,LS50,TD0,PN0,MC%d,DP1,BI%d,CH%d,TM%d,LP%d;%s";
 		data.add(new Object[] {createHandlerBuilder().setCopies(2).build(), multiPageDocumentInput, String.format(copiesHeader, 2, 0, 40, 0, 25, Arrays.stream(multiPageDocumentOutputStrings).map(s -> s.concat("\f")).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString()).concat("\u001a")});
@@ -80,7 +81,8 @@ public class IndexBrailleDocumentHandlerTest {
 		data.add(new Object[] {createHandlerBuilder().setCopies(3).setLinesPerPage(30).build(), multiPageDocumentInput, String.format(copiesHeader, 3, 0, 40, 0, 30, Arrays.stream(multiPageDocumentOutputStrings).map(s -> s.concat("\f")).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString()).concat("\u001a")});
 		// Tests for adding/padding margins
 		// 2019-11-12: For now margins ignored for Index Embossers.
-		data.add(new Object[] {createHandlerBuilder().setCopies(11).setLeftMargin(3).setTopMargin(2).build(), multiPageDocumentInput, String.format(copiesHeader, 11, 0, 40, 0, 25, Arrays.stream(multiPageDocumentOutputStrings).map(s -> String.format("%s%s", s, "\f")).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString()).concat("\u001a")});
+		// 2019/11/26: Re-enabling margins as not thought to be the cause of problems.
+		data.add(new Object[] {createHandlerBuilder().setCopies(11).setLeftMargin(3).setTopMargin(2).build(), multiPageDocumentInput, String.format(copiesHeader, 11, 3, 40, 2, 25, Arrays.stream(multiPageDocumentOutputStrings).map(s -> String.format("%s%s", s, "\f")).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString()).concat("\u001a")});
 		
 		// Test that duplex volumes start on a right page
 		final ImmutableList<DocumentEvent> duplexVolumesEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2801"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2803"), new EndLineEvent(), new EndPageEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u280f\u2801\u281b\u2811\u2800\u283c\u2803"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2809"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());

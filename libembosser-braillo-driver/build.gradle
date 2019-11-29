@@ -1,10 +1,10 @@
 plugins {
 	id "java-library"
-	id "com.github.spotbugs" version "2.0.1"
+	id "com.github.spotbugs" version "3.0.0"
 }
 
 dependencies {
-	implementation 'com.google.guava:guava:23.5-jre'
+	implementation 'com.google.guava:guava:28.1-jre'
 	api project(':libembosser-api')
 	implementation project(':libembosser-core-drivers')
 	implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
