@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.function.Function;
+import java.util.stream.IntStream;
 
 import org.brailleblaster.libembosser.drivers.utils.BaseTextEmbosser;
 import org.brailleblaster.libembosser.drivers.utils.document.events.DocumentEvent;
@@ -81,7 +82,7 @@ public class IndexBrailleEmbosser extends BaseTextEmbosser {
 		// The Index protocol seems to have no way to set all the Braille cell types, therefore we will assume it uses the standard NLS cell.
 		// Get left margin in number of cells
 		// Index only allows defining binding margin, so we will assume left margin is always the binding margin.
-		final int bindingMargin = OptionalInt.of(BrlCell.NLS.getCellsForWidth(leftMargin)).stream().filter(i -> i + cellsPerLine <= maxCellsPerLine).findFirst().orElseGet(() -> maxCellsPerLine - cellsPerLine);
+		final int bindingMargin = IntStream.of(BrlCell.NLS.getCellsForWidth(leftMargin)).filter(i -> i + cellsPerLine <= maxCellsPerLine).findFirst().orElseGet(() -> maxCellsPerLine - cellsPerLine);
 		
 		// Index protocol takes top margin in number of lines.
 		final int topLines = cell.getLinesForHeight(topMargin);
