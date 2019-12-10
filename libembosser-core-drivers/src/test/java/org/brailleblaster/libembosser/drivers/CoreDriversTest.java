@@ -94,14 +94,15 @@ public class CoreDriversTest {
 		
 		// Interpoint with margins
 		// 2019-11-12: For now ignore the margins for Enabling Technologies embossers.
+		// 2019-12-05: Enable margins again, however do it by padding spaces.
 		attrs = new EmbossingAttributeSet(new EmbossingAttribute[] {new PaperLayout(Layout.INTERPOINT), new PaperMargins(new Margins(new BigDecimal("13"), BigDecimal.ZERO, BigDecimal.TEN, BigDecimal.ZERO))});
 		expectedHeader = "\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bLA\u001bRq\u001bTN\u001bQc".getBytes(Charsets.US_ASCII);
-		expectedOutput = "  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\r\n\f\u001a".getBytes(Charsets.US_ASCII);
+		expectedOutput = "\r\n    ,\"H IS \"S TEXT4\r\n  ,TEXT ON A NEW L9E4\r\n\f\u001a".getBytes(Charsets.US_ASCII);
 		data.add(new Object[] {"libembosser.et.phoenix_gold", testBrf, attrs, Bytes.concat(expectedHeader, expectedOutput)});
 		data.add(new Object[] {"libembosser.et.phoenix_silver", testBrf, attrs, Bytes.concat(expectedHeader, expectedOutput)});
 		data.add(new Object[] {"libembosser.et.cyclone", testBrf, attrs, Bytes.concat(expectedHeader, expectedOutput)});
 		expectedHeader = "\u001bA@@\u001bK@\u001bW@\u001bi@\u001bs@\u001bLA\u001bRq\u001bTN\u001bQc".getBytes(Charsets.US_ASCII);
-		expectedOutput = "  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\r\n\f\r\n\f\u001a".getBytes(Charsets.US_ASCII);
+		expectedOutput = "\r\n    ,\"H IS \"S TEXT4\r\n  ,TEXT ON A NEW L9E4\r\n\f\r\n\f\u001a".getBytes(Charsets.US_ASCII);
 		data.add(new Object[] {"libembosser.et.trident", testBrf, attrs, Bytes.concat(expectedHeader, expectedOutput)});
 		
 		// Interpoint

@@ -127,9 +127,9 @@ public class EnablingTechnologiesDocumentHandler implements ByteSourceHandlerToF
 		final int maxLines = cell.getLinesForHeight(new BigDecimal(pageLength).multiply(new BigDecimal("25.4")));
 		checkState(isNumberArgValid(totalLines) && totalLines <= maxLines, "The sum of top margin and lines per page must be less than %s which is the maximum for page length %s, topMargin=%s, linesPerPage=%s, total=%s", maxLines, pageLength, topMargin, linesPerPage, totalLines);
 		this.handler = new GenericTextDocumentHandler.Builder()
-				.setLeftMargin(0)
+				.setLeftMargin(leftMargin)
 				.setCellsPerLine(cellsPerLine)
-				.setTopMargin(0)
+				.setTopMargin(topMargin)
 				.setLinesPerPage(linesPerPage)
 				.setEndOfLine(model.getLineEnd())
 				.setEndOfPage(model.getPageEnd())

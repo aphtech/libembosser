@@ -12,6 +12,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.function.IntFunction;
+import java.util.stream.Collectors;
+
 import org.brailleblaster.libembosser.drivers.enablingTechnologies.EnablingTechnologiesDocumentHandler.Builder;
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler;
 import org.brailleblaster.libembosser.drivers.utils.document.events.BrailleEvent;
@@ -82,21 +84,21 @@ public class EnablingTechnologiesDocumentHandlerTest {
 		
 		// Test that multiple pages work.
 		final ImmutableList<DocumentEvent> multiPageDocumentInput = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("f/ page"), new EndLineEvent(), new EndPageEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("second page"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
-		final String[] multiPageDocumentOutputStrings = new String[] {"F/ PAGE", "SECOND PAGE"};
-		data.add(new Object[] {createHandlerBuilder().build(), multiPageDocumentInput, String.format(headerString, "A", "h", "K", "Y") + String.join(EOP, multiPageDocumentOutputStrings).concat(EOP).concat("\u001a")});
-		data.add(new Object[] {createHandlerBuilder().setLinesPerPage(30).setPageLength(12).build(), multiPageDocumentInput, String.format(headerString, "A", "h", "L", "^") + String.join(EOP, multiPageDocumentOutputStrings).concat(EOP).concat("\u001a")});
+		final String[][] multiPageDocumentOutputStrings = new String[][] {{"F/ PAGE"}, {"SECOND PAGE"}};
+		data.add(new Object[] {createHandlerBuilder().build(), multiPageDocumentInput, String.format(headerString, "A", "h", "K", "Y") + Arrays.stream(multiPageDocumentOutputStrings).map(s -> String.join("\r\n", s)).map(s -> s.concat(EOP)).collect(Collectors.joining()).concat("\u001a")});
+		data.add(new Object[] {createHandlerBuilder().setLinesPerPage(30).setPageLength(12).build(), multiPageDocumentInput, String.format(headerString, "A", "h", "L", "^") + Arrays.stream(multiPageDocumentOutputStrings).map(s -> String.join("\r\n", s)).map(s -> s.concat(EOP)).collect(Collectors.joining()).concat("\u001a")});
 		
 		// Tests for adding/padding margins
-		data.add(new Object[] {createHandlerBuilder().setLeftMargin(3).setTopMargin(2).build(), multiPageDocumentInput, String.format(headerString, "A", "h", "K", "[") + Arrays.stream(multiPageDocumentOutputStrings).map(s -> String.format("%s%s", s, EOP)).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString().concat("\u001a")});
+		data.add(new Object[] {createHandlerBuilder().setLeftMargin(3).setTopMargin(2).build(), multiPageDocumentInput, String.format(headerString, "A", "h", "K", "[") + Arrays.stream(multiPageDocumentOutputStrings).map(s -> "\r\n\r\n   ".concat(String.join("\r\n", s))).map(s -> s.concat(EOP)).collect(Collectors.joining()).concat("\u001a")});
 		
 		// Multiple copy tests
-		data.add(new Object[] {createHandlerBuilder().setCopies(2).build(), multiPageDocumentInput, String.format(headerString, "A", "h", "K", "Y") + Strings.repeat(Arrays.stream(multiPageDocumentOutputStrings).map(s -> s.concat(EOP)).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString(), 2).concat("\u001a")});
-		data.add(new Object[] {createHandlerBuilder().setCopies(2).setLinesPerPage(30).setPageLength(14).build(), multiPageDocumentInput, String.format(headerString, "A", "h", "N", "^") + Strings.repeat(Arrays.stream(multiPageDocumentOutputStrings).map(s -> s.concat(EOP)).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString(), 2).concat("\u001a")});
-		data.add(new Object[] {createHandlerBuilder().setCopies(4).build(), multiPageDocumentInput, String.format(headerString, "A", "h", "K", "Y") + Strings.repeat(Arrays.stream(multiPageDocumentOutputStrings).map(s -> s.concat(EOP)).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString(), 4).concat("\u001a")});
-		data.add(new Object[] {createHandlerBuilder().setCopies(3).setLinesPerPage(30).setPageLength(13).build(), multiPageDocumentInput, String.format(headerString, "A", "h", "M", "^") + Strings.repeat(Arrays.stream(multiPageDocumentOutputStrings).map(s -> s.concat(EOP)).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString(), 3).concat("\u001a")});
+		data.add(new Object[] {createHandlerBuilder().setCopies(2).build(), multiPageDocumentInput, String.format(headerString, "A", "h", "K", "Y") + Strings.repeat(Arrays.stream(multiPageDocumentOutputStrings).map(s -> String.join("\r\n", s)).map(s -> s.concat(EOP)).collect(Collectors.joining()), 2).concat("\u001a")});
+		data.add(new Object[] {createHandlerBuilder().setCopies(2).setLinesPerPage(30).setPageLength(14).build(), multiPageDocumentInput, String.format(headerString, "A", "h", "N", "^") + Strings.repeat(Arrays.stream(multiPageDocumentOutputStrings).map(s -> String.join("\r\n", s)).map(s -> s.concat(EOP)).collect(Collectors.joining()), 2).concat("\u001a")});
+		data.add(new Object[] {createHandlerBuilder().setCopies(4).build(), multiPageDocumentInput, String.format(headerString, "A", "h", "K", "Y") + Strings.repeat(Arrays.stream(multiPageDocumentOutputStrings).map(s -> String.join("\r\n", s)).map(s -> s.concat(EOP)).collect(Collectors.joining()), 4).concat("\u001a")});
+		data.add(new Object[] {createHandlerBuilder().setCopies(3).setLinesPerPage(30).setPageLength(13).build(), multiPageDocumentInput, String.format(headerString, "A", "h", "M", "^") + Strings.repeat(Arrays.stream(multiPageDocumentOutputStrings).map(s -> String.join("\r\n", s)).map(s -> s.concat(EOP)).collect(Collectors.joining()), 3).concat("\u001a")});
 		
 		// Tests for adding/padding margins
-		data.add(new Object[] {createHandlerBuilder().setCopies(11).setLeftMargin(3).setTopMargin(2).build(), multiPageDocumentInput, String.format(headerString, "A", "h", "K", "[") + Strings.repeat(Arrays.stream(multiPageDocumentOutputStrings).map(s -> String.format("%s%s", s, EOP)).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString(), 11).concat("\u001a")});
+		data.add(new Object[] {createHandlerBuilder().setCopies(11).setLeftMargin(3).setTopMargin(2).build(), multiPageDocumentInput, String.format(headerString, "A", "h", "K", "[") + Strings.repeat(Arrays.stream(multiPageDocumentOutputStrings).map(s -> "\r\n\r\n   ".concat(String.join("\r\n", s))).map(s -> s.concat(EOP)).collect(Collectors.joining()), 11).concat("\u001a")});
 		
 		// Test that duplex volumes start on a right page
 		final ImmutableList<DocumentEvent> duplexVolumesEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2801"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2803"), new EndLineEvent(), new EndPageEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u280f\u2801\u281b\u2811\u2800\u283c\u2803"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2809"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
@@ -242,19 +244,24 @@ public class EnablingTechnologiesDocumentHandlerTest {
 			// Left margin cannot take the highest value
 			if (i < NUMBER_MAPPINGS.length - 1) {
 				// 2019-11-12: Left margin escape sequence ignores margin for now.
-				data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder()::setLeftMargin), i, String.format("\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bL%s\u001bRh\u001bTK\u001bQY%s", 'A', EOP + "\u001a")});
+				// 2019-12-09: Left margin now padded with spaces.
+				data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder()::setLeftMargin), i, String.format("\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bLA\u001bRh\u001bTK\u001bQY%s", Strings.repeat(" ", i) + "A" + EOP + "\u001a")});
 			}
-			data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder()::setCellsPerLine), i, String.format("\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bLA\u001bR%s\u001bTK\u001bQY%s", NUMBER_MAPPINGS[i], EOP + "\u001a")});
-			data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder().setTopMargin(0).setPageLength(59)::setLinesPerPage), i, String.format("\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bLA\u001bRh\u001bT{\u001bQ%s%s", NUMBER_MAPPINGS[i], EOP + "\u001a")});
-			data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder().setTopMargin(59 - i).setPageLength(59)::setLinesPerPage), i, String.format("\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bLA\u001bRh\u001bT{\u001bQ%s%s", NUMBER_MAPPINGS[59], EOP + "\u001a")});
-			data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder().setTopMargin(0).setLinesPerPage(0)::setPageLength), i, String.format("\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bLA\u001bRh\u001bT%s\u001bQ@%s", NUMBER_MAPPINGS[i], EOP + "\u001a")});
+			if (i > 0) {
+				data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder()::setCellsPerLine), i, String.format("\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bLA\u001bR%s\u001bTK\u001bQY%s", NUMBER_MAPPINGS[i], "A" + EOP + "\u001a")});
+				data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder().setTopMargin(0).setPageLength(59)::setLinesPerPage), i, String.format("\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bLA\u001bRh\u001bT{\u001bQ%s%s", NUMBER_MAPPINGS[i], "A" + EOP + "\u001a")});
+				data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder().setTopMargin(59 - i).setPageLength(59)::setLinesPerPage), i, String.format("\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bLA\u001bRh\u001bT{\u001bQ%s%s", NUMBER_MAPPINGS[59], Strings.repeat("\r\n", 59 - i) + "A" + EOP + "\u001a")});
+			}
+			if (i > 1) {
+				data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder().setTopMargin(0).setLinesPerPage(1)::setPageLength), i, String.format("\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bLA\u001bRh\u001bT%s\u001bQA%s", NUMBER_MAPPINGS[i], "A" + EOP + "\u001a")});
+			}
 		}
 		return data.iterator();
 	}
 	@Test(dataProvider="intPropertyProvider")
 	public void testSetIntProperty(IntFunction<Builder> func, int value, String expected) {
 		EnablingTechnologiesDocumentHandler handler = func.apply(value).build();
-		List<DocumentEvent> events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		List<DocumentEvent> events = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2801"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		for (DocumentEvent event: events) {
 			handler.onEvent(event);
 		}
