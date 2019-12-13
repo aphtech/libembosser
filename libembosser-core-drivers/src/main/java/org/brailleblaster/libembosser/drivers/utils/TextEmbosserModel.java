@@ -66,4 +66,11 @@ public interface TextEmbosserModel {
 	 * @return The manufacturer of the embosser model.
 	 */
 	public String getManufacturer();
+	/**
+	 * Get the maximum cells the embosser can put on a line.
+	 * 
+	 * Many embossers have a limit of how many cells they can emboss on a single line, it may be less than can fit on the maximum paper width.
+	 * @return The maximum cells which can be embossed per line.
+	 */
+	int getMaxCellsPerLine();
 }

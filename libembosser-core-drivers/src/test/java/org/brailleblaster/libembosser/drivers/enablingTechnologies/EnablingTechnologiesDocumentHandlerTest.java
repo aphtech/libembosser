@@ -41,11 +41,15 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
+import com.google.common.primitives.Bytes;
 
 public class EnablingTechnologiesDocumentHandlerTest {
 	private static final String EOP = new String(new char[] {'\r', '\n', '\f'});
+	private Builder createHandlerBuilder(Model model) {
+		return new EnablingTechnologiesDocumentHandler.Builder(model).setPapermode(Layout.P1ONLY);
+	}
 	private EnablingTechnologiesDocumentHandler.Builder createHandlerBuilder() {
-		return new EnablingTechnologiesDocumentHandler.Builder().setPapermode(Layout.P1ONLY);
+		return createHandlerBuilder(Model.PHOENIX_GOLD);
 	}
 	@DataProvider(name="handlerProvider")
 	public Iterator<Object[]> handlerProvider() {
@@ -55,7 +59,7 @@ public class EnablingTechnologiesDocumentHandlerTest {
 		data.add(new Object[] {createHandlerBuilder().build(), minimalDocumentInput, String.format(headerString, "A", "h", "K", "Y") + EOP + "\u001a"});
 		data.add(new Object[] {createHandlerBuilder().setLinesPerPage(30).setPageLength(13).build(), minimalDocumentInput, String.format(headerString, "A", "h", "M", "^") + EOP + "\u001a"});
 		data.add(new Object[] {createHandlerBuilder().setLinesPerPage(30).setTopMargin(2).setPageLength(14).build(), minimalDocumentInput, String.format(headerString, "A", "h", "N", "`") + EOP + "\u001a"});
-		data.add(new Object[] {createHandlerBuilder().setLeftMargin(2).build(), minimalDocumentInput, String.format(headerString, "A", "h", "K", "Y") + EOP + "\u001a"});
+		data.add(new Object[] {createHandlerBuilder().setLeftMargin(2).build(), minimalDocumentInput, String.format(headerString, "A", "j", "K", "Y") + EOP + "\u001a"});
 		data.add(new Object[] {createHandlerBuilder().setLinesPerPage(30).setPageLength(12).setCellsPerLine(30).build(), minimalDocumentInput, String.format(headerString, "A", "^", "L", "^") + EOP + "\u001a"});
 		
 		final ImmutableList<DocumentEvent> basicDocumentInput = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(",a te/ docu;t4"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
@@ -71,9 +75,9 @@ public class EnablingTechnologiesDocumentHandlerTest {
 		final ImmutableList<DocumentEvent> multiLineDocumentInput = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent(",! F/ L9E4"), new EndLineEvent(), new StartLineEvent(), new BrailleEvent(",second l9e4"), new EndLineEvent(), new StartLineEvent(), new BrailleEvent(",a ?ird l9e4"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		final String[] multiLineDocumentOutputString = new String[] {",! F/ L9E4", ",SECOND L9E4", ",A ?IRD L9E4"};
 		data.add(new Object[] {createHandlerBuilder().build(), multiLineDocumentInput, String.format(headerString, "A", "h", "K", "Y") + String.join("\r\n", multiLineDocumentOutputString).concat(EOP).concat("\u001a")});
-		data.add(new Object[] {createHandlerBuilder().setModel(Model.TRIDENT).build(), multiLineDocumentInput, String.format(headerString, "A", "h", "K", "Y") + String.join("\r\n", multiLineDocumentOutputString).concat(EOP).concat("\u001a")});
-		data.add(new Object[] {createHandlerBuilder().setModel(Model.JULIET_CLASSIC).build(), multiLineDocumentInput, String.format(headerString, "A", "h", "K", "Y") + String.join("\r\n", multiLineDocumentOutputString).concat(EOP)});
-		data.add(new Object[] {createHandlerBuilder().setModel(Model.ROMEO_ATTACHE).build(), multiLineDocumentInput, String.format(headerString, "A", "h", "K", "Y") + String.join("\n", multiLineDocumentOutputString).concat("\n\f")});
+		data.add(new Object[] {createHandlerBuilder(Model.TRIDENT).build(), multiLineDocumentInput, String.format(headerString, "A", "h", "K", "Y") + String.join("\r\n", multiLineDocumentOutputString).concat(EOP).concat("\u001a")});
+		data.add(new Object[] {createHandlerBuilder(Model.JULIET_CLASSIC).build(), multiLineDocumentInput, String.format(headerString, "A", "h", "K", "Y") + String.join("\r\n", multiLineDocumentOutputString).concat(EOP)});
+		data.add(new Object[] {createHandlerBuilder(Model.ROMEO_ATTACHE).build(), multiLineDocumentInput, String.format(headerString, "A", "h", "K", "Y") + String.join("\n", multiLineDocumentOutputString).concat("\n\f")});
 		data.add(new Object[] {createHandlerBuilder().setLinesPerPage(30).setPageLength(12).build(), multiLineDocumentInput, String.format(headerString, "A", "h", "L", "^") + String.join("\r\n", multiLineDocumentOutputString).concat(EOP).concat("\u001a")});
 		data.add(new Object[] {createHandlerBuilder().setCellsPerLine(35).build(), multiLineDocumentInput, String.format(headerString, "A", "c", "K", "Y") + String.join("\r\n", multiLineDocumentOutputString).concat(EOP).concat("\u001a")});
 		data.add(new Object[] {createHandlerBuilder().setLinesPerPage(3).build(), multiLineDocumentInput, String.format(headerString, "A", "h", "K", "C") + String.join("\r\n", multiLineDocumentOutputString).concat(EOP).concat("\u001a")});
@@ -89,7 +93,7 @@ public class EnablingTechnologiesDocumentHandlerTest {
 		data.add(new Object[] {createHandlerBuilder().setLinesPerPage(30).setPageLength(12).build(), multiPageDocumentInput, String.format(headerString, "A", "h", "L", "^") + Arrays.stream(multiPageDocumentOutputStrings).map(s -> String.join("\r\n", s)).map(s -> s.concat(EOP)).collect(Collectors.joining()).concat("\u001a")});
 		
 		// Tests for adding/padding margins
-		data.add(new Object[] {createHandlerBuilder().setLeftMargin(3).setTopMargin(2).build(), multiPageDocumentInput, String.format(headerString, "A", "h", "K", "[") + Arrays.stream(multiPageDocumentOutputStrings).map(s -> "\r\n\r\n   ".concat(String.join("\r\n", s))).map(s -> s.concat(EOP)).collect(Collectors.joining()).concat("\u001a")});
+		data.add(new Object[] {createHandlerBuilder().setLeftMargin(3).setTopMargin(2).build(), multiPageDocumentInput, String.format(headerString, "A", "k", "K", "[") + Arrays.stream(multiPageDocumentOutputStrings).map(s -> "\r\n\r\n   ".concat(String.join("\r\n", s))).map(s -> s.concat(EOP)).collect(Collectors.joining()).concat("\u001a")});
 		
 		// Multiple copy tests
 		data.add(new Object[] {createHandlerBuilder().setCopies(2).build(), multiPageDocumentInput, String.format(headerString, "A", "h", "K", "Y") + Strings.repeat(Arrays.stream(multiPageDocumentOutputStrings).map(s -> String.join("\r\n", s)).map(s -> s.concat(EOP)).collect(Collectors.joining()), 2).concat("\u001a")});
@@ -98,13 +102,13 @@ public class EnablingTechnologiesDocumentHandlerTest {
 		data.add(new Object[] {createHandlerBuilder().setCopies(3).setLinesPerPage(30).setPageLength(13).build(), multiPageDocumentInput, String.format(headerString, "A", "h", "M", "^") + Strings.repeat(Arrays.stream(multiPageDocumentOutputStrings).map(s -> String.join("\r\n", s)).map(s -> s.concat(EOP)).collect(Collectors.joining()), 3).concat("\u001a")});
 		
 		// Tests for adding/padding margins
-		data.add(new Object[] {createHandlerBuilder().setCopies(11).setLeftMargin(3).setTopMargin(2).build(), multiPageDocumentInput, String.format(headerString, "A", "h", "K", "[") + Strings.repeat(Arrays.stream(multiPageDocumentOutputStrings).map(s -> "\r\n\r\n   ".concat(String.join("\r\n", s))).map(s -> s.concat(EOP)).collect(Collectors.joining()), 11).concat("\u001a")});
+		data.add(new Object[] {createHandlerBuilder().setCopies(11).setLeftMargin(3).setTopMargin(2).build(), multiPageDocumentInput, String.format(headerString, "A", "k", "K", "[") + Strings.repeat(Arrays.stream(multiPageDocumentOutputStrings).map(s -> "\r\n\r\n   ".concat(String.join("\r\n", s))).map(s -> s.concat(EOP)).collect(Collectors.joining()), 11).concat("\u001a")});
 		
 		// Test that duplex volumes start on a right page
 		final ImmutableList<DocumentEvent> duplexVolumesEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2801"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2803"), new EndLineEvent(), new EndPageEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u280f\u2801\u281b\u2811\u2800\u283c\u2803"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2827\u2815\u2807\u2800\u283c\u2809"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
 		final String duplexHeaderString = "\u001bA@@\u001bK@\u001bW@\u001bi%s\u001bs@\u001bLA\u001bRh\u001bTK\u001bQY%s";
 		final String duplexVolumesString = String.format(duplexHeaderString, '@', "VOL #A\r\n\f\r\n\fVOL #B\r\n\fPAGE #B\r\n\fVOL #C\r\n\f\r\n\f");
-		data.add(new Object[] {new EnablingTechnologiesDocumentHandler.Builder().build(), duplexVolumesEvents, duplexVolumesString.concat("\u001a")});
+		data.add(new Object[] {new EnablingTechnologiesDocumentHandler.Builder(Model.PHOENIX_GOLD).build(), duplexVolumesEvents, duplexVolumesString.concat("\u001a")});
 		EnablingTechnologiesDocumentHandler.Builder builder = createHandlerBuilder().setPapermode(Layout.INTERPOINT);
 		data.add(new Object[] {builder.build(), duplexVolumesEvents, duplexVolumesString.concat("\u001a")});
 		// Test duplex sections
@@ -220,10 +224,10 @@ public class EnablingTechnologiesDocumentHandlerTest {
 	}
 	@DataProvider(name="invalidNumberArgProvider")
 	public Iterator<Object[]> invalidNumberArgProvider() {
-		Builder b = createHandlerBuilder();
+		Builder b = createHandlerBuilder(Model.JULIET_CLASSIC);
 		Random r = new Random(System.currentTimeMillis());
-		List<IntFunction<Builder>> funcs = ImmutableList.of(b::setLeftMargin, b::setTopMargin, b::setCellsPerLine, b::setLinesPerPage, b::setPageLength);
-		return Iterators.concat(invalidLeftmarginProvider(), Streams.mapWithIndex(r.ints().filter(i -> i < 0 || i > 59), (value, index) -> new Object[] {funcs.get((int)(index % funcs.size())), value}).limit(100).iterator());
+		List<IntFunction<Builder>> funcs = ImmutableList.of(b::setTopMargin, b::setLinesPerPage, b::setPageLength);
+		return Streams.mapWithIndex(r.ints().filter(i -> i < 0 || i > 59), (value, index) -> new Object[] {funcs.get((int)(index % funcs.size())), value}).limit(100).iterator();
 	}
 	@Test(dataProvider="invalidNumberArgProvider")
 	public void testInvalidNumberArgThrowsException(IntFunction<Builder> m, int arg) {
@@ -239,21 +243,24 @@ public class EnablingTechnologiesDocumentHandlerTest {
 	};
 	@DataProvider(name="intPropertyProvider")
 	public Iterator<Object[]> intPropertyProvider() {
+		final Model model = Model.JULIET_CLASSIC;
 		List<Object[]> data = new ArrayList<>();
 		for (int i = 0; i < NUMBER_MAPPINGS.length; ++i) {
 			// Left margin cannot take the highest value
-			if (i < NUMBER_MAPPINGS.length - 1) {
+			if (i < model.getMaxCellsPerLine()) {
 				// 2019-11-12: Left margin escape sequence ignores margin for now.
 				// 2019-12-09: Left margin now padded with spaces.
-				data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder()::setLeftMargin), i, String.format("\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bLA\u001bRh\u001bTK\u001bQY%s", Strings.repeat(" ", i) + "A" + EOP + "\u001a")});
+				data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder(model).setCellsPerLine(1)::setLeftMargin), i, String.format("\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bLA\u001bR%s\u001bTK\u001bQY%s", NUMBER_MAPPINGS[i + 1], Strings.repeat(" ", i) + "A" + new String(Bytes.concat(model.getPageEnd(), model.getDocEnd()), Charsets.US_ASCII))});
 			}
 			if (i > 0) {
-				data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder()::setCellsPerLine), i, String.format("\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bLA\u001bR%s\u001bTK\u001bQY%s", NUMBER_MAPPINGS[i], "A" + EOP + "\u001a")});
-				data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder().setTopMargin(0).setPageLength(59)::setLinesPerPage), i, String.format("\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bLA\u001bRh\u001bT{\u001bQ%s%s", NUMBER_MAPPINGS[i], "A" + EOP + "\u001a")});
-				data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder().setTopMargin(59 - i).setPageLength(59)::setLinesPerPage), i, String.format("\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bLA\u001bRh\u001bT{\u001bQ%s%s", NUMBER_MAPPINGS[59], Strings.repeat("\r\n", 59 - i) + "A" + EOP + "\u001a")});
+				if (i <= model.getMaxCellsPerLine()) {
+					data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder(model)::setCellsPerLine), i, String.format("\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bLA\u001bR%s\u001bTK\u001bQY%s", NUMBER_MAPPINGS[i], "A" + new String(Bytes.concat(model.getPageEnd(), model.getDocEnd()), Charsets.US_ASCII))});
+				}
+				data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder(model).setTopMargin(0).setPageLength(59)::setLinesPerPage), i, String.format("\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bLA\u001bRh\u001bT{\u001bQ%s%s", NUMBER_MAPPINGS[i], "A" + new String(Bytes.concat(model.getPageEnd(), model.getDocEnd()), Charsets.US_ASCII))});
+				data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder(model).setTopMargin(59 - i).setPageLength(59)::setLinesPerPage), i, String.format("\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bLA\u001bRh\u001bT{\u001bQ%s%s", NUMBER_MAPPINGS[59], Strings.repeat("\r\n", 59 - i) + "A" + new String(Bytes.concat(model.getPageEnd(), model.getDocEnd()), Charsets.US_ASCII))});
 			}
 			if (i > 1) {
-				data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder().setTopMargin(0).setLinesPerPage(1)::setPageLength), i, String.format("\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bLA\u001bRh\u001bT%s\u001bQA%s", NUMBER_MAPPINGS[i], "A" + EOP + "\u001a")});
+				data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder(model).setTopMargin(0).setLinesPerPage(1)::setPageLength), i, String.format("\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bLA\u001bRh\u001bT%s\u001bQA%s", NUMBER_MAPPINGS[i], "A" + new String(Bytes.concat(model.getPageEnd(), model.getDocEnd()), Charsets.US_ASCII))});
 			}
 		}
 		return data.iterator();

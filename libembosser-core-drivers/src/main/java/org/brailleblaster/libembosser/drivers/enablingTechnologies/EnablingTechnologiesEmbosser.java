@@ -46,16 +46,15 @@ public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 		
 		// Calculate the margins
 		int leftMargin = cell.getCellsForWidth(margins.getLeft());
-		int rightMargin = cell.getCellsForWidth(paper.getWidth().subtract(margins.getRight()));
+		int cellsPerLine = Math.min(cell.getCellsForWidth(paper.getWidth().subtract(margins.getRight()).subtract(margins.getRight())), embosserModel.getMaxCellsPerLine());
 		int topMargin = 0;
 		if (BigDecimal.ZERO.compareTo(margins.getTop()) < 0) {
 			topMargin = cell.getLinesForHeight(margins.getTop());
 		}
 		int linesPerPage = cell.getLinesForHeight(paper.getHeight().subtract(margins.getTop()).subtract(margins.getBottom()));
-		EnablingTechnologiesDocumentHandler.Builder builder = new EnablingTechnologiesDocumentHandler.Builder();
-		builder.setModel(embosserModel);
+		EnablingTechnologiesDocumentHandler.Builder builder = new EnablingTechnologiesDocumentHandler.Builder(embosserModel);
 		Optional.ofNullable(attributes.get(Copies.class)).ifPresent(v -> builder.setCopies(((Copies)v).getValue()));
-		builder.setLeftMargin(leftMargin).setCellsPerLine(rightMargin).setPageLength(paperHeight).setLinesPerPage(linesPerPage).setTopMargin(topMargin);
+		builder.setLeftMargin(leftMargin).setCellsPerLine(cellsPerLine).setPageLength(paperHeight).setLinesPerPage(linesPerPage).setTopMargin(topMargin);
 		builder.setPapermode(Optional.ofNullable(attributes.get(PaperLayout.class)).filter(v -> interpoint).map(v -> ((PaperLayout)v).getValue()).filter(EnablingTechnologiesDocumentHandler.supportedDuplexModes()::contains).orElse(Layout.P1ONLY));
 		if (EnablingTechnologiesDocumentHandler.supportedCellTypes().contains(cell)) {
 			builder.setCell(cell);

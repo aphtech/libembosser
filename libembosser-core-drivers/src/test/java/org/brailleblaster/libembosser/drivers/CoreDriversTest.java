@@ -72,14 +72,14 @@ public class CoreDriversTest {
 		String testBrf = "  ,\"h is \"s text4\n,text on a new l9e4";
 		List<Object[]> data = new ArrayList<>();
 		// Basic embossing
-		byte[] expectedHeader = "\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bLA\u001bRq\u001bTN\u001bQc".getBytes(Charsets.US_ASCII);
+		byte[] expectedHeader = "\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bLA\u001bRm\u001bTN\u001bQc".getBytes(Charsets.US_ASCII);
 		byte[] expectedOutput = "  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\r\n\f\u001a".getBytes(Charsets.US_ASCII);
 		EmbossingAttributeSet attrs = new EmbossingAttributeSet();
 		data.add(new Object[] {"libembosser.et.phoenix_gold", testBrf, attrs, Bytes.concat(expectedHeader, expectedOutput)});
 		data.add(new Object[] {"libembosser.et.phoenix_silver", testBrf, attrs, Bytes.concat(expectedHeader, expectedOutput)});
 		data.add(new Object[] {"libembosser.et.cyclone", testBrf, attrs, Bytes.concat(expectedHeader, expectedOutput)});
 		data.add(new Object[] {"libembosser.et.trident", testBrf, attrs, Bytes.concat(expectedHeader, expectedOutput)});
-		expectedHeader = "\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bLA\u001bRb\u001bTN\u001bQc".getBytes(Charsets.US_ASCII);
+		expectedHeader = "\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bLA\u001bR`\u001bTN\u001bQc".getBytes(Charsets.US_ASCII);
 		expectedOutput = "  ,\"H IS \"S TEXT4\n,TEXT ON A NEW L9E4\n\f".getBytes(Charsets.US_ASCII);
 		data.add(new Object[] {"libembosser.et.romeo_attache", testBrf, attrs, Bytes.concat(expectedHeader, expectedOutput)});
 		
@@ -95,29 +95,29 @@ public class CoreDriversTest {
 		// Interpoint with margins
 		// 2019-11-12: For now ignore the margins for Enabling Technologies embossers.
 		// 2019-12-05: Enable margins again, however do it by padding spaces.
-		attrs = new EmbossingAttributeSet(new EmbossingAttribute[] {new PaperLayout(Layout.INTERPOINT), new PaperMargins(new Margins(new BigDecimal("13"), BigDecimal.ZERO, BigDecimal.TEN, BigDecimal.ZERO))});
-		expectedHeader = "\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bLA\u001bRq\u001bTN\u001bQc".getBytes(Charsets.US_ASCII);
+		attrs = new EmbossingAttributeSet(new EmbossingAttribute[] {new PaperLayout(Layout.INTERPOINT), new PaperMargins(new Margins(new BigDecimal("13"), BigDecimal.ZERO, BigDecimal.TEN, BigDecimal.ZERO)), new org.brailleblaster.libembosser.embossing.attribute.PaperSize(PaperSize.LETTER.getSize())});
+		expectedHeader = "\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bLA\u001bRd\u001bTK\u001bQ[".getBytes(Charsets.US_ASCII);
 		expectedOutput = "\r\n    ,\"H IS \"S TEXT4\r\n  ,TEXT ON A NEW L9E4\r\n\f\u001a".getBytes(Charsets.US_ASCII);
 		data.add(new Object[] {"libembosser.et.phoenix_gold", testBrf, attrs, Bytes.concat(expectedHeader, expectedOutput)});
 		data.add(new Object[] {"libembosser.et.phoenix_silver", testBrf, attrs, Bytes.concat(expectedHeader, expectedOutput)});
 		data.add(new Object[] {"libembosser.et.cyclone", testBrf, attrs, Bytes.concat(expectedHeader, expectedOutput)});
-		expectedHeader = "\u001bA@@\u001bK@\u001bW@\u001bi@\u001bs@\u001bLA\u001bRq\u001bTN\u001bQc".getBytes(Charsets.US_ASCII);
+		expectedHeader = "\u001bA@@\u001bK@\u001bW@\u001bi@\u001bs@\u001bLA\u001bRd\u001bTK\u001bQ[".getBytes(Charsets.US_ASCII);
 		expectedOutput = "\r\n    ,\"H IS \"S TEXT4\r\n  ,TEXT ON A NEW L9E4\r\n\f\r\n\f\u001a".getBytes(Charsets.US_ASCII);
 		data.add(new Object[] {"libembosser.et.trident", testBrf, attrs, Bytes.concat(expectedHeader, expectedOutput)});
 		
 		// Interpoint
 		attrs = new EmbossingAttributeSet(new PaperLayout(Layout.INTERPOINT));
-		expectedHeader = "\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bLA\u001bRq\u001bTN\u001bQc".getBytes(Charsets.US_ASCII);
+		expectedHeader = "\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bLA\u001bRm\u001bTN\u001bQc".getBytes(Charsets.US_ASCII);
 		expectedOutput = "  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\r\n\f".getBytes(Charsets.US_ASCII);
 		data.add(new Object[] {"libembosser.et.phoenix_gold", testBrf, attrs, Bytes.concat(expectedHeader, expectedOutput, new byte[] {0x1a})});
 		data.add(new Object[] {"libembosser.et.phoenix_silver", testBrf, attrs, Bytes.concat(expectedHeader, expectedOutput, new byte[] {0x1a})});
 		data.add(new Object[] {"libembosser.et.cyclone", testBrf, attrs, Bytes.concat(expectedHeader, expectedOutput, new byte[] {0x1a})});
-		expectedHeader = "\u001bA@@\u001bK@\u001bW@\u001bi@\u001bs@\u001bLA\u001bRq\u001bTN\u001bQc".getBytes(Charsets.US_ASCII);
+		expectedHeader = "\u001bA@@\u001bK@\u001bW@\u001bi@\u001bs@\u001bLA\u001bRm\u001bTN\u001bQc".getBytes(Charsets.US_ASCII);
 		data.add(new Object[] {"libembosser.et.trident", testBrf, attrs, Bytes.concat(expectedHeader, expectedOutput, "\r\n\f\u001a".getBytes(Charsets.US_ASCII))});
 				
 		// Multiple copies
 		attrs = new EmbossingAttributeSet(new Copies(2));
-		expectedHeader = "\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bLA\u001bRq\u001bTN\u001bQc".getBytes(Charsets.US_ASCII);
+		expectedHeader = "\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bLA\u001bRm\u001bTN\u001bQc".getBytes(Charsets.US_ASCII);
 		expectedOutput = "  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\r\n\f  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\r\n\f\u001a".getBytes(Charsets.US_ASCII);
 		data.add(new Object[] {"libembosser.et.phoenix_gold", testBrf, attrs, Bytes.concat(expectedHeader, expectedOutput)});
 		data.add(new Object[] {"libembosser.et.phoenix_silver", testBrf, attrs, Bytes.concat(expectedHeader, expectedOutput)});

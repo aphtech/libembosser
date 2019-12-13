@@ -30,31 +30,32 @@ public class EnablingTechnologiesDocumentHandler implements ByteSourceHandlerToF
 		private int pageLength = 11;
 		private Layout paperMode = Layout.INTERPOINT;
 		private BrlCell cell = BrlCell.NLS;
-		private Model model = Model.PHOENIX_GOLD;
-		
+		private final Model model;
+		@Deprecated
+		public Builder() {
+			this(Model.PHOENIX_GOLD);
+		}
+		public Builder(Model model) {
+			this.model = checkNotNull(model);
+		}
 		public EnablingTechnologiesDocumentHandler build() {
 			return new EnablingTechnologiesDocumentHandler(model, leftMargin, cellsPerLine, topMargin, pageLength, linesPerPage, cell, paperMode, copies);
 		}
-		public Builder setModel(Model model) {
-			this.model = checkNotNull(model);
-			return this;
-		}
-
-		public Builder setCellsPerLine(int cellsPerLine) {
-			checkNumberArgument(cellsPerLine);
-			this.cellsPerLine = cellsPerLine;
-			return this;
-		}
-
+		
+		
 		public Builder setCopies(int copies) {
 			this.copies = copies;
 			return this;
 		}
 
 		public Builder setLeftMargin(int leftMargin) {
-			checkNumberArgument(leftMargin);
-			checkArgument(leftMargin < NUMBER_MAPPING.length - 1);
+			checkArgument(leftMargin < model.getMaxCellsPerLine(), "Too many cells, the margin must leave at least one cell for Braille. Maximum cells per line is %s", model.getMaxCellsPerLine());
 			this.leftMargin = leftMargin;
+			return this;
+		}
+		public Builder setCellsPerLine(int cellsPerLine) {
+			checkArgument(cellsPerLine <= model.getMaxCellsPerLine(), "Too many cells per line, maximum cells per line is %s", model.getMaxCellsPerLine());
+			this.cellsPerLine = cellsPerLine;
 			return this;
 		}
 
@@ -124,6 +125,7 @@ public class EnablingTechnologiesDocumentHandler implements ByteSourceHandlerToF
 	private GenericTextDocumentHandler handler;
 	private EnablingTechnologiesDocumentHandler(Model model, int leftMargin, int cellsPerLine, int topMargin, int pageLength, int linesPerPage, BrlCell cell, Layout duplex, int copies) {
 		final int totalLines = topMargin + linesPerPage;
+		final int totalCellsPerLine = leftMargin + cellsPerLine;
 		final int maxLines = cell.getLinesForHeight(new BigDecimal(pageLength).multiply(new BigDecimal("25.4")));
 		checkState(isNumberArgValid(totalLines) && totalLines <= maxLines, "The sum of top margin and lines per page must be less than %s which is the maximum for page length %s, topMargin=%s, linesPerPage=%s, total=%s", maxLines, pageLength, topMargin, linesPerPage, totalLines);
 		this.handler = new GenericTextDocumentHandler.Builder()
@@ -145,7 +147,7 @@ public class EnablingTechnologiesDocumentHandler implements ByteSourceHandlerToF
 		headerOutput.write(new byte[] { 0x1b, 'i', DUPLEX_MAPPING.get(duplex) }); // Interpoint mode
 		headerOutput.write(new byte[] { 0x1b, 's', CELL_MAPPING.get(cell) }); // Braille cell type
 		headerOutput.write(new byte[] {0x1b, 'L', 'A'}); // Left margin, always set to first cell
-		headerOutput.write(new byte[] { 0x1b, 'R', NUMBER_MAPPING[cellsPerLine] }); // Set cells per line
+		headerOutput.write(new byte[] { 0x1b, 'R', NUMBER_MAPPING[totalCellsPerLine] }); // Set cells per line
 		headerOutput.write(new byte[] { 0x1b, 'T', NUMBER_MAPPING[pageLength] });
 		headerOutput.write(new byte[] { 0x1b, 'Q', NUMBER_MAPPING[totalLines] }); // Set lines per page, include top margin as this needs padding
 		

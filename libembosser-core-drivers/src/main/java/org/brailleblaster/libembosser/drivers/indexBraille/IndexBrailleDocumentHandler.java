@@ -12,7 +12,6 @@ import org.brailleblaster.libembosser.spi.Layout;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Streams;
 import com.google.common.io.ByteSource;
 
 public class IndexBrailleDocumentHandler implements ByteSourceHandlerToFunctionAdapter {
