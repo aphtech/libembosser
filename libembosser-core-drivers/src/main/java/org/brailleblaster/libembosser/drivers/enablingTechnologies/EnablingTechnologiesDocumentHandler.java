@@ -39,7 +39,8 @@ public class EnablingTechnologiesDocumentHandler implements ByteSourceHandlerToF
 			this.model = checkNotNull(model);
 		}
 		public EnablingTechnologiesDocumentHandler build() {
-			return new EnablingTechnologiesDocumentHandler(model, leftMargin, cellsPerLine, topMargin, pageLength, linesPerPage, cell, paperMode, copies);
+			// 2019-12-13: Reduce the margin if leftMargin + cellsPerLine would be too wide for embosser
+			return new EnablingTechnologiesDocumentHandler(model, Math.min(leftMargin, model.getMaxCellsPerLine() - cellsPerLine), cellsPerLine, topMargin, pageLength, linesPerPage, cell, paperMode, copies);
 		}
 		
 		

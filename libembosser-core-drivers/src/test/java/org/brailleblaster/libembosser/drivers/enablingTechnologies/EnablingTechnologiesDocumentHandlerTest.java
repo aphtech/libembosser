@@ -31,6 +31,7 @@ import org.brailleblaster.libembosser.drivers.utils.document.events.StartSection
 import org.brailleblaster.libembosser.drivers.utils.document.events.StartVolumeEvent;
 import org.brailleblaster.libembosser.spi.BrlCell;
 import org.brailleblaster.libembosser.spi.Layout;
+import org.brailleblaster.libembosser.spi.PaperSize;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -41,6 +42,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
+import com.google.common.io.ByteSource;
 import com.google.common.primitives.Bytes;
 
 public class EnablingTechnologiesDocumentHandlerTest {
@@ -77,7 +79,7 @@ public class EnablingTechnologiesDocumentHandlerTest {
 		data.add(new Object[] {createHandlerBuilder().build(), multiLineDocumentInput, String.format(headerString, "A", "h", "K", "Y") + String.join("\r\n", multiLineDocumentOutputString).concat(EOP).concat("\u001a")});
 		data.add(new Object[] {createHandlerBuilder(Model.TRIDENT).build(), multiLineDocumentInput, String.format(headerString, "A", "h", "K", "Y") + String.join("\r\n", multiLineDocumentOutputString).concat(EOP).concat("\u001a")});
 		data.add(new Object[] {createHandlerBuilder(Model.JULIET_CLASSIC).build(), multiLineDocumentInput, String.format(headerString, "A", "h", "K", "Y") + String.join("\r\n", multiLineDocumentOutputString).concat(EOP)});
-		data.add(new Object[] {createHandlerBuilder(Model.ROMEO_ATTACHE).build(), multiLineDocumentInput, String.format(headerString, "A", "h", "K", "Y") + String.join("\n", multiLineDocumentOutputString).concat("\n\f")});
+		data.add(new Object[] {createHandlerBuilder(Model.ROMEO_ATTACHE).build(), multiLineDocumentInput, String.format(headerString, "A", "`", "K", "Y") + String.join("\n", multiLineDocumentOutputString).concat("\n\f")});
 		data.add(new Object[] {createHandlerBuilder().setLinesPerPage(30).setPageLength(12).build(), multiLineDocumentInput, String.format(headerString, "A", "h", "L", "^") + String.join("\r\n", multiLineDocumentOutputString).concat(EOP).concat("\u001a")});
 		data.add(new Object[] {createHandlerBuilder().setCellsPerLine(35).build(), multiLineDocumentInput, String.format(headerString, "A", "c", "K", "Y") + String.join("\r\n", multiLineDocumentOutputString).concat(EOP).concat("\u001a")});
 		data.add(new Object[] {createHandlerBuilder().setLinesPerPage(3).build(), multiLineDocumentInput, String.format(headerString, "A", "h", "K", "C") + String.join("\r\n", multiLineDocumentOutputString).concat(EOP).concat("\u001a")});
@@ -386,5 +388,29 @@ public class EnablingTechnologiesDocumentHandlerTest {
 	@Test(dataProvider="invalidCellTypeProvider")
 	public void testInvalidCellTypeThrowsException(Builder builder, BrlCell cell) {
 		expectThrows(IllegalArgumentException.class, () -> builder.setCell(cell));
+	}
+	@DataProvider(name="leftMarginProvider")
+	public Iterator<Object[]> leftMarginProvider() {
+		List<Object[]> data = new ArrayList<>();
+		List<DocumentEvent> inputEvents = ImmutableList.of(new StartDocumentEvent(), new StartVolumeEvent(), new StartSectionEvent(), new StartPageEvent(), new StartLineEvent(), new BrailleEvent("\u2801\u2803"), new EndLineEvent(), new EndPageEvent(), new EndSectionEvent(), new EndVolumeEvent(), new EndDocumentEvent());
+		Model model = Model.JULIET_CLASSIC;
+		int cellsPerLine = 2;
+		for (int i = 0; i < model.getMaxCellsPerLine(); i++) {
+			byte[] header = String.format("\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bL%s\u001bR%s\u001bT%s\u001bQ%s", "A", (char)(64 + Math.min(i + cellsPerLine, model.getMaxCellsPerLine())), "K", "Y").getBytes(Charsets.US_ASCII);
+			data.add(new Object[] { new EnablingTechnologiesDocumentHandler.Builder(model).setPapermode(Layout.P1ONLY), i, cellsPerLine, inputEvents, Bytes.concat(header, Strings.repeat(" ", Math.min(i, model.getMaxCellsPerLine() - cellsPerLine)).concat("AB").getBytes(Charsets.US_ASCII), model.getPageEnd(), model.getDocEnd())});
+		}
+		return data.iterator();
+	}
+	@Test(dataProvider="leftMarginProvider")
+	public void testLeftMargin(EnablingTechnologiesDocumentHandler.Builder builder, int leftMargin, int cellsPerLine, List<DocumentEvent> input, byte[] expected) {
+		EnablingTechnologiesDocumentHandler handler = builder.setLeftMargin(leftMargin).setCellsPerLine(cellsPerLine).build();
+		ByteSource result = handler.apply(input.iterator());
+		byte[] actual = null;
+		try {
+			actual = result.read();
+		} catch (IOException e) {
+			fail("Problem converting the document", e);
+		}
+		assertEquals(actual, expected);
 	}
 }

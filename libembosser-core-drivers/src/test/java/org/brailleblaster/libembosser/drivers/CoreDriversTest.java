@@ -101,7 +101,7 @@ public class CoreDriversTest {
 		data.add(new Object[] {"libembosser.et.phoenix_gold", testBrf, attrs, Bytes.concat(expectedHeader, expectedOutput)});
 		data.add(new Object[] {"libembosser.et.phoenix_silver", testBrf, attrs, Bytes.concat(expectedHeader, expectedOutput)});
 		data.add(new Object[] {"libembosser.et.cyclone", testBrf, attrs, Bytes.concat(expectedHeader, expectedOutput)});
-		expectedHeader = "\u001bA@@\u001bK@\u001bW@\u001bi@\u001bs@\u001bLA\u001bRd\u001bTK\u001bQ[".getBytes(Charsets.US_ASCII);
+	expectedHeader = "\u001bA@@\u001bK@\u001bW@\u001bi@\u001bs@\u001bLA\u001bRd\u001bTK\u001bQ[".getBytes(Charsets.US_ASCII);
 		expectedOutput = "\r\n    ,\"H IS \"S TEXT4\r\n  ,TEXT ON A NEW L9E4\r\n\f\r\n\f\u001a".getBytes(Charsets.US_ASCII);
 		data.add(new Object[] {"libembosser.et.trident", testBrf, attrs, Bytes.concat(expectedHeader, expectedOutput)});
 		
