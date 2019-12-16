@@ -50,15 +50,17 @@ public class CoreDriversTest {
 		
 		// Interpoint
 		// Generic does not support it so just does as it normally does.
+		// 2019-12-16: Now supports interpoint for inserting the appropriate blank pages.
 		attrs = new EmbossingAttributeSet(new PaperLayout(Layout.INTERPOINT));
-		data.add(new Object[] {"libembosser.generic.text", testBrf, attrs, expectedOutput});
-		data.add(new Object[] {"libembosser.generic.text_with_margins", testBrf, attrs, expectedOutput});
+		byte[] interpointExpectedOutput = "  ,\"H IS \"S TEXT4\r\n,TEXT ON A NEW L9E4\f\f".getBytes(Charsets.US_ASCII);
+		data.add(new Object[] {"libembosser.generic.text", testBrf, attrs, interpointExpectedOutput});
+		data.add(new Object[] {"libembosser.generic.text_with_margins", testBrf, attrs, interpointExpectedOutput});
 		
 		// Interpoint with margins
 		attrs = new EmbossingAttributeSet(new EmbossingAttribute[] {new PaperLayout(Layout.INTERPOINT), new PaperMargins(new Margins(new BigDecimal("13"), BigDecimal.ZERO, BigDecimal.TEN, BigDecimal.ZERO))});
-		data.add(new Object[] {"libembosser.generic.text", testBrf, attrs, expectedOutput});
-		expectedOutput = "\r\n    ,\"H IS \"S TEXT4\r\n  ,TEXT ON A NEW L9E4\f".getBytes(Charsets.US_ASCII);
-		data.add(new Object[] {"libembosser.generic.text_with_margins", testBrf, attrs, expectedOutput});
+		data.add(new Object[] {"libembosser.generic.text", testBrf, attrs, interpointExpectedOutput});
+		interpointExpectedOutput = "\r\n    ,\"H IS \"S TEXT4\r\n  ,TEXT ON A NEW L9E4\f\f".getBytes(Charsets.US_ASCII);
+		data.add(new Object[] {"libembosser.generic.text_with_margins", testBrf, attrs, interpointExpectedOutput});
 				
 		// Multiple copies
 		attrs = new EmbossingAttributeSet(new Copies(2));

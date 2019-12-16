@@ -12,10 +12,12 @@ import org.brailleblaster.libembosser.drivers.utils.document.filters.PageFilter;
 import org.brailleblaster.libembosser.embossing.attribute.BrailleCellType;
 import org.brailleblaster.libembosser.embossing.attribute.Copies;
 import org.brailleblaster.libembosser.embossing.attribute.PageRanges;
+import org.brailleblaster.libembosser.embossing.attribute.PaperLayout;
 import org.brailleblaster.libembosser.embossing.attribute.PaperMargins;
 import org.brailleblaster.libembosser.embossing.attribute.PaperSize;
 import org.brailleblaster.libembosser.spi.BrlCell;
 import org.brailleblaster.libembosser.spi.EmbossingAttributeSet;
+import org.brailleblaster.libembosser.spi.Layout;
 import org.brailleblaster.libembosser.spi.Margins;
 import org.brailleblaster.libembosser.spi.Rectangle;
 
@@ -51,6 +53,7 @@ public class GenericTextEmbosser extends BaseTextEmbosser {
 		GenericTextDocumentHandler.Builder builder = new GenericTextDocumentHandler.Builder();
 		builder.setTopMargin(topMarginCells).setLeftMargin(leftMarginCells).setCellsPerLine(cellsPerLine).setLinesPerPage(linesPerPage);
 		Optional.ofNullable(attributes.get(Copies.class)).ifPresent(v -> builder.setCopies(((Copies)v).getValue()));
+		builder.setInterpoint(Optional.ofNullable(attributes.get(PaperLayout.class)).filter(p -> ((PaperLayout)p).getValue().equals(Layout.INTERPOINT)).isPresent());
 		GenericTextDocumentHandler handler = builder.build();
 		PageRanges pages = Optional.ofNullable((PageRanges)(attributes.get(PageRanges.class))).orElseGet(() -> new PageRanges());
 		return new PageFilter(pages).andThen(handler);
