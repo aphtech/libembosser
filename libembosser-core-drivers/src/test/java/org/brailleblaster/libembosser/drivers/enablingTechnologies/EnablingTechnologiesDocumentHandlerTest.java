@@ -31,7 +31,6 @@ import org.brailleblaster.libembosser.drivers.utils.document.events.StartSection
 import org.brailleblaster.libembosser.drivers.utils.document.events.StartVolumeEvent;
 import org.brailleblaster.libembosser.spi.BrlCell;
 import org.brailleblaster.libembosser.spi.Layout;
-import org.brailleblaster.libembosser.spi.PaperSize;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -39,7 +38,6 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterators;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
 import com.google.common.io.ByteSource;
