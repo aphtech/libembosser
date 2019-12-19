@@ -1,2 +1,2 @@
-include 'libembosser-api','libembosser-core-drivers','libembosser-braillo-driver','libembosser-viewplus-driver','libembosser-utils','libembosser-cli'
+include 'libembosser-api','libembosser-core-drivers','libembosser-nippon-driver','libembosser-braillo-driver','libembosser-viewplus-driver','libembosser-utils','libembosser-cli'
 rootProject.name = 'libembosser'
