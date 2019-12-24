@@ -1,13 +1,18 @@
 package org.brailleblaster.libembosser.spi;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import javax.print.PrintService;
 import javax.print.StreamPrintServiceFactory;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 /**
  * Interface for embosser drivers.
@@ -68,7 +73,18 @@ public interface Embosser extends IEmbosser {
 	 * @param attributes Additional information about how to emboss the document.
 	 * @throws EmbossException When there is a problem embossing the document.
 	 */
-	public void embossPef(PrintService embosserDevice, InputStream pef, EmbossingAttributeSet attributes) throws EmbossException;
+	public default void embossPef(PrintService embosserDevice, InputStream pef, EmbossingAttributeSet attributes) throws EmbossException {
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		dbf.setNamespaceAware(true);
+		Document doc = null;
+		try {
+			DocumentBuilder db = dbf.newDocumentBuilder();
+			doc = db.parse(pef);
+		} catch (ParserConfigurationException | SAXException | IOException e) {
+			throw new EmbossException("Problem parsing XML", e);
+		}
+		embossPef(embosserDevice, doc, attributes);
+	}
 	
 	/**
 	 * Emboss a BRF document.
