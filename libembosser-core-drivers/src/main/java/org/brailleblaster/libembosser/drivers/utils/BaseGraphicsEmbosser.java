@@ -68,12 +68,6 @@ public abstract class BaseGraphicsEmbosser implements Embosser {
 	}
 
 	@Override
-	public void embossPef(PrintService embosserDevice, InputStream pef, EmbossingAttributeSet attributes)
-			throws EmbossException {
-		emboss(embosserDevice, pef, attributes, new DocumentParser()::parsePef);
-	}
-
-	@Override
 	public void embossBrf(PrintService embosserDevice, InputStream brf, EmbossingAttributeSet attributes)
 			throws EmbossException {
 		emboss(embosserDevice, brf, attributes, new DocumentParser()::parseBrf);

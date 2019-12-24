@@ -81,13 +81,6 @@ public abstract class BaseTextEmbosser implements Embosser {
 	}
 
 	@Override
-	public void embossPef(PrintService embosserDevice, InputStream pef, EmbossingAttributeSet attributes)
-			throws EmbossException {
-		DocumentParser parser = new DocumentParser();
-		emboss(embosserDevice, pef, parser::parsePef, createHandler(attributes));
-	}
-
-	@Override
 	public void embossBrf(PrintService embosserDevice, InputStream brf, EmbossingAttributeSet attributes)
 			throws EmbossException {
 		DocumentParser parser = new DocumentParser();

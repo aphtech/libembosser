@@ -55,8 +55,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
-import org.xml.sax.SAXException;
-
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
@@ -163,14 +161,6 @@ public class DocumentParser {
 			handler.onEvent(new EndLineEvent());
 		}
 		lineBuffer.reset();
-	}
-
-	public void parsePef(InputStream input, DocumentHandler handler) throws ParseException {
-		try {
-			parsePef(docBuilder.parse(input), handler);
-		} catch (SAXException | IOException e) {
-			throw new ParseException(e);
-		}
 	}
 
 	public void parsePef(Document inputDoc, DocumentHandler handler) {

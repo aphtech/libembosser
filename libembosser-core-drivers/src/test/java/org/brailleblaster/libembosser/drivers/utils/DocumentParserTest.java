@@ -164,17 +164,6 @@ public class DocumentParserTest {
 		data.add(new Object[] {input, expectedEvents});
 		return data.iterator();
 	}
-	@Test(dataProvider="pefProvider")
-	public void testParsePef(ByteSource input, List<DocumentEvent> expectedEvents) {
-		DocumentParser parser = new DocumentParser();
-		final List<DocumentEvent> actualEvents = new ArrayList<>();
-		try(InputStream is = input.openStream()) {
-			parser.parsePef(is, e -> actualEvents.add(e));
-		} catch (ParseException | IOException e) {
-			fail("Problem reading the PEF", e);
-		}
-		assertEqualEvents(expectedEvents, actualEvents);
-	}
 	
 	@Test(dataProvider="pefProvider")
 	public void testParsePefDom(ByteSource input, List<DocumentEvent> expectedEvents) {
