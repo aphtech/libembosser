@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<pef xmlns="http://www.daisy.org/ns/2008/pef" version="2008-1">
+  <head>
+    <meta xmlns:dc="http://purl.org/dc/elements/1.1/">
+      <dc:format>application/x-pef+xml</dc:format>
+      <dc:identifier>MultiplePages</dc:identifier>
+    </meta>
+  </head>
+  <body>
+    <volume cols="40" rows="25" duplex="false">
+      <section>
+        <page>
+          <row>&#x2820;&#x2801;&#x2800;&#x281e;&#x2811;&#x280c;</row>
+          <row>&#x2820;&#x2807;&#x2814;&#x2811;&#x2800;&#x283c;&#x2803;</row>
+        </page>
+        <page>
+        <row>&#x2820;&#x280f;&#x2801;&#x281b;&#x2811;&#x2800;&#x283c;&#x2803;</row>
+        <row></row>
+          <row>&#x2820;&#x2801;&#x2800;&#x281e;&#x2811;&#x280c;</row>
+          <row>&#x2820;&#x2807;&#x2814;&#x2811;&#x2800;&#x283c;&#x2809;</row>
+        </page>
+      </section>
+    </volume>
+  </body>
+</pef>
