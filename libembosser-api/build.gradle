@@ -5,6 +5,7 @@ plugins {
 
 dependencies {
 	implementation 'com.google.guava:guava:28.1-jre'
+	implementation project(':libembosser-utils')
 	testImplementation 'org.testng:testng:6.13.1'
 }
 

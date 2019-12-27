@@ -11,6 +11,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.brailleblaster.libembosser.utils.PefUtils;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -94,7 +95,15 @@ public interface Embosser extends IEmbosser {
 	 * @param attributes Additional information about how to emboss the document.
 	 * @throws EmbossException When there is a problem embossing the document.
 	 */
-	public void embossBrf(PrintService embosserDevice, InputStream brf, EmbossingAttributeSet attributes) throws EmbossException;
+	public default void embossBrf(PrintService embosserDevice, InputStream brf, EmbossingAttributeSet attributes) throws EmbossException {
+		Document doc = null;
+		try {
+			doc = PefUtils.fromBrf(brf, "BrfEmboss", 40, 25, false);
+		} catch (ParserConfigurationException | IOException e) {
+			throw new EmbossException("Unable to convert the BRF to PEF for embossing.", e);
+		}
+		embossPef(embosserDevice, doc, attributes);
+	}
 	
 	/**
 	 * Get the maximum paper which can be handled by the embosser.

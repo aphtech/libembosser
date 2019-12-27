@@ -7,8 +7,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -18,8 +16,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import com.google.common.base.Charsets;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Streams;
 import com.google.common.primitives.Ints;
 
 public final class PefUtils {
