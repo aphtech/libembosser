@@ -14,6 +14,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -23,9 +24,15 @@ import org.xml.sax.SAXException;
 import com.google.common.base.Charsets;
 
 public class NodeListUtilsTest {
-	@Test
-	public void testAsStream() {
-		String inputXml = "<doc><d1><c1/></d1><pef xmlns=\"http://www.daisy.org/ns/2008/pef\"></pef></doc>";
+	@DataProvider(name="inputXmlProvider")
+	public Object[][] inputXmlProvider() {
+		return new Object[][] {
+			{ "<doc><d1><c1/></d1><pef xmlns=\"http://www.daisy.org/ns/2008/pef\"></pef></doc>" },
+			{ "<p><b>ffi</b><br/></p>" },
+		};
+	}
+	@Test(dataProvider="inputXmlProvider")
+	public void testAsStream(String inputXml) {
 		NodeList nodes = null;
 		try (InputStream is = new ByteArrayInputStream(inputXml.getBytes(Charsets.US_ASCII))) {
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
