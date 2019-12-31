@@ -51,4 +51,7 @@ public enum BrailleMapper {
 		IntStream.range(0, chars.length).forEach(i -> chars[i] = mapper.applyAsChar(chars[i]));
 		return String.valueOf(chars);
 	}
+	public char map(char ch) {
+		return mapper.applyAsChar(ch);
+	}
 }
