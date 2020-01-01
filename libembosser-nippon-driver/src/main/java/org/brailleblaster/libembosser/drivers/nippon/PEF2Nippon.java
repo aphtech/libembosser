@@ -54,7 +54,8 @@ public class PEF2Nippon {
 	 * 
 	 * @return A collector for joining the rows into a page.
 	 */
-	public Collector<CharSequence, ?, String> rowsJoiner() {
+	Collector<CharSequence, ?, String> rowsJoiner() {
 		return Collector.of(RowsJoiner::new, RowsJoiner::append, RowsJoiner::append, RowsJoiner::getPageString, new Collector.Characteristics[] {});
 	}
+	
 }
