@@ -1,6 +1,8 @@
 package org.brailleblaster.libembosser.drivers.nippon;
 
 import java.util.stream.Collector;
+import java.util.stream.Collectors;
+
 import org.brailleblaster.libembosser.utils.BrailleMapper;
 import org.w3c.dom.Element;
 
@@ -57,5 +59,7 @@ public class PEF2Nippon {
 	Collector<CharSequence, ?, String> rowsJoiner() {
 		return Collector.of(RowsJoiner::new, RowsJoiner::append, RowsJoiner::append, RowsJoiner::getPageString, new Collector.Characteristics[] {});
 	}
-	
+	Collector<CharSequence, ?, String> pagesJoiner() {
+		return Collectors.joining("\f");
+	}
 }

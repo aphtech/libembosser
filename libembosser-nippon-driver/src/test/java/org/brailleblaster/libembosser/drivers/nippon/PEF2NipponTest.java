@@ -6,6 +6,7 @@ import static org.testng.Assert.fail;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.stream.Collector;
 import java.util.stream.Stream;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -68,6 +69,7 @@ public class PEF2NipponTest {
 	@DataProvider(name="rowsJoinerProvider")
 	public Object[][] rowsJoinerProvider() {
 		return new Object[][] {
+			{ Stream.<String>empty(), "\u0002\u0001\u0000" },
 			{ Stream.of("\u0003 \r\n", "\u0005A B\r\n"), "\u0002\u0001\u0002\u0003 \r\n\u0005A B\r\n" },
 			{ Stream.of("\u0006BACK\r\n", "\u0005GOT\r\n", "\u0013BACKW>DS TGR ON A\r\n", "\u0003 \r\n"), "\u0002\u0001\u0004\u0006BACK\r\n\u0005GOT\r\n\u0013BACKW>DS TGR ON A\r\n\u0003 \r\n" },
 		};
@@ -75,6 +77,20 @@ public class PEF2NipponTest {
 	@Test(dataProvider="rowsJoinerProvider")
 	public void testRowsJoiner(Stream<String> rows, String expected) {
 		String actual = rows.collect(new PEF2Nippon().rowsJoiner());
+		assertEquals(actual, expected);
+	}
+	@DataProvider(name="pagesJoinerProvider")
+	public Object[][] pagesJoinerProvider() {
+		return new Object[][] {
+			{ Stream.<String>empty(), "" },
+			{ Stream.of("\u0002\u0001\u0003\u0003A\r\n\u0005GOT\r\n\u0006BACK\r\n"), "\u0002\u0001\u0003\u0003A\r\n\u0005GOT\r\n\u0006BACK\r\n" },
+			{ Stream.of("\u0002\u0001\u0003\u0003A\r\n\u0005GOT\r\n\u0006BACK\r\n", "\u0002\u0001\u0004\u0003B\r\n\u0004CD\r\n\u0007FINDS\r\n\u0005GOT\r\n"), "\u0002\u0001\u0003\u0003A\r\n\u0005GOT\r\n\u0006BACK\r\n\f\u0002\u0001\u0004\u0003B\r\n\u0004CD\r\n\u0007FINDS\r\n\u0005GOT\r\n" },
+		};
+	}
+	@Test(dataProvider="pagesJoinerProvider")
+	public void testPagesJoinerProvider(Stream<String> pagesStream, String expected) {
+		Collector<CharSequence, ?, String> pagesJoiner = new PEF2Nippon().pagesJoiner();
+		String actual = pagesStream.collect(pagesJoiner);
 		assertEquals(actual, expected);
 	}
 }
