@@ -59,7 +59,25 @@ public class PEF2Nippon {
 	Collector<CharSequence, ?, String> rowsJoiner() {
 		return Collector.of(RowsJoiner::new, RowsJoiner::append, RowsJoiner::append, RowsJoiner::getPageString, new Collector.Characteristics[] {});
 	}
+	/**
+	 * Join pages in a section.
+	 * 
+	 * This joiner should be used for embossing jobs in single side mode.
+	 * 
+	 * @return A collector for joining pages together.
+	 */
 	Collector<CharSequence, ?, String> pagesJoiner() {
 		return Collectors.joining("\f");
+	}
+	/**
+	 * Collect pages in a duplex embossing job.
+	 * 
+	 * This should be used for jobs where the embosser has been set to duplex mode. Use the duplex parameter to indicate whether this specific section is duplex or not.
+	 * 
+	 * @param duplex Whether this section is duplex.
+	 * @return A collector for joining the pages together.
+	 */
+	Collector<CharSequence, ?, String> duplexPagesJoiner(boolean duplex) {
+		return Collectors.mapping(p -> new StringBuilder().append(p).append("\f\u0002\u0001\u0000"), pagesJoiner());
 	}
 }

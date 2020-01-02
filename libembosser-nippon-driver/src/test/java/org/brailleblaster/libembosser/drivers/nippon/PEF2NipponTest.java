@@ -93,4 +93,18 @@ public class PEF2NipponTest {
 		String actual = pagesStream.collect(pagesJoiner);
 		assertEquals(actual, expected);
 	}
+	@DataProvider(name="duplexPagesJoinerProvider")
+	public Object[][] duplexPagesJoinerProvider() {
+		return new Object[][] {
+			{ Stream.<String>empty(), false, "" },
+			{ Stream.of("\u0002\u0001\u0003\u0003A\r\n\u0005GOT\r\n\u0006BACK\r\n"), false, "\u0002\u0001\u0003\u0003A\r\n\u0005GOT\r\n\u0006BACK\r\n\f\u0002\u0001\u0000" },
+			{ Stream.of("\u0002\u0001\u0003\u0003A\r\n\u0005GOT\r\n\u0006BACK\r\n", "\u0002\u0001\u0004\u0003B\r\n\u0004CD\r\n\u0007FINDS\r\n\u0005GOT\r\n"), false, "\u0002\u0001\u0003\u0003A\r\n\u0005GOT\r\n\u0006BACK\r\n\f\u0002\u0001\u0000\f\u0002\u0001\u0004\u0003B\r\n\u0004CD\r\n\u0007FINDS\r\n\u0005GOT\r\n\f\u0002\u0001\u0000" },
+		};
+	}
+	@Test(dataProvider="duplexPagesJoinerProvider")
+	public void testDuplexPagesJoinerProvider(Stream<String> pagesStream, boolean duplex, String expected) {
+		Collector<CharSequence, ?, String> pagesJoiner = new PEF2Nippon().duplexPagesJoiner(duplex);
+		String actual = pagesStream.collect(pagesJoiner);
+		assertEquals(actual, expected);
+	}
 }
