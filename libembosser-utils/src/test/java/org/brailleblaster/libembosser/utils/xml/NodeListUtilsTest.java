@@ -50,4 +50,22 @@ public class NodeListUtilsTest {
 			assertEquals(actualAsList.get(i), nodes.item(i), String.format("Item at index %d does not match", i));
 		}
 	}
+	@Test(dataProvider="inputXmlProvider")
+	public void testAsList(String inputXml) {
+		NodeList nodes = null;
+		try (InputStream is = new ByteArrayInputStream(inputXml.getBytes(Charsets.US_ASCII))) {
+			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			dbf.setNamespaceAware(true);
+			DocumentBuilder db = dbf.newDocumentBuilder();
+			Document doc = db.parse(is);
+			nodes = doc.getDocumentElement().getChildNodes();
+		} catch (ParserConfigurationException | SAXException | IOException e) {
+			fail("Problem parsing test XML", e);
+		}
+		List<Node> actualAsList = NodeListUtils.asList(nodes);
+		assertEquals(actualAsList.size(), nodes.getLength(), "Stream does not have correct length");
+		for (int i = 0; i < nodes.getLength(); i++) {
+			assertEquals(actualAsList.get(i), nodes.item(i), String.format("Item at index %d does not match", i));
+		}
+	}
 }

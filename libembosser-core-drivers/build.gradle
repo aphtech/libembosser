@@ -4,7 +4,7 @@ plugins {
 }
 
 dependencies {
-	implementation 'com.google.guava:guava:28.1-jre'
+	implementation 'com.google.guava:guava:28.2-jre'
 	api project(':libembosser-api')
 	implementation project(':libembosser-utils')
 	implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
