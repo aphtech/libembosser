@@ -27,6 +27,29 @@ public class PEF2Nippon {
 			return sb.insert(0, new char[] { '\u0002', '\u0001', (char)rows}).toString();
 		}
 	}
+	private static class DuplexPagesJoiner {
+		private StringBuilder sb = new StringBuilder();
+		private int pages = 0;
+		public DuplexPagesJoiner append(CharSequence cs) {
+			sb.append(cs).append("\f");
+			pages++;
+			return this;
+		}
+		public DuplexPagesJoiner append(DuplexPagesJoiner dpj) {
+			sb.append(dpj.sb).append("\f");
+			pages += dpj.pages;
+			return this;
+		}
+		public String getSection() {
+			if (sb.length() == 0) {
+				return "";
+			} else if (pages % 2 != 0) {
+				return sb.append("\u0002\u0001\u0000").toString();
+			} else {
+				return sb.substring(0, sb.length() - 1);
+			}
+		}
+	}
 	/**
 	 * Map a row element to ASCII Braille.
 	 * 
@@ -78,6 +101,6 @@ public class PEF2Nippon {
 	 * @return A collector for joining the pages together.
 	 */
 	Collector<CharSequence, ?, String> duplexPagesJoiner(boolean duplex) {
-		return Collectors.mapping(p -> new StringBuilder().append(p).append("\f\u0002\u0001\u0000"), pagesJoiner());
+		return duplex? Collector.of(DuplexPagesJoiner::new, DuplexPagesJoiner::append, DuplexPagesJoiner::append, DuplexPagesJoiner::getSection, new Collector.Characteristics[] {}): Collectors.mapping(p -> new StringBuilder().append(p).append("\f\u0002\u0001\u0000"), pagesJoiner());
 	}
 }
