@@ -7,22 +7,50 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.stream.Stream;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.brailleblaster.libembosser.utils.xml.NodeListUtils;
+import org.brailleblaster.libembosser.utils.xml.UnknownNodeFlatMapper;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import com.google.common.base.Charsets;
 import com.google.common.primitives.Ints;
 
+
 public final class PefUtils {
 	private static final int[] LINE_ENDINGS = new int[] { '\r', '\n', '\f', -1 };
+	/**
+	 * Create a PEF from a BRF.
+	 * 
+	 * @param brf The BRF as a Reader.
+	 * @param id The identifier to be used for this document.
+	 * @param cells The number of cells per line.
+	 * @param lines The number of lines per page.
+	 * @param duplex Whether this document should be considered duplex.
+	 * @return A PEF Document containing the Braille from the BRF.
+	 * @throws ParserConfigurationException When there is a problem initialising the DOM.
+	 * @throws IOException When there is a problem reading the BRF.
+	 */
 	public static Document fromBrf(InputStream brf, String id, int cells, int lines, boolean duplex) throws ParserConfigurationException, IOException {
 		return fromBrf(new BufferedReader(new InputStreamReader(brf, Charsets.US_ASCII)), id, cells, lines, duplex);
 	}
+	/**
+	 * Create a PEF from a BRF.
+	 * 
+	 * @param brf The BRF as a Reader.
+	 * @param id The identifier to be used for this document.
+	 * @param cells The number of cells per line.
+	 * @param lines The number of lines per page.
+	 * @param duplex Whether this document should be considered duplex.
+	 * @return A PEF Document containing the Braille from the BRF.
+	 * @throws ParserConfigurationException When there is a problem initialising the DOM.
+	 * @throws IOException When there is a problem reading the BRF.
+	 */
 	public static Document fromBrf(Reader brf, String id, int cells, int lines, boolean duplex) throws ParserConfigurationException, IOException {
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware(true);
@@ -79,5 +107,15 @@ public final class PefUtils {
 		body.appendChild(volume);
 		root.appendChild(body);
 		return doc;
+	}
+	/**
+	 * Get the rows of a page as a stream of elements.
+	 * 
+	 * @param page The page element of the PEF.
+	 * @return A stream of elements where each element is a row.
+	 */
+	public static Stream<Element> getRowsAsStream(Element page) {
+		UnknownNodeFlatMapper rowsFlatMapper = new UnknownNodeFlatMapper(n -> n instanceof Element && PEFElementType.findElementType((Element)n).filter(PEFElementType.ROW::equals).isPresent());
+		return NodeListUtils.asStream(page.getChildNodes()).flatMap(rowsFlatMapper).map(n -> (Element)n);
 	}
 }
