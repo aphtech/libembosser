@@ -25,3 +25,5 @@ syntax: regexp
 ^spring-shell\.log$
 syntax: regexp
 ^libembosser-cli/spring-shell\.log$
+syntax: regexp
+^libembosser-nippon-driver/bin$
