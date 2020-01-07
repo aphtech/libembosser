@@ -63,19 +63,25 @@ public class PefUtilsTest {
 		}
 		
 	}
-	@DataProvider(name="pageProvider")
-	public Object[][] pageProvider() {
+	@DataProvider(name="findMatchingDescendantsProvider")
+	public Object[][] findMatchingDescendantsProvider() {
 		return new Object[][] {
-			{"<page xmlns=\"http://www.daisy.org/ns/2008/pef\"/>", new String[] {}},
-			{"<page xmlns=\"http://www.daisy.org/ns/2008/pef\"><row>&#x2801;&#x2800;&#x2803;</row></page>", new String[] {"<row xmlns=\"http://www.daisy.org/ns/2008/pef\">&#x2801;&#x2800;&#x2803;</row>"}},
-			{"<page xmlns=\"http://www.daisy.org/ns/2008/pef\"><row>&#x2801;</row><row>&#x2803;&#x2806;</row></page>", new String[] {"<row xmlns=\"http://www.daisy.org/ns/2008/pef\">&#x2801;</row>", "<row xmlns=\"http://www.daisy.org/ns/2008/pef\">&#x2803;&#x2806;</row>"}},
-			{"<page xmlns=\"http://www.daisy.org/ns/2008/pef\">   <row>&#x2801;</row>ffed<row>&#x2803;&#x2806;</row></page>", new String[] {"<row xmlns=\"http://www.daisy.org/ns/2008/pef\">&#x2801;</row>", "<row xmlns=\"http://www.daisy.org/ns/2008/pef\">&#x2803;&#x2806;</row>"}},
-			{"<page xmlns=\"http://www.daisy.org/ns/2008/pef\"><row>&#x2801;</row><row xmlns=\"some.other.ns\">&#x2805;</row><p xmlns=\"some.other\">&#x2803;</p><row>&#x2803;&#x2806;</row></page>", new String[] {"<row xmlns=\"http://www.daisy.org/ns/2008/pef\">&#x2801;</row>", "<row xmlns=\"http://www.daisy.org/ns/2008/pef\">&#x2803;&#x2806;</row>"}},
-			{"<page xmlns=\"http://www.daisy.org/ns/2008/pef\"><p xmlns=\"another.ns\"><row xmlns=\"http://www.daisy.org/ns/2008/pef\">&#x2801;</row></p><row>&#x2803;&#x2806;</row></page>", new String[] {"<row xmlns=\"http://www.daisy.org/ns/2008/pef\">&#x2801;</row>", "<row xmlns=\"http://www.daisy.org/ns/2008/pef\">&#x2803;&#x2806;</row>"}},
+			{"<page xmlns=\"http://www.daisy.org/ns/2008/pef\"/>", new String[] {}, new PEFElementType[] {PEFElementType.ROW}},
+			{"<page xmlns=\"http://www.daisy.org/ns/2008/pef\"><row>&#x2801;&#x2800;&#x2803;</row></page>", new String[] {"<row xmlns=\"http://www.daisy.org/ns/2008/pef\">&#x2801;&#x2800;&#x2803;</row>"}, new PEFElementType[] {PEFElementType.ROW}},
+			{"<page xmlns=\"http://www.daisy.org/ns/2008/pef\"><row>&#x2801;</row><row>&#x2803;&#x2806;</row></page>", new String[] {"<row xmlns=\"http://www.daisy.org/ns/2008/pef\">&#x2801;</row>", "<row xmlns=\"http://www.daisy.org/ns/2008/pef\">&#x2803;&#x2806;</row>"}, new PEFElementType[] {PEFElementType.ROW}},
+			{"<page xmlns=\"http://www.daisy.org/ns/2008/pef\">   <row>&#x2801;</row>ffed<row>&#x2803;&#x2806;</row></page>", new String[] {"<row xmlns=\"http://www.daisy.org/ns/2008/pef\">&#x2801;</row>", "<row xmlns=\"http://www.daisy.org/ns/2008/pef\">&#x2803;&#x2806;</row>"}, new PEFElementType[] {PEFElementType.ROW}},
+			{"<page xmlns=\"http://www.daisy.org/ns/2008/pef\"><row>&#x2801;</row><row xmlns=\"some.other.ns\">&#x2805;</row><p xmlns=\"some.other\">&#x2803;</p><row>&#x2803;&#x2806;</row></page>", new String[] {"<row xmlns=\"http://www.daisy.org/ns/2008/pef\">&#x2801;</row>", "<row xmlns=\"http://www.daisy.org/ns/2008/pef\">&#x2803;&#x2806;</row>"}, new PEFElementType[] {PEFElementType.ROW}},
+			{"<page xmlns=\"http://www.daisy.org/ns/2008/pef\"><p xmlns=\"another.ns\"><row xmlns=\"http://www.daisy.org/ns/2008/pef\">&#x2801;</row></p><row>&#x2803;&#x2806;</row></page>", new String[] {"<row xmlns=\"http://www.daisy.org/ns/2008/pef\">&#x2801;</row>", "<row xmlns=\"http://www.daisy.org/ns/2008/pef\">&#x2803;&#x2806;</row>"}, new PEFElementType[] {PEFElementType.ROW}},
+			{"<section xmlns=\"http://www.daisy.org/ns/2008/pef\"/>", new String[] {}, new PEFElementType[] {PEFElementType.PAGE}},
+			{"<section xmlns=\"http://www.daisy.org/ns/2008/pef\"><page><row>&#x2801;&#x2800;&#x2803;</row></page></section>", new String[] {"<page xmlns=\"http://www.daisy.org/ns/2008/pef\"><row>&#x2801;&#x2800;&#x2803;</row></page>"}, new PEFElementType[] {PEFElementType.PAGE}},
+			{"<section xmlns=\"http://www.daisy.org/ns/2008/pef\"><page><row>&#x2801;</row></page><page><row>&#x2803;&#x2806;</row></page></section>", new String[] {"<page xmlns=\"http://www.daisy.org/ns/2008/pef\"><row>&#x2801;</row></page>", "<page xmlns=\"http://www.daisy.org/ns/2008/pef\"><row>&#x2803;&#x2806;</row></page>"}, new PEFElementType[] {PEFElementType.PAGE}},
+			{"<section xmlns=\"http://www.daisy.org/ns/2008/pef\">   <page><row>&#x2801;</row></page>ffed<page><row>&#x2803;&#x2806;</row></page></section>", new String[] {"<page xmlns=\"http://www.daisy.org/ns/2008/pef\"><row>&#x2801;</row></page>", "<page xmlns=\"http://www.daisy.org/ns/2008/pef\"><row>&#x2803;&#x2806;</row></page>"}, new PEFElementType[] {PEFElementType.PAGE}},
+			{"<section xmlns=\"http://www.daisy.org/ns/2008/pef\"><page><row>&#x2801;</row></page><row xmlns=\"some.other.ns\">&#x2805;</row><p xmlns=\"some.other\">&#x2803;</p><page><row>&#x2803;&#x2806;</row></page></section>", new String[] {"<page xmlns=\"http://www.daisy.org/ns/2008/pef\"><row>&#x2801;</row></page>", "<page xmlns=\"http://www.daisy.org/ns/2008/pef\"><row>&#x2803;&#x2806;</row></page>"}, new PEFElementType[] {PEFElementType.PAGE}},
+			{"<section xmlns=\"http://www.daisy.org/ns/2008/pef\"><p xmlns=\"another.ns\"><page xmlns=\"http://www.daisy.org/ns/2008/pef\"><row>&#x2801;</row></page></p><page><row>&#x2803;&#x2806;</row></page></section>", new String[] {"<page xmlns=\"http://www.daisy.org/ns/2008/pef\"><row>&#x2801;</row></page>", "<page xmlns=\"http://www.daisy.org/ns/2008/pef\"><row>&#x2803;&#x2806;</row></page>"}, new PEFElementType[] {PEFElementType.PAGE}},
 		};
 	}
-	@Test(dataProvider="pageProvider")
-	public void testGetRowsAsStream(String pageXml, String[] rowsXml) {
+	@Test(dataProvider="findMatchingDescendantsProvider")
+	public void testFindMatchingDescendants(String parentXml, String[] descendantsXml, PEFElementType[] elementTypes) {
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware(true);
 		DocumentBuilder db = null;
@@ -84,27 +90,28 @@ public class PefUtilsTest {
 		} catch (ParserConfigurationException e) {
 			fail("Problem setting up XML parser", e);
 		}
-		Element inputPage = null;
-		try (InputStream is = new ByteArrayInputStream(pageXml.getBytes(Charsets.UTF_8))) {
-			inputPage = db.parse(is).getDocumentElement();
+		Element inputParent = null;
+		try (InputStream is = new ByteArrayInputStream(parentXml.getBytes(Charsets.UTF_8))) {
+			inputParent = db.parse(is).getDocumentElement();
 		} catch (IOException | SAXException e) {
 			fail("Problem parsing input XML", e);
 		}
-		ImmutableList.Builder<Element> rowsBuilder = ImmutableList.builderWithExpectedSize(rowsXml.length);
-		for (String rowXml: rowsXml) {
-			try (InputStream is = new ByteArrayInputStream(rowXml.getBytes(Charsets.UTF_8))) {
-				Element rowElem = db.parse(is).getDocumentElement();
-				rowsBuilder.add(rowElem);
+		ImmutableList.Builder<Element> descendantsBuilder = ImmutableList.builderWithExpectedSize(descendantsXml.length);
+		for (String descendantXml: descendantsXml) {
+			try (InputStream is = new ByteArrayInputStream(descendantXml.getBytes(Charsets.UTF_8))) {
+				Element descendantElem = db.parse(is).getDocumentElement();
+				descendantsBuilder.add(descendantElem);
 			} catch (IOException | SAXException e) {
 				fail("Problem parsing expected XML", e);
 			}
 		}
-		List<Element> expected = rowsBuilder.build();
-		Stream<Element> actualStream = PefUtils.getRowsAsStream(inputPage);
+		List<Element> expected = descendantsBuilder.build();
+		Stream<Element> actualStream = PefUtils.findMatchingDescendants(inputParent, elementTypes);
 		List<Element> actualAsList = actualStream.collect(ImmutableList.toImmutableList());
 		assertEquals(actualAsList.size(), expected.size(), "Not got the expected number of elements in the stream.");
 		for (int i = 0; i < actualAsList.size(); i++) {
 			XmlAssert.assertThat(actualAsList.get(i)).and(expected.get(i)).areIdentical();
 		}
 	}
+	
 }

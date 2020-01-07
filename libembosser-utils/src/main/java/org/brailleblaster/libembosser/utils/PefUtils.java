@@ -5,8 +5,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.stream.Stream;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -108,14 +110,10 @@ public final class PefUtils {
 		root.appendChild(body);
 		return doc;
 	}
-	/**
-	 * Get the rows of a page as a stream of elements.
-	 * 
-	 * @param page The page element of the PEF.
-	 * @return A stream of elements where each element is a row.
-	 */
-	public static Stream<Element> getRowsAsStream(Element page) {
-		UnknownNodeFlatMapper rowsFlatMapper = new UnknownNodeFlatMapper(n -> n instanceof Element && PEFElementType.findElementType((Element)n).filter(PEFElementType.ROW::equals).isPresent());
-		return NodeListUtils.asStream(page.getChildNodes()).flatMap(rowsFlatMapper).map(n -> (Element)n);
+	
+	public static Stream<Element> findMatchingDescendants(Element element, PEFElementType... elementTypes) {
+		List<PEFElementType> typesList = Arrays.asList(elementTypes);
+		UnknownNodeFlatMapper flatMapper = new UnknownNodeFlatMapper(n -> n instanceof Element && PEFElementType.findElementType((Element)n).filter(typesList::contains).isPresent());
+		return NodeListUtils.asStream(element.getChildNodes()).flatMap(flatMapper).map(n -> (Element)n);
 	}
 }
