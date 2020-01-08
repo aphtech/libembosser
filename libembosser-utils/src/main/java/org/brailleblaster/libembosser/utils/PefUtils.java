@@ -16,6 +16,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.brailleblaster.libembosser.utils.xml.NodeListUtils;
+import org.brailleblaster.libembosser.utils.xml.NodeUtils;
 import org.brailleblaster.libembosser.utils.xml.UnknownNodeFlatMapper;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -113,7 +114,6 @@ public final class PefUtils {
 	
 	public static Stream<Element> findMatchingDescendants(Element element, PEFElementType... elementTypes) {
 		List<PEFElementType> typesList = Arrays.asList(elementTypes);
-		UnknownNodeFlatMapper flatMapper = new UnknownNodeFlatMapper(n -> n instanceof Element && PEFElementType.findElementType((Element)n).filter(typesList::contains).isPresent());
-		return NodeListUtils.asStream(element.getChildNodes()).flatMap(flatMapper).map(n -> (Element)n);
+		return NodeUtils.findMatchingDescendants(element, n -> n instanceof Element && PEFElementType.findElementType((Element)n).filter(typesList::contains).isPresent()).map(n -> (Element)n);
 	}
 }
