@@ -4,6 +4,8 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.brailleblaster.libembosser.utils.BrailleMapper;
+import org.brailleblaster.libembosser.utils.PEFElementType;
+import org.brailleblaster.libembosser.utils.PefUtils;
 import org.w3c.dom.Element;
 
 /**
@@ -69,7 +71,6 @@ public class PEF2Nippon {
 	 * @return The line of Braille with the start and end sequences added.
 	 */
 	String addRowStartAndEnd(String row) {
-		
 		return new StringBuilder(row.length() + 3).append((char)(row.length() + 2)).append(row).append("\r\n").toString();
 	}
 	/**
@@ -102,5 +103,17 @@ public class PEF2Nippon {
 	 */
 	Collector<CharSequence, ?, String> duplexPagesJoiner(boolean duplex) {
 		return duplex? Collector.of(DuplexPagesJoiner::new, DuplexPagesJoiner::append, DuplexPagesJoiner::append, DuplexPagesJoiner::getSection, new Collector.Characteristics[] {}): Collectors.mapping(p -> new StringBuilder().append(p).append("\f\u0002\u0001\u0000"), pagesJoiner());
+	}
+	String pageToString(Element page) {
+		return PefUtils.findMatchingDescendants(page, PEFElementType.ROW).map(r -> addRowStartAndEnd(rowToAscii(r))).collect(rowsJoiner());
+	}
+	String sectionToString(Element section) {
+		return PefUtils.findMatchingDescendants(section, PEFElementType.PAGE).map(this::pageToString).collect(pagesJoiner());
+	}
+	String volumeToString(Element volume) {
+		return PefUtils.findMatchingDescendants(volume, PEFElementType.SECTION).map(this::sectionToString).collect(pagesJoiner());
+	}
+	String bodyToString(Element body) {
+		return PefUtils.findMatchingDescendants(body, PEFElementType.VOLUME).map(this::volumeToString).collect(pagesJoiner());
 	}
 }

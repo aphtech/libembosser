@@ -6,6 +6,7 @@ import static org.testng.Assert.fail;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
 
@@ -112,4 +113,49 @@ public class PEF2NipponTest {
 		String actual = pagesStream.collect(pagesJoiner);
 		assertEquals(actual, expected);
 	}
+	@DataProvider(name="elementToStringProvider")
+	public Object[][] elementToStringProvider() {
+		final PEF2Nippon pefToNippon = new PEF2Nippon();
+		Function<Element, String> pageToString = pefToNippon::pageToString;
+		Function<Element, String> sectionToString = pefToNippon::sectionToString;
+		Function<Element, String> volumeToString = pefToNippon::volumeToString;
+		Function<Element, String> bodyToString = pefToNippon::bodyToString;
+		return new Object[][] {
+			{"<page xmlns=\"http://www.daisy.org/ns/2008/pef\"/>", "\u0002\u0001\u0000", pageToString},
+			{"<page xmlns=\"http://www.daisy.org/ns/2008/pef\"><row>&#x2801;&#x2803;</row></page>", "\u0002\u0001\u0001\u0004AB\r\n", pageToString},
+			{"<page xmlns=\"http://www.daisy.org/ns/2008/pef\"><row>&#x2803;&#x2801;</row><row>&#x2801;&#x2800;&#x2803;&#x2800;&#x2809;</row></page>", "\u0002\u0001\u0002\u0004BA\r\n\u0007A B C\r\n", pageToString},
+			{"<section xmlns=\"http://www.daisy.org/ns/2008/pef\"><page/></section>", "\u0002\u0001\u0000", sectionToString},
+			{"<section xmlns=\"http://www.daisy.org/ns/2008/pef\"><page/><page/></section>", "\u0002\u0001\u0000\f\u0002\u0001\u0000", sectionToString},
+			{"<section xmlns=\"http://www.daisy.org/ns/2008/pef\"><page><row>&#x2809;&#x2801;&#x2803;</row></page></section>", "\u0002\u0001\u0001\u0005CAB\r\n", sectionToString},
+			{"<section xmlns=\"http://www.daisy.org/ns/2008/pef\"><page><row>&#x2809;&#x2801;&#x2803;</row><row>&#x2801;&#x2800;&#x2803;&#x2800;&#x2809;</row></page></section>", "\u0002\u0001\u0002\u0005CAB\r\n\u0007A B C\r\n", sectionToString},
+			{"<section xmlns=\"http://www.daisy.org/ns/2008/pef\"><page><row>&#x2809;&#x2801;&#x2803;</row><row>&#x2801;&#x2800;&#x2803;&#x2800;&#x2809;</row></page><page><row>&#x2801;&#x2800;&#x2803;&#x2800;&#x2809;</row><row>&#x2801;&#x2803;</row></page></section>", "\u0002\u0001\u0002\u0005CAB\r\n\u0007A B C\r\n\f\u0002\u0001\u0002\u0007A B C\r\n\u0004AB\r\n", sectionToString},
+			{"<volume xmlns=\"http://www.daisy.org/ns/2008/pef\"><section><page/></section></volume>", "\u0002\u0001\u0000", volumeToString},
+			{"<volume xmlns=\"http://www.daisy.org/ns/2008/pef\"><section><page/><page/></section></volume>", "\u0002\u0001\u0000\f\u0002\u0001\u0000", volumeToString},
+			{"<volume xmlns=\"http://www.daisy.org/ns/2008/pef\"><section><page/></section><section><page/></section></volume>", "\u0002\u0001\u0000\f\u0002\u0001\u0000", volumeToString},
+			{"<volume xmlns=\"http://www.daisy.org/ns/2008/pef\"><section><page><row>&#x281b;&#x2815;&#x281e;</row><row>&#x2801;&#x2803;&#x2809;</row></page></section></volume>", "\u0002\u0001\u0002\u0005GOT\r\n\u0005ABC\r\n", volumeToString},
+			{"<volume xmlns=\"http://www.daisy.org/ns/2008/pef\"><section><page><row>&#x2801;&#x2800;&#x2803;&#x2800;&#x2809;</row></page><page><row>&#x2801;&#x2803;&#x2809;</row></page></section></volume>", "\u0002\u0001\u0001\u0007A B C\r\n\f\u0002\u0001\u0001\u0005ABC\r\n", volumeToString},
+			{"<volume xmlns=\"http://www.daisy.org/ns/2008/pef\"><section><page><row>&#x2801;&#x2800;&#x2803;&#x2800;&#x2809;</row></page></section><section><page><row>&#x2801;&#x2803;&#x2809;</row></page></section></volume>", "\u0002\u0001\u0001\u0007A B C\r\n\f\u0002\u0001\u0001\u0005ABC\r\n", volumeToString},
+			{"<body xmlns=\"http://www.daisy.org/ns/2008/pef\"><volume><section><page/></section></volume></body>", "\u0002\u0001\u0000", bodyToString},
+			{"<body xmlns=\"http://www.daisy.org/ns/2008/pef\"><volume><section><page/><page/></section></volume></body>", "\u0002\u0001\u0000\f\u0002\u0001\u0000", bodyToString},
+			{"<body xmlns=\"http://www.daisy.org/ns/2008/pef\"><volume><section><page/></section><section><page/></section></volume></body>", "\u0002\u0001\u0000\f\u0002\u0001\u0000", bodyToString},
+			{"<body xmlns=\"http://www.daisy.org/ns/2008/pef\"><volume><section><page><row>&#x281b;&#x2815;&#x281e;</row><row>&#x2801;&#x2803;&#x2809;</row></page></section></volume></body>", "\u0002\u0001\u0002\u0005GOT\r\n\u0005ABC\r\n", bodyToString},
+			{"<body xmlns=\"http://www.daisy.org/ns/2008/pef\"><volume><section><page><row>&#x2801;&#x2800;&#x2803;&#x2800;&#x2809;</row></page><page><row>&#x2801;&#x2803;&#x2809;</row></page></section></volume></body>", "\u0002\u0001\u0001\u0007A B C\r\n\f\u0002\u0001\u0001\u0005ABC\r\n", bodyToString},
+			{"<body xmlns=\"http://www.daisy.org/ns/2008/pef\"><volume><section><page><row>&#x2801;&#x2800;&#x2803;&#x2800;&#x2809;</row></page></section><section><page><row>&#x2801;&#x2803;&#x2809;</row></page></section></volume></body>", "\u0002\u0001\u0001\u0007A B C\r\n\f\u0002\u0001\u0001\u0005ABC\r\n", bodyToString},
+		};
+	}
+	@Test(dataProvider="elementToStringProvider")
+	public void testElementToStringConversion(String inputXml, String expected, Function<Element, String> conversionFunction) {
+		Element page = null;
+		try (InputStream is = new ByteArrayInputStream(inputXml.getBytes(Charsets.UTF_8))) {
+			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			dbf.setNamespaceAware(true);
+			DocumentBuilder db = dbf.newDocumentBuilder();
+			page = db.parse(is).getDocumentElement();
+		} catch (SAXException | IOException | ParserConfigurationException e) {
+			fail("Problem parsing the input XML", e);
+		}
+		String actual = conversionFunction.apply(page);
+		assertEquals(actual, expected);
+	}
+	
 }

@@ -15,9 +15,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.brailleblaster.libembosser.utils.xml.NodeListUtils;
 import org.brailleblaster.libembosser.utils.xml.NodeUtils;
-import org.brailleblaster.libembosser.utils.xml.UnknownNodeFlatMapper;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
