@@ -114,6 +114,6 @@ public class PEF2Nippon {
 		return PefUtils.findMatchingDescendants(volume, PEFElementType.SECTION).map(this::sectionToString).collect(pagesJoiner());
 	}
 	String bodyToString(Element body) {
-		return PefUtils.findMatchingDescendants(body, PEFElementType.VOLUME).map(this::volumeToString).collect(pagesJoiner());
+		return PefUtils.findMatchingDescendants(body, PEFElementType.VOLUME).map(this::volumeToString).collect(Collectors.joining("\f", "\u0001\u0000\u0000", "\u0003"));
 	}
 }
