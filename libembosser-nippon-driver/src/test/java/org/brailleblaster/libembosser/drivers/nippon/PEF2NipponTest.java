@@ -120,6 +120,7 @@ public class PEF2NipponTest {
 		Function<Element, String> sectionToString = pefToNippon::sectionToString;
 		Function<Element, String> volumeToString = pefToNippon::volumeToString;
 		Function<Element, String> bodyToString = pefToNippon::bodyToString;
+		Function<Element, String> pefToString = pefToNippon::pefToString;
 		return new Object[][] {
 			{"<page xmlns=\"http://www.daisy.org/ns/2008/pef\"/>", "\u0002\u0001\u0000", pageToString},
 			{"<page xmlns=\"http://www.daisy.org/ns/2008/pef\"><row>&#x2801;&#x2803;</row></page>", "\u0002\u0001\u0001\u0004AB\r\n", pageToString},
@@ -142,6 +143,14 @@ public class PEF2NipponTest {
 			{"<body xmlns=\"http://www.daisy.org/ns/2008/pef\"><volume><section><page><row>&#x2801;&#x2800;&#x2803;&#x2800;&#x2809;</row></page><page><row>&#x2801;&#x2803;&#x2809;</row></page></section></volume></body>", "\u0001\u0000\u0000\u0002\u0001\u0001\u0007A B C\r\n\f\u0002\u0001\u0001\u0005ABC\r\n\u0003", bodyToString},
 			{"<body xmlns=\"http://www.daisy.org/ns/2008/pef\"><volume><section><page><row>&#x2801;&#x2800;&#x2803;&#x2800;&#x2809;</row></page></section><section><page><row>&#x2801;&#x2803;&#x2809;</row></page></section></volume></body>", "\u0001\u0000\u0000\u0002\u0001\u0001\u0007A B C\r\n\f\u0002\u0001\u0001\u0005ABC\r\n\u0003", bodyToString},
 			{"<body xmlns=\"http://www.daisy.org/ns/2008/pef\"><volume><section><page><row>&#x281b;&#x2815;&#x281e;</row><row>&#x2801;&#x2800;&#x2803;</row></page><page><row>&#x2813;&#x2800;&#x281b;&#x2815;&#x281e;</row></page></section></volume><volume><section><page><row>&#x2801;&#x2800;&#x2803;&#x2800;&#x2809;</row></page></section><section><page><row>&#x2801;&#x2803;&#x2809;</row></page></section></volume></body>", "\u0001\u0000\u0000\u0002\u0001\u0002\u0005GOT\r\n\u0005A B\r\n\f\u0002\u0001\u0001\u0007H GOT\r\n\f\u0002\u0001\u0001\u0007A B C\r\n\f\u0002\u0001\u0001\u0005ABC\r\n\u0003", bodyToString},
+			
+			{"<pef xmlns=\"http://www.daisy.org/ns/2008/pef\"><body><volume><section><page/></section></volume></body></pef>", "\u0001\u0000\u0000\u0002\u0001\u0000\u0003", pefToString},
+			{"<pef xmlns=\"http://www.daisy.org/ns/2008/pef\"><body><volume><section><page/><page/></section></volume></body></pef>", "\u0001\u0000\u0000\u0002\u0001\u0000\f\u0002\u0001\u0000\u0003", pefToString},
+			{"<pef xmlns=\"http://www.daisy.org/ns/2008/pef\"><body><volume><section><page/></section><section><page/></section></volume></body></pef>", "\u0001\u0000\u0000\u0002\u0001\u0000\f\u0002\u0001\u0000\u0003", pefToString},
+			{"<pef xmlns=\"http://www.daisy.org/ns/2008/pef\"><body><volume><section><page><row>&#x281b;&#x2815;&#x281e;</row><row>&#x2801;&#x2803;&#x2809;</row></page></section></volume></body></pef>", "\u0001\u0000\u0000\u0002\u0001\u0002\u0005GOT\r\n\u0005ABC\r\n\u0003", pefToString},
+			{"<pef xmlns=\"http://www.daisy.org/ns/2008/pef\"><body><volume><section><page><row>&#x2801;&#x2800;&#x2803;&#x2800;&#x2809;</row></page><page><row>&#x2801;&#x2803;&#x2809;</row></page></section></volume></body></pef>", "\u0001\u0000\u0000\u0002\u0001\u0001\u0007A B C\r\n\f\u0002\u0001\u0001\u0005ABC\r\n\u0003", pefToString},
+			{"<pef xmlns=\"http://www.daisy.org/ns/2008/pef\"><body><volume><section><page><row>&#x2801;&#x2800;&#x2803;&#x2800;&#x2809;</row></page></section><section><page><row>&#x2801;&#x2803;&#x2809;</row></page></section></volume></body></pef>", "\u0001\u0000\u0000\u0002\u0001\u0001\u0007A B C\r\n\f\u0002\u0001\u0001\u0005ABC\r\n\u0003", pefToString},
+			{"<pef xmlns=\"http://www.daisy.org/ns/2008/pef\"><body><volume><section><page><row>&#x281b;&#x2815;&#x281e;</row><row>&#x2801;&#x2800;&#x2803;</row></page><page><row>&#x2813;&#x2800;&#x281b;&#x2815;&#x281e;</row></page></section></volume><volume><section><page><row>&#x2801;&#x2800;&#x2803;&#x2800;&#x2809;</row></page></section><section><page><row>&#x2801;&#x2803;&#x2809;</row></page></section></volume></body></pef>", "\u0001\u0000\u0000\u0002\u0001\u0002\u0005GOT\r\n\u0005A B\r\n\f\u0002\u0001\u0001\u0007H GOT\r\n\f\u0002\u0001\u0001\u0007A B C\r\n\f\u0002\u0001\u0001\u0005ABC\r\n\u0003", pefToString},
 		};
 	}
 	@Test(dataProvider="elementToStringProvider")

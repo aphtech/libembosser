@@ -116,4 +116,9 @@ public class PEF2Nippon {
 	String bodyToString(Element body) {
 		return PefUtils.findMatchingDescendants(body, PEFElementType.VOLUME).map(this::volumeToString).collect(Collectors.joining("\f", "\u0001\u0000\u0000", "\u0003"));
 	}
+	String pefToString(Element pef) {
+		// An optimisation is to get all the known PEF element types (eg. head, body) and then filter out the ones we do not descend.
+		// This works as unknown elements are searched for known types where as a known element is not searched.
+		return PefUtils.findMatchingDescendants(pef, PEFElementType.HEAD, PEFElementType.BODY).filter(e -> PEFElementType.findElementType(e).filter(PEFElementType.BODY::equals).isPresent()).map(this::bodyToString).collect(Collectors.joining());
+	}
 }
