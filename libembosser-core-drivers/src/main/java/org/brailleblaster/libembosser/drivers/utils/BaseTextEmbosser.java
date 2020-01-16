@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Stream;
 
 import javax.print.Doc;
 import javax.print.DocFlavor;
@@ -24,7 +23,6 @@ import org.brailleblaster.libembosser.drivers.utils.document.events.DocumentEven
 import org.brailleblaster.libembosser.spi.EmbossException;
 import org.brailleblaster.libembosser.spi.Embosser;
 import org.brailleblaster.libembosser.spi.EmbossingAttributeSet;
-import org.brailleblaster.libembosser.spi.Notification;
 import org.brailleblaster.libembosser.spi.Rectangle;
 import org.brailleblaster.libembosser.utils.EmbossToStreamPrintServiceFactory;
 import org.w3c.dom.Document;
@@ -155,9 +153,5 @@ public abstract class BaseTextEmbosser implements Embosser {
 	@Override
 	public Optional<StreamPrintServiceFactory> getStreamPrintServiceFactory() {
 		return Optional.of(streamPrintServiceFactory);
-	}
-	@Override
-	public Stream<Notification> checkPrerequisites() {
-		return Stream.empty();
 	}
 }
