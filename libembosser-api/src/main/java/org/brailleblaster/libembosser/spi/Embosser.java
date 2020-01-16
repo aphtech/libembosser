@@ -135,4 +135,17 @@ public interface Embosser extends IEmbosser {
 	 * @return A list of notifications informing the user of actions which must be taken to be able to use this embosser.
 	 */
 	public Stream<Notification> checkPrerequisites();
+	/**
+	 * Check if the embosser can emboss a job.
+	 * 
+	 * Due to the differing capabilities of embossers, it may be necessary for the embosser to approximate the requested attributes. In this case it may not be possible for the embosser to reproduce the document accurately. This method helps client applications confirm whether a particular emboss job can be reproduced on the embosser prior to actually requesting embossing of the job.
+	 * 
+	 * @param cellsPerLine The cells per line of the document.
+	 * @param linesPerPage The lines per page of the document.
+	 * @param attributes The emboss job attributes.
+	 * @return A stream of notifications containing information about any approximations which will be made for embossing.
+	 */
+	public default Stream<Notification> checkEmboss(int cellsPerLine, int linesPerPage, EmbossingAttributeSet attributes) {
+		return Stream.empty();
+	}
 }
