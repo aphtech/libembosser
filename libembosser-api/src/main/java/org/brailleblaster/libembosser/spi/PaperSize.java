@@ -12,6 +12,7 @@ public enum PaperSize {
 	BRAILLE_11_5X11("11.5x11", "292.1", "279.4"),
 	// Needed for legacy
 	// We should be able to remove after a few releases (may be in July 2018)
+	@Deprecated
 	BRAILLE_11X11_5(BRAILLE_11_5X11),
 	A0("A0", "841", "1189"),
 	A1("A1", "594", "841"),
