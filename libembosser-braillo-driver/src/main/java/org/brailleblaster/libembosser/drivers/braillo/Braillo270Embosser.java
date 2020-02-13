@@ -38,7 +38,7 @@ public class Braillo270Embosser extends BaseTextEmbosser {
 	@Override
 	protected Function<Iterator<DocumentEvent>, ByteSource> createHandler(EmbossingAttributeSet attributes) {
 		final BrlCell cell = BrlCell.NLS;
-		final Rectangle paperSize = Optional.ofNullable((PaperSize)(attributes.get(PaperSize.class))).map(p -> p.getValue()).orElse(org.brailleblaster.libembosser.spi.PaperSize.BRAILLE_11X11_5.getSize());
+		final Rectangle paperSize = Optional.ofNullable((PaperSize)(attributes.get(PaperSize.class))).map(p -> p.getValue()).orElse(org.brailleblaster.libembosser.spi.PaperSize.BRAILLE_11_5X11.getSize());
 		final Margins margins = Optional.ofNullable((PaperMargins)(attributes.get(PaperMargins.class))).map(m -> m.getValue()).orElse(Margins.NO_MARGINS);
 		final BigDecimal height = paperSize.getHeight();
 		final BigDecimal width = paperSize.getWidth();
