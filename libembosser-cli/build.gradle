@@ -6,6 +6,11 @@ plugins {
 
 apply plugin: 'io.spring.dependency-management'
 
+java {
+	sourceCompatibility = JavaVersion.VERSION_1_8
+	targetCompatibility = JavaVersion.VERSION_1_8
+}
+
 application {
 	mainClassName = 'org.brailleblaster.libembosser.cli.LibEmbosserCliApplication'
 }

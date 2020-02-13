@@ -3,6 +3,11 @@ plugins {
 	id "com.github.spotbugs" version "3.0.0"
 }
 
+java {
+	sourceCompatibility = JavaVersion.VERSION_1_8
+	targetCompatibility = JavaVersion.VERSION_1_8
+}
+
 dependencies {
 	implementation 'com.google.guava:guava:28.2-jre'
 	testImplementation "org.assertj:assertj-core:3.14.0"
