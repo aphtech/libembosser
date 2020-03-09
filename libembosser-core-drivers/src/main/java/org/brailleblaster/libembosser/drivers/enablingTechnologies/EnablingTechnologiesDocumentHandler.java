@@ -136,9 +136,11 @@ public class EnablingTechnologiesDocumentHandler implements ByteSourceHandlerToF
 				.setLinesPerPage(linesPerPage)
 				.setEndOfLine(model.getLineEnd())
 				.setEndOfPage(model.getPageEnd())
+				.setEopOnFullPage(false)
 				.setInterpoint(duplex.isDoubleSide())
 				.setCopies(copies)
 				.setFooter(model.getDocEnd())
+				.padWithBlankLines(false)
 				.build();
 		// Build the header
 		ByteArrayDataOutput headerOutput = ByteStreams.newDataOutput(100);

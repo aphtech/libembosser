@@ -128,6 +128,7 @@ public class GenericTextDocumentHandler implements ByteSourceHandlerToFunctionAd
 		private byte[] endOfLine = new byte[] {'\r','\n'};
 		private byte[] endOfPage = new byte[] {'\f'};
 		private boolean padWithBlanks = false;
+		private boolean eopOnFullPage = true;
 		private byte[] header = new byte[0];
 		private byte[] footer = new byte[0];
 		public Builder setHeader(byte[] header) {
@@ -154,6 +155,10 @@ public class GenericTextDocumentHandler implements ByteSourceHandlerToFunctionAd
 		public Builder setEndOfPage(byte[] endOfPage) {
 			checkNotNull(endOfPage);
 			this.endOfPage = Arrays.copyOf(endOfPage, endOfPage.length);
+			return this;
+		}
+		public Builder setEopOnFullPage(boolean eopOnFull) {
+			this.eopOnFullPage = eopOnFull;
 			return this;
 		}
 		public Builder padWithBlankLines(boolean pad) {
@@ -185,7 +190,7 @@ public class GenericTextDocumentHandler implements ByteSourceHandlerToFunctionAd
 			return this;
 		}
 		public GenericTextDocumentHandler build() {
-			return new GenericTextDocumentHandler(leftMargin, topMargin, cellsPerLine, linesPerPage, endOfLine, endOfPage, padWithBlanks, interpoint, copies, header, footer);
+			return new GenericTextDocumentHandler(leftMargin, topMargin, cellsPerLine, linesPerPage, endOfLine, endOfPage, eopOnFullPage, padWithBlanks, interpoint, copies, header, footer);
 		}
 	}
 	private ByteArrayOutputStream output;
@@ -204,13 +209,14 @@ public class GenericTextDocumentHandler implements ByteSourceHandlerToFunctionAd
 	private final Deque<HandlerStates> stateStack = new LinkedList<>();
 	private final byte[] newLineBytes;
 	private byte[] newPageBytes;
+	private final boolean eopOnFullPage;
 	private final boolean bottomPadding;
 	private int pendingLines;
 	private boolean rightPage = true;
 	private final ByteSource header;
 	private final ByteSource footer;
 
-	private GenericTextDocumentHandler(int leftMargin, int topMargin, int cellsPerLine, int linesPerPage, byte[] endOfLine, byte[] endOfPage, boolean bottomPadding, boolean interpoint, int copies, byte[] header, byte[] footer) {
+	private GenericTextDocumentHandler(int leftMargin, int topMargin, int cellsPerLine, int linesPerPage, byte[] endOfLine, byte[] endOfPage, boolean eopOnFullPage, boolean bottomPadding, boolean interpoint, int copies, byte[] header, byte[] footer) {
 		maxCellsPerLine = cellsPerLine;
 		this.copies = copies;
 		this.bottomPadding = bottomPadding;
@@ -224,6 +230,7 @@ public class GenericTextDocumentHandler implements ByteSourceHandlerToFunctionAd
 		output = new ByteArrayOutputStream(initialBufferCapacity);
 		newLineBytes = endOfLine;
 		newPageBytes = endOfPage;
+		this.eopOnFullPage = eopOnFullPage;
 		this.header = ByteSource.wrap(header);
 		this.footer = ByteSource.wrap(footer);
 	}
@@ -299,11 +306,17 @@ public class GenericTextDocumentHandler implements ByteSourceHandlerToFunctionAd
 	
 	public void endPage() {
 		pendingLines += Math.max(linesRemaining, 0);
-		if (bottomPadding && pendingLines > 0) {
+		final boolean pageNotFull = pendingLines > 0;
+		if (bottomPadding && pageNotFull) {
 			// Pad the page with new lines to make it contain linesPerPage.
 			write(repeatedBytes(newLineBytes, pendingLines));
 		}
-		write(newPageBytes);
+		// Decide whether to insert EOP based on setting and if the page is full
+		if (eopOnFullPage || pageNotFull) {
+			write(newPageBytes);
+		} else {
+			write(newLineBytes);
+		}
 		rightPage = !rightPage;
 		optionStack.pop();
 		stateStack.pop();

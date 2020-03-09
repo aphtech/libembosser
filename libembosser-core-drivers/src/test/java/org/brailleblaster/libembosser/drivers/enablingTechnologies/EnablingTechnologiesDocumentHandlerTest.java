@@ -80,10 +80,12 @@ public class EnablingTechnologiesDocumentHandlerTest {
 		data.add(new Object[] {createHandlerBuilder(Model.ROMEO_ATTACHE).build(), multiLineDocumentInput, String.format(headerString, "A", "`", "K", "Y") + String.join("\n", multiLineDocumentOutputString).concat("\n\f")});
 		data.add(new Object[] {createHandlerBuilder().setLinesPerPage(30).setPageLength(12).build(), multiLineDocumentInput, String.format(headerString, "A", "h", "L", "^") + String.join("\r\n", multiLineDocumentOutputString).concat(EOP).concat("\u001a")});
 		data.add(new Object[] {createHandlerBuilder().setCellsPerLine(35).build(), multiLineDocumentInput, String.format(headerString, "A", "c", "K", "Y") + String.join("\r\n", multiLineDocumentOutputString).concat(EOP).concat("\u001a")});
-		data.add(new Object[] {createHandlerBuilder().setLinesPerPage(3).build(), multiLineDocumentInput, String.format(headerString, "A", "h", "K", "C") + String.join("\r\n", multiLineDocumentOutputString).concat(EOP).concat("\u001a")});
+		// Only EOL on a full page, no EOP
+		data.add(new Object[] {createHandlerBuilder().setLinesPerPage(3).build(), multiLineDocumentInput, String.format(headerString, "A", "h", "K", "C") + String.join("\r\n", multiLineDocumentOutputString).concat("\r\n").concat("\u001a")});
 		
 		// Confirm Braille is truncated to fit page limits.
-		data.add(new Object[] {createHandlerBuilder().setLinesPerPage(2).build(), multiLineDocumentInput, String.format(headerString, "A", "h", "K", "B") + String.join("\r\n", multiLineDocumentOutputString[0], multiLineDocumentOutputString[1]).concat(EOP).concat("\u001a")});
+		// Also confirm full page only ends with EOL and not EOP
+		data.add(new Object[] {createHandlerBuilder().setLinesPerPage(2).build(), multiLineDocumentInput, String.format(headerString, "A", "h", "K", "B") + String.join("\r\n", multiLineDocumentOutputString[0], multiLineDocumentOutputString[1]).concat("\r\n").concat("\u001a")});
 		data.add(new Object[] {createHandlerBuilder().setCellsPerLine(6).build(), multiLineDocumentInput, String.format(headerString, "A", "F", "K", "Y") + String.join("\r\n", Arrays.stream(multiLineDocumentOutputString).map(s -> s.substring(0, Math.min(s.length(), 6))).collect(ImmutableList.toImmutableList())).concat(EOP).concat("\u001a")});
 		
 		// Test that multiple pages work.
@@ -256,11 +258,12 @@ public class EnablingTechnologiesDocumentHandlerTest {
 				if (i <= model.getMaxCellsPerLine()) {
 					data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder(model)::setCellsPerLine), i, String.format("\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bLA\u001bR%s\u001bTK\u001bQY%s", NUMBER_MAPPINGS[i], "A" + new String(Bytes.concat(model.getPageEnd(), model.getDocEnd()), Charsets.US_ASCII))});
 				}
-				data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder(model).setTopMargin(0).setPageLength(59)::setLinesPerPage), i, String.format("\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bLA\u001bRh\u001bT{\u001bQ%s%s", NUMBER_MAPPINGS[i], "A" + new String(Bytes.concat(model.getPageEnd(), model.getDocEnd()), Charsets.US_ASCII))});
-				data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder(model).setTopMargin(59 - i).setPageLength(59)::setLinesPerPage), i, String.format("\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bLA\u001bRh\u001bT{\u001bQ%s%s", NUMBER_MAPPINGS[59], Strings.repeat("\r\n", 59 - i) + "A" + new String(Bytes.concat(model.getPageEnd(), model.getDocEnd()), Charsets.US_ASCII))});
+				byte[] pageEnd = i > 1? model.getPageEnd() : model.getLineEnd();
+				data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder(model).setTopMargin(0).setPageLength(59)::setLinesPerPage), i, String.format("\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bLA\u001bRh\u001bT{\u001bQ%s%s", NUMBER_MAPPINGS[i], "A" + new String(Bytes.concat(pageEnd, model.getDocEnd()), Charsets.US_ASCII))});
+				data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder(model).setTopMargin(59 - i).setPageLength(59)::setLinesPerPage), i, String.format("\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bLA\u001bRh\u001bT{\u001bQ%s%s", NUMBER_MAPPINGS[59], Strings.repeat("\r\n", 59 - i) + "A" + new String(Bytes.concat(pageEnd, model.getDocEnd()), Charsets.US_ASCII))});
 			}
 			if (i > 1) {
-				data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder(model).setTopMargin(0).setLinesPerPage(1)::setPageLength), i, String.format("\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bLA\u001bRh\u001bT%s\u001bQA%s", NUMBER_MAPPINGS[i], "A" + new String(Bytes.concat(model.getPageEnd(), model.getDocEnd()), Charsets.US_ASCII))});
+				data.add(new Object[] {(IntFunction<Builder>)(createHandlerBuilder(model).setTopMargin(0).setLinesPerPage(1)::setPageLength), i, String.format("\u001bA@@\u001bK@\u001bW@\u001biA\u001bs@\u001bLA\u001bRh\u001bT%s\u001bQA%s", NUMBER_MAPPINGS[i], "A" + new String(Bytes.concat(model.getLineEnd(), model.getDocEnd()), Charsets.US_ASCII))});
 			}
 		}
 		return data.iterator();
