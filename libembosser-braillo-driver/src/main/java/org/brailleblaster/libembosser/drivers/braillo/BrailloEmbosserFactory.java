@@ -28,9 +28,5 @@ public class BrailloEmbosserFactory implements EmbosserFactory {
 		return embossers;
 	}
 
-	@Override
-	public List<Embosser> getEmbossers(Locale locale) {
-		return getEmbossers();
-	}
 
 }
