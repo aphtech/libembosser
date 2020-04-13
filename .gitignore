@@ -1,0 +1,17 @@
+
+repo
+.classpath
+.project
+.settings
+.gradle
+build
+libembosser-api/bin
+libembosser-core-drivers/bin
+libembosser-utils/bin
+et-test/bin
+libembosser-braillo-driver/bin
+libembosser-viewplus-driver/bin
+libembosser-cli/bin
+spring-shell.log
+libembosser-cli/spring-shell.log
+libembosser-nippon-driver/bin
