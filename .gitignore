@@ -6,6 +6,7 @@ repo
 .gradle
 build
 libembosser-api/bin
+libembosser-aph-driver/bin
 libembosser-core-drivers/bin
 libembosser-utils/bin
 et-test/bin
@@ -15,3 +16,4 @@ libembosser-cli/bin
 spring-shell.log
 libembosser-cli/spring-shell.log
 libembosser-nippon-driver/bin
+bin
