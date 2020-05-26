@@ -3,16 +3,13 @@ package org.brailleblaster.libembosser.drivers.utils.document;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.expectThrows;
 import static org.testng.Assert.fail;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.brailleblaster.libembosser.drivers.utils.DocumentHandler;
-import org.brailleblaster.libembosser.drivers.utils.document.GenericTextDocumentHandler;
 import org.brailleblaster.libembosser.drivers.utils.document.events.BrailleEvent;
 import org.brailleblaster.libembosser.drivers.utils.document.events.DocumentEvent;
 import org.brailleblaster.libembosser.drivers.utils.document.events.Duplex;
@@ -28,7 +25,6 @@ import org.brailleblaster.libembosser.drivers.utils.document.events.StartSection
 import org.brailleblaster.libembosser.drivers.utils.document.events.StartVolumeEvent;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;

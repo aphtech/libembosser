@@ -2,12 +2,9 @@ package org.brailleblaster.libembosser.drivers.braillo;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Locale;
-
 import org.brailleblaster.libembosser.spi.Embosser;
 import org.brailleblaster.libembosser.spi.EmbosserFactory;
 import org.brailleblaster.libembosser.spi.Rectangle;
-
 import com.google.common.collect.ImmutableList;
 
 public class BrailloEmbosserFactory implements EmbosserFactory {
