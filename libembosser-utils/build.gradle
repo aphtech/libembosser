@@ -9,7 +9,7 @@ java {
 }
 
 dependencies {
-	implementation 'com.google.guava:guava:28.2-jre'
+	implementation 'com.google.guava:guava:29.0-jre'
 	testImplementation "org.assertj:assertj-core:3.14.0"
 	testImplementation "org.xmlunit:xmlunit-core:2.6.3"
 	testImplementation "org.xmlunit:xmlunit-assertj:2.6.3"

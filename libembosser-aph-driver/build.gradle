@@ -9,7 +9,7 @@ java {
 }
 
 dependencies {
-	implementation 'com.google.guava:guava:28.2-jre'
+	implementation 'com.google.guava:guava:29.0-jre'
 	api project(':libembosser-api')
 	implementation project(':libembosser-core-drivers')
 	implementation project(':libembosser-viewplus-driver')
