@@ -1,7 +1,7 @@
 plugins {
-	id 'org.springframework.boot' version '2.3.0.RELEASE'
+	id 'org.springframework.boot' version '2.3.1.RELEASE'
 	id "application"
-	id "com.github.spotbugs" version "4.2.2"
+	id "com.github.spotbugs" version "4.4.3"
 }
 
 apply plugin: 'io.spring.dependency-management'
@@ -46,7 +46,7 @@ publishing {
 	}
 }
 
-spotbugsMain {
+tasks.withType(com.github.spotbugs.snom.SpotBugsTask) {
 	reports {
 		xml.enabled = false
 		html.enabled = true
