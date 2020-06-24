@@ -6,10 +6,7 @@ import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.io.InputStream;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 
 import javax.print.DocFlavor;
@@ -20,6 +17,7 @@ import javax.print.attribute.PrintRequestAttribute;
 import javax.print.attribute.PrintRequestAttributeSet;
 import javax.print.attribute.standard.Sides;
 
+import com.google.common.collect.ImmutableSet;
 import org.brailleblaster.libembosser.drivers.utils.DocumentParser.ParseException;
 import org.brailleblaster.libembosser.drivers.utils.DocumentToPrintableHandler.LayoutHelper;
 import org.brailleblaster.libembosser.drivers.utils.document.events.DocumentEvent;
@@ -46,7 +44,8 @@ public abstract class BaseGraphicsEmbosser implements Embosser {
 	private String id;
 	private String manufacturer;
 	private String model;
-	
+	public static final Set<Sides> DOUBLE_SIDED_MODES = ImmutableSet.of(Sides.DUPLEX, Sides.TWO_SIDED_LONG_EDGE, Sides.TUMBLE, Sides.TWO_SIDED_SHORT_EDGE);
+
 	protected BaseGraphicsEmbosser(String id, String manufacturer, String model) {
 		this.id = id;
 		this.manufacturer = manufacturer;
@@ -79,10 +78,10 @@ public abstract class BaseGraphicsEmbosser implements Embosser {
 		} catch (ParseException e) {
 			throw new RuntimeException("Problem parsing document", e);
 		}
-		PrintRequestAttribute duplex = Optional.ofNullable((org.brailleblaster.libembosser.embossing.attribute.PaperLayout)attributes.get(PaperLayout.class)).filter(p -> supportsInterpoint()).map(p -> p.getValue().isDoubleSide() ? Sides.DUPLEX : Sides.ONE_SIDED).orElse(Sides.ONE_SIDED);
+		PrintRequestAttribute duplex = Optional.ofNullable((org.brailleblaster.libembosser.embossing.attribute.PaperLayout)attributes.get(PaperLayout.class)).filter(p -> supportsInterpoint()).map(p -> p.getValue().isDoubleSide() ? Sides.TWO_SIDED_LONG_EDGE : Sides.ONE_SIDED).orElse(Sides.ONE_SIDED);
 		PageRanges pages = Optional.ofNullable((PageRanges)attributes.get(PageRanges.class)).orElseGet(() -> new PageRanges());
 		Function<Iterator<DocumentEvent>, Iterator<DocumentEvent>> transform = new PageFilter(pages);
-		if (duplex.equals(Sides.DUPLEX)) {
+		if (DOUBLE_SIDED_MODES.contains(duplex)) {
 			transform = transform.andThen(new InterpointGraphicTransform());
 		}
 		Function<Iterator<DocumentEvent>, Printable> handler = transform.andThen(new DocumentToPrintableHandler.Builder().setLayoutHelper(getLayoutHelper(BrlCell.NLS)).build());
