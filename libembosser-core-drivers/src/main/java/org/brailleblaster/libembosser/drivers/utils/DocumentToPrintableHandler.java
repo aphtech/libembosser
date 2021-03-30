@@ -12,14 +12,7 @@ import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.text.AttributedString;
-import java.util.Arrays;
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -151,7 +144,7 @@ public class DocumentToPrintableHandler implements DocumentHandler, Function<Ite
 			for (int i = 0; i < elements.size(); ++i) {
 				PageElement e1 = elements.get(i);
 				PageElement e2 = otherPage.elements.get(i);
-				if (!(e1 == null? e2 == null : e1.equals(e2))) {
+				if (!(Objects.equals(e1, e2))) {
 					return false;
 				}
 			}
@@ -460,7 +453,7 @@ public class DocumentToPrintableHandler implements DocumentHandler, Function<Ite
 		}
 	}
 	private void endLine() {
-		int rowgap = optionStack.parallelStream().flatMap(options -> options.stream()).filter(o -> o instanceof RowGap).mapToInt(o -> ((RowGap)o).getValue()).findFirst().orElse(0);
+		int rowgap = optionStack.parallelStream().flatMap(Collection::stream).filter(o -> o instanceof RowGap).mapToInt(o -> ((RowGap)o).getValue()).findFirst().orElse(0);
 		if (isInGraphic()) {
 			graphicHeight += rowgap + 1;
 		} else {
@@ -486,7 +479,7 @@ public class DocumentToPrintableHandler implements DocumentHandler, Function<Ite
 		stateStack.pop();
 	}
 	private boolean isInGraphic() {
-		return optionStack.stream().flatMap(options -> options.stream()).anyMatch(o -> o instanceof GraphicOption.ImageData);
+		return optionStack.stream().flatMap(Collection::stream).anyMatch(o -> o instanceof GraphicOption.ImageData);
 	}
 	@Override
 	public Printable apply(Iterator<DocumentEvent> doc) {

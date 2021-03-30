@@ -60,7 +60,7 @@ public class PEF2Nippon {
 	 */
 	String rowToAscii(Element row) {
 		String brlUnicode = row.getTextContent();
-		return brlUnicode.chars().filter(c -> c >= 0x2800 && c <= 0x28ff).map(c -> BrailleMapper.UNICODE_TO_ASCII_FAST.map((char)c)).collect(() -> new StringBuilder(), (a, c) -> a.append((char)c), (s1, s2) -> s1.append(s2)).toString();
+		return brlUnicode.chars().filter(c -> c >= 0x2800 && c <= 0x28ff).map(c -> BrailleMapper.UNICODE_TO_ASCII_FAST.map((char)c)).collect(StringBuilder::new, (a, c) -> a.append((char)c), StringBuilder::append).toString();
 	}
 	/**
 	 * Add to a row the start and end required for a Nippon embosser.

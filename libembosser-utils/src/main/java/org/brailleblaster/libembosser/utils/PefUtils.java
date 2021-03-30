@@ -83,7 +83,7 @@ public final class PefUtils {
 					PEFElementType.PAGE.getElementName());
 			Deque<String> rows = new LinkedList<>();
 			do {
-				StringBuffer buf = new StringBuffer();
+				StringBuilder buf = new StringBuilder();
 				prevChar = curChar;
 				while (!Ints.contains(LINE_ENDINGS, (curChar = brf.read()))) {
 					buf.append((char) curChar);

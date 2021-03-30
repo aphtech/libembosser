@@ -297,7 +297,7 @@ public class EnablingTechnologiesDocumentHandlerTest {
 	@Test(dataProvider="invalidTopMarginAndLinesProvider")
 	public void testPreventInvalidTopMarginAndLines(int topMargin, int lines) {
 		Builder builder = createHandlerBuilder().setPageLength(59).setTopMargin(topMargin).setLinesPerPage(lines);
-		expectThrows(IllegalStateException.class, () -> builder.build());
+		expectThrows(IllegalStateException.class, builder::build);
 	}
 	@DataProvider(name="invalidPageLengthAndTopMarginAndLinesProvider")
 	public Iterator<Object[]> invalidPageLengthAndTopMarginAndLinesProvider() {
@@ -317,7 +317,7 @@ public class EnablingTechnologiesDocumentHandlerTest {
 	public void testRestrictTopMarginAndLinesToPageLength(int pageLength, int topMargin, int lines) {
 		Builder builder = createHandlerBuilder().setTopMargin(topMargin).setLinesPerPage(lines)
 				.setPageLength(pageLength);
-		expectThrows(IllegalStateException.class, () -> builder.build());
+		expectThrows(IllegalStateException.class, builder::build);
 	}
 	@DataProvider(name="duplexModeProvider")
 	public Iterator<Object[]> duplexModeProvider() {

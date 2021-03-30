@@ -41,7 +41,7 @@ public class EmbosserCommand {
 		if (printServices.length == 0) {
 			return "No printers attached";
 		}
-		List<String> printers = Arrays.stream(printServices).map(p -> p.getName()).collect(ImmutableList.toImmutableList());
+		List<String> printers = Arrays.stream(printServices).map(PrintService::getName).collect(ImmutableList.toImmutableList());
 		int result = inputReader.selectFromList("Select your printer: ", "Select: ", printers, 0);
 		final String selPrinter = printers.get(result);
 		printer = Optional.of(selPrinter);
@@ -53,7 +53,7 @@ public class EmbosserCommand {
 	}
 	@ShellMethod("Select the embosser model")
 	public String selectEmbosser() {
-		Map<String, List<Embosser>> embosserMap = embosserService.getEmbosserStream().collect(Collectors.groupingBy(e -> e.getManufacturer()));
+		Map<String, List<Embosser>> embosserMap = embosserService.getEmbosserStream().collect(Collectors.groupingBy(Embosser::getManufacturer));
 		if (embosserMap.isEmpty()) {
 			return "There are no embosser drivers available";
 		}
@@ -61,7 +61,7 @@ public class EmbosserCommand {
 		int result = inputReader.selectFromList("Select the embosser model", "Select: ", manufacturers, 0);
 		String manufacturer = manufacturers.get(result);
 		final List<Embosser> models = embosserMap.get(manufacturer);
-		result = inputReader.selectFromList("Select embosser model", "Select: ", models.parallelStream().map(e -> e.getModel()).collect(ImmutableList.toImmutableList()), 0);
+		result = inputReader.selectFromList("Select embosser model", "Select: ", models.parallelStream().map(Embosser::getModel).collect(ImmutableList.toImmutableList()), 0);
 		final Embosser model = models.get(result);
 		embosser = Optional.of(model);
 		return String.format("You have selected a %s %s", model.getManufacturer(), model.getModel());

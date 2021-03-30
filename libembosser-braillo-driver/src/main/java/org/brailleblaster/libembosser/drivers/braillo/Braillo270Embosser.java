@@ -9,11 +9,7 @@ import org.brailleblaster.libembosser.drivers.braillo.Braillo270DocumentHandler.
 import org.brailleblaster.libembosser.drivers.utils.BaseTextEmbosser;
 import org.brailleblaster.libembosser.drivers.utils.document.events.DocumentEvent;
 import org.brailleblaster.libembosser.drivers.utils.document.filters.PageFilter;
-import org.brailleblaster.libembosser.embossing.attribute.Copies;
-import org.brailleblaster.libembosser.embossing.attribute.PageRanges;
-import org.brailleblaster.libembosser.embossing.attribute.PaperLayout;
-import org.brailleblaster.libembosser.embossing.attribute.PaperMargins;
-import org.brailleblaster.libembosser.embossing.attribute.PaperSize;
+import org.brailleblaster.libembosser.embossing.attribute.*;
 import org.brailleblaster.libembosser.spi.BrlCell;
 import org.brailleblaster.libembosser.spi.EmbossingAttributeSet;
 import org.brailleblaster.libembosser.spi.Layout;
@@ -21,6 +17,8 @@ import org.brailleblaster.libembosser.spi.Margins;
 import org.brailleblaster.libembosser.spi.Rectangle;
 
 import com.google.common.io.ByteSource;
+
+import javax.print.attribute.IntegerSyntax;
 
 public class Braillo270Embosser extends BaseTextEmbosser {
 	private boolean interpoint;
@@ -38,8 +36,8 @@ public class Braillo270Embosser extends BaseTextEmbosser {
 	@Override
 	protected Function<Iterator<DocumentEvent>, ByteSource> createHandler(EmbossingAttributeSet attributes) {
 		final BrlCell cell = BrlCell.NLS;
-		final Rectangle paperSize = Optional.ofNullable((PaperSize)(attributes.get(PaperSize.class))).map(p -> p.getValue()).orElse(org.brailleblaster.libembosser.spi.PaperSize.BRAILLE_11_5X11.getSize());
-		final Margins margins = Optional.ofNullable((PaperMargins)(attributes.get(PaperMargins.class))).map(m -> m.getValue()).orElse(Margins.NO_MARGINS);
+		final Rectangle paperSize = Optional.ofNullable((PaperSize)(attributes.get(PaperSize.class))).map(ObjectSyntax::getValue).orElse(org.brailleblaster.libembosser.spi.PaperSize.BRAILLE_11_5X11.getSize());
+		final Margins margins = Optional.ofNullable((PaperMargins)(attributes.get(PaperMargins.class))).map(ObjectSyntax::getValue).orElse(Margins.NO_MARGINS);
 		final BigDecimal height = paperSize.getHeight();
 		final BigDecimal width = paperSize.getWidth();
 		int leftMargin = Math.max(cell.getCellsForWidth(margins.getLeft()) - 5, 0);
@@ -53,7 +51,7 @@ public class Braillo270Embosser extends BaseTextEmbosser {
 			rightMargin = 27 - cellsPerLine;
 			cellsPerLine = 27;
 		}
-		final Layout paperLayout = Optional.ofNullable((PaperLayout)(attributes.get(PaperLayout.class))).map(l -> l.getValue()).orElse(Layout.P1ONLY);
+		final Layout paperLayout = Optional.ofNullable((PaperLayout)(attributes.get(PaperLayout.class))).map(ObjectSyntax::getValue).orElse(Layout.P1ONLY);
 		boolean zfolding;
 		switch(paperLayout) {
 		case Z_FOLDING_DOUBLE_HORIZONTAL:
@@ -65,7 +63,7 @@ public class Braillo270Embosser extends BaseTextEmbosser {
 		default:
 			zfolding = false;
 		}
-		int copies = Optional.ofNullable((Copies)(attributes.get(Copies.class))).map(c -> c.getValue()).orElse(1);
+		int copies = Optional.ofNullable((Copies)(attributes.get(Copies.class))).map(IntegerSyntax::getValue).orElse(1);
 		Function<Iterator<DocumentEvent>, ByteSource> handler = new Braillo270DocumentHandler.Builder(firmware)
 				.setCellsPerLine(cellsPerLine)
 				.setSheetlength(height.doubleValue() / 25.4)
@@ -77,7 +75,7 @@ public class Braillo270Embosser extends BaseTextEmbosser {
 				.setInterpoint(paperLayout.isDoubleSide())
 				.setCopies(copies)
 				.build();
-		PageRanges pages = Optional.ofNullable((PageRanges)(attributes.get(PageRanges.class))).orElseGet(() -> new PageRanges());
+		PageRanges pages = Optional.ofNullable((PageRanges)(attributes.get(PageRanges.class))).orElseGet(PageRanges::new);
 		return new PageFilter(pages).andThen(handler);
 	}
 

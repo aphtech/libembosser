@@ -201,30 +201,30 @@ public class DocumentParser {
 					handler.onEvent(new StartDocumentEvent());
 					break;
 				case VOLUME:
-					cols = Optional.ofNullable(((Element) node).getAttribute("cols")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new CellsPerLine(v));
-					duplex = Optional.ofNullable(((Element) node).getAttribute("duplex")).map(v -> v.toLowerCase()).flatMap(v -> v.equals("true")? Optional.of(new Duplex(true)) : v.equals("false")? Optional.of(new Duplex(false)) : Optional.empty());
-					rowGap = Optional.ofNullable(((Element) node).getAttribute("rowgap")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new RowGap(v));
-					rows = Optional.ofNullable(((Element) node).getAttribute("rows")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new LinesPerPage(v));
+					cols = Optional.ofNullable(((Element) node).getAttribute("cols")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(CellsPerLine::new);
+					duplex = Optional.ofNullable(((Element) node).getAttribute("duplex")).map(String::toLowerCase).flatMap(v -> v.equals("true")? Optional.of(new Duplex(true)) : v.equals("false")? Optional.of(new Duplex(false)) : Optional.empty());
+					rowGap = Optional.ofNullable(((Element) node).getAttribute("rowgap")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(RowGap::new);
+					rows = Optional.ofNullable(((Element) node).getAttribute("rows")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(LinesPerPage::new);
 					Set<VolumeOption> volOptions = Streams.concat(Streams.stream(cols), Streams.stream(duplex), Streams.stream(rowGap),  Streams.stream(rows)).collect(Collectors.toSet());
 					handler.onEvent(new StartVolumeEvent(volOptions));
 					break;
 				case SECTION:
-					cols = Optional.ofNullable(((Element) node).getAttribute("cols")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new CellsPerLine(v));
-					duplex = Optional.ofNullable(((Element) node).getAttribute("duplex")).map(v -> v.toLowerCase()).flatMap(v -> v.equals("true")? Optional.of(new Duplex(true)) : v.equals("false")? Optional.of(new Duplex(false)) : Optional.empty());
-					rowGap = Optional.ofNullable(((Element) node).getAttribute("rowgap")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new RowGap(v));
-					rows = Optional.ofNullable(((Element) node).getAttribute("rows")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new LinesPerPage(v));
+					cols = Optional.ofNullable(((Element) node).getAttribute("cols")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(CellsPerLine::new);
+					duplex = Optional.ofNullable(((Element) node).getAttribute("duplex")).map(String::toLowerCase).flatMap(v -> v.equals("true")? Optional.of(new Duplex(true)) : v.equals("false")? Optional.of(new Duplex(false)) : Optional.empty());
+					rowGap = Optional.ofNullable(((Element) node).getAttribute("rowgap")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(RowGap::new);
+					rows = Optional.ofNullable(((Element) node).getAttribute("rows")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(LinesPerPage::new);
 					Set<SectionOption> sectionOptions = Streams.concat(Streams.stream(cols), Streams.stream(duplex), Streams.stream(rowGap),  Streams.stream(rows)).collect(Collectors.toSet());
 					handler.onEvent(new StartSectionEvent(sectionOptions));;
 					break;
 				case PAGE:
-					cols = Optional.ofNullable(((Element) node).getAttribute("cols")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new CellsPerLine(v));
-					rowGap = Optional.ofNullable(((Element) node).getAttribute("rowgap")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new RowGap(v));
-					rows = Optional.ofNullable(((Element) node).getAttribute("rows")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new LinesPerPage(v));
+					cols = Optional.ofNullable(((Element) node).getAttribute("cols")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(CellsPerLine::new);
+					rowGap = Optional.ofNullable(((Element) node).getAttribute("rowgap")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(RowGap::new);
+					rows = Optional.ofNullable(((Element) node).getAttribute("rows")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(LinesPerPage::new);
 					Set<PageOption> pageOptions = Streams.concat(Streams.stream(cols), Streams.stream(rowGap),  Streams.stream(rows)).collect(Collectors.toSet());
 					handler.onEvent(new StartPageEvent(pageOptions));;
 					break;
 				case ROW:
-					rowGap = Optional.ofNullable(((Element) node).getAttribute("rowgap")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new RowGap(v));
+					rowGap = Optional.ofNullable(((Element) node).getAttribute("rowgap")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(RowGap::new);
 					Set<RowOption> rowOptions = Streams.stream(rowGap).collect(Collectors.toSet());
 					handler.onEvent(new StartLineEvent(rowOptions));
 					NodeList children = node.getChildNodes();
@@ -239,10 +239,10 @@ public class DocumentParser {
 					result = false;
 					break;
 				case GRAPHIC:
-					Optional<GraphicOption.ImageData> img = Optional.ofNullable(((Element)node).getAttribute("idref")).flatMap(a -> findResourceById(resourceNodes, a)).flatMap(e -> loadImageFromElement(e)).map(i -> new GraphicOption.ImageData(i));
-					Optional<GraphicOption.Height> height = Optional.ofNullable(((Element)node).getAttribute("height")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new GraphicOption.Height(v));
-					Optional<GraphicOption.Indent> indent = Optional.ofNullable(((Element)node).getAttribute("indent")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new GraphicOption.Indent(v));
-					Optional<GraphicOption.Width> width = Optional.ofNullable(((Element)node).getAttribute("width")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(v -> new GraphicOption.Width(v));
+					Optional<GraphicOption.ImageData> img = Optional.ofNullable(((Element)node).getAttribute("idref")).flatMap(a -> findResourceById(resourceNodes, a)).flatMap(this::loadImageFromElement).map(GraphicOption.ImageData::new);
+					Optional<GraphicOption.Height> height = Optional.ofNullable(((Element)node).getAttribute("height")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(GraphicOption.Height::new);
+					Optional<GraphicOption.Indent> indent = Optional.ofNullable(((Element)node).getAttribute("indent")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(GraphicOption.Indent::new);
+					Optional<GraphicOption.Width> width = Optional.ofNullable(((Element)node).getAttribute("width")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(GraphicOption.Width::new);
 					Set<GraphicOption> graphicOptions = Streams.concat(Streams.stream(img), Streams.stream(height), Streams.stream(indent), Streams.stream(width)).collect(ImmutableSet.toImmutableSet());
 					handler.onEvent(new StartGraphicEvent(graphicOptions));
 					result = true;

@@ -55,7 +55,7 @@ public class GenericTextEmbosser extends BaseTextEmbosser {
 		Optional.ofNullable(attributes.get(Copies.class)).ifPresent(v -> builder.setCopies(((Copies)v).getValue()));
 		builder.setInterpoint(Optional.ofNullable(attributes.get(PaperLayout.class)).filter(p -> ((PaperLayout)p).getValue().equals(Layout.INTERPOINT)).isPresent());
 		GenericTextDocumentHandler handler = builder.build();
-		PageRanges pages = Optional.ofNullable((PageRanges)(attributes.get(PageRanges.class))).orElseGet(() -> new PageRanges());
+		PageRanges pages = Optional.ofNullable((PageRanges)(attributes.get(PageRanges.class))).orElseGet(PageRanges::new);
 		return new PageFilter(pages).andThen(handler);
 	}
 

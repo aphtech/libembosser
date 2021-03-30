@@ -57,7 +57,7 @@ public final class EmbossProperties {
 				cellType = (BrlCell) value;
 				break;
 			case "copies":
-				copies = ((Integer) value).intValue();
+				copies = (Integer) value;
 				break;
 			case "sides":
 				sides = (MultiSides) value;
@@ -156,9 +156,7 @@ public final class EmbossProperties {
 				return false;
 		} else if (!paper.equals(other.paper))
 			return false;
-		if (sides != other.sides)
-			return false;
-		return true;
+		return sides == other.sides;
 	}
 	public EmbossingAttributeSet toAttributeSet() {
 		EmbossingAttributeSet attributes = new EmbossingAttributeSet();

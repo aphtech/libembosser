@@ -26,7 +26,7 @@ public class IndexBrailleFactory implements EmbosserFactory {
 	private static final Rectangle ELEVEN_BY_ELEVEN_PAPER = new Rectangle(new BigDecimal("279.4"), new BigDecimal("279.4"));
 	private static final Rectangle TEN_BY_ELEVEN_PAPER = new Rectangle(new BigDecimal("254.0"), new BigDecimal("279.4"));
 	private static final Rectangle LETTER_PAPER = PaperSize.LETTER.getSize();
-	private static final ImmutableMap<Rectangle, Integer> ET_PA_PAPER_SIZES = ImmutableMap.of(ELEVEN_AND_HALF_BY_ELEVEN_PAPER, Integer.valueOf(0), LETTER_PAPER, Integer.valueOf(1), TEN_BY_ELEVEN_PAPER, Integer.valueOf(2), ELEVEN_BY_ELEVEN_PAPER, Integer.valueOf(3));
+	private static final ImmutableMap<Rectangle, Integer> ET_PA_PAPER_SIZES = ImmutableMap.of(ELEVEN_AND_HALF_BY_ELEVEN_PAPER, 0, LETTER_PAPER, 1, TEN_BY_ELEVEN_PAPER, 2, ELEVEN_BY_ELEVEN_PAPER, 3);
 	private static final Rectangle BRAILLEBOX_MAX_PAPER = new Rectangle(new BigDecimal("300"), new BigDecimal("440"));
 	private static final Rectangle BRAILLEBOX_MIN_PAPER = new Rectangle(new BigDecimal("200"), new BigDecimal("250"));
 	private List<Embosser> embossers;

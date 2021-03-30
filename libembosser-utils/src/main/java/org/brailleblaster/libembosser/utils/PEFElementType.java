@@ -8,7 +8,6 @@ import java.util.function.Predicate;
 import org.w3c.dom.Element;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 
 public enum PEFElementType {
 	PEF(PEFNamespaceContext.PEF_NAMESPACE, "pef", ImmutableList.of(e -> "2008-1".equals(e.getAttribute("version")))),
@@ -43,7 +42,7 @@ public enum PEFElementType {
 		return Arrays.stream(PEFElementType.values()).filter(t -> 
 			t.ns.equals(element.getNamespaceURI())
 			&& t.elemName.equals(element.getLocalName())
-			&& Iterables.all(t.additionalChecks, c -> c.test(element))
+			&& t.additionalChecks.stream().allMatch(c -> c.test(element))
 		).findFirst();
 	}
 }

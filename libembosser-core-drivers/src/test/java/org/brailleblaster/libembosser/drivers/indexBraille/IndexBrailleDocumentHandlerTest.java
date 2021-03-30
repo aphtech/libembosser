@@ -136,14 +136,14 @@ public class IndexBrailleDocumentHandlerTest {
 		data.add(new Object[] {createHandlerBuilder(), Layout.Z_FOLDING_SINGLE_VERTICAL, basicDocumentInput, String.format(paperFormatHeader, 7, basicDocumentOutput).concat("\u001a")});
 		data.add(new Object[] {createHandlerBuilder(), Layout.SADDLE_STITCH_SINGLE_SIDED, basicDocumentInput, String.format(paperFormatHeader, 8, basicDocumentOutput).concat("\u001a")});
 		
-		data.add(new Object[] {createHandlerBuilder(), Integer.valueOf(1), basicDocumentInput, String.format(paperFormatHeader, 1, basicDocumentOutput).concat("\u001a")});
-		data.add(new Object[] {createHandlerBuilder(), Integer.valueOf(2), basicDocumentInput, String.format(paperFormatHeader, 2, basicDocumentOutput + "\f").concat("\u001a")});
-		data.add(new Object[] {createHandlerBuilder(), Integer.valueOf(3), basicDocumentInput, String.format(paperFormatHeader, 3, basicDocumentOutput + "\f").concat("\u001a")});
-		data.add(new Object[] {createHandlerBuilder(), Integer.valueOf(4), basicDocumentInput, String.format(paperFormatHeader, 4, basicDocumentOutput + "\f").concat("\u001a")});
-		data.add(new Object[] {createHandlerBuilder(), Integer.valueOf(5), basicDocumentInput, String.format(paperFormatHeader, 5, basicDocumentOutput).concat("\u001a")});
-		data.add(new Object[] {createHandlerBuilder(), Integer.valueOf(6), basicDocumentInput, String.format(paperFormatHeader, 6, basicDocumentOutput + "\f").concat("\u001a")});
-		data.add(new Object[] {createHandlerBuilder(), Integer.valueOf(7), basicDocumentInput, String.format(paperFormatHeader, 7, basicDocumentOutput).concat("\u001a")});
-		data.add(new Object[] {createHandlerBuilder(), Integer.valueOf(8), basicDocumentInput, String.format(paperFormatHeader, 8, basicDocumentOutput).concat("\u001a")});
+		data.add(new Object[] {createHandlerBuilder(), 1, basicDocumentInput, String.format(paperFormatHeader, 1, basicDocumentOutput).concat("\u001a")});
+		data.add(new Object[] {createHandlerBuilder(), 2, basicDocumentInput, String.format(paperFormatHeader, 2, basicDocumentOutput + "\f").concat("\u001a")});
+		data.add(new Object[] {createHandlerBuilder(), 3, basicDocumentInput, String.format(paperFormatHeader, 3, basicDocumentOutput + "\f").concat("\u001a")});
+		data.add(new Object[] {createHandlerBuilder(), 4, basicDocumentInput, String.format(paperFormatHeader, 4, basicDocumentOutput + "\f").concat("\u001a")});
+		data.add(new Object[] {createHandlerBuilder(), 5, basicDocumentInput, String.format(paperFormatHeader, 5, basicDocumentOutput).concat("\u001a")});
+		data.add(new Object[] {createHandlerBuilder(), 6, basicDocumentInput, String.format(paperFormatHeader, 6, basicDocumentOutput + "\f").concat("\u001a")});
+		data.add(new Object[] {createHandlerBuilder(), 7, basicDocumentInput, String.format(paperFormatHeader, 7, basicDocumentOutput).concat("\u001a")});
+		data.add(new Object[] {createHandlerBuilder(), 8, basicDocumentInput, String.format(paperFormatHeader, 8, basicDocumentOutput).concat("\u001a")});
 		return data.iterator();
 	}
 	@Test(dataProvider="paperModeProvider")
@@ -152,7 +152,7 @@ public class IndexBrailleDocumentHandlerTest {
 		if (paperMode instanceof Layout) {
 			handler = builder.setPaperMode((Layout)paperMode).build();
 		} else if (paperMode instanceof Integer) {
-			handler = builder.setPaperMode(((Integer)paperMode).intValue()).build();
+			handler = builder.setPaperMode((Integer) paperMode).build();
 		} else {
 			throw new IllegalArgumentException(String.format("Paper mode must either be int or MultiSides, got %s instead", paperMode.getClass().getName()));
 		}

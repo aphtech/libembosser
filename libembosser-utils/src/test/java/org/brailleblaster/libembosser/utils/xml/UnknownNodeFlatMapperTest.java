@@ -1,9 +1,16 @@
 package org.brailleblaster.libembosser.utils.xml;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertSame;
-import static org.testng.Assert.fail;
+import com.google.common.base.Charsets;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,19 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
-import com.google.common.base.Charsets;
-import com.google.common.base.Predicates;
+import static org.testng.Assert.*;
 
 public class UnknownNodeFlatMapperTest {
 	@DataProvider(name="inputXmlProvider")
@@ -46,7 +41,7 @@ public class UnknownNodeFlatMapperTest {
 		} catch (ParserConfigurationException | SAXException | IOException e) {
 			fail("Problem parsing XML", e);
 		}
-		UnknownNodeFlatMapper fm = new UnknownNodeFlatMapper(Predicates.alwaysTrue());
+		UnknownNodeFlatMapper fm = new UnknownNodeFlatMapper(node1 -> true);
 		Stream<Node> actualStream = fm.apply(node);
 		List<Node> actualAsList = actualStream.collect(Collectors.toList());
 		assertEquals(actualAsList.size(), 1, "Stream should only have one element");
@@ -64,7 +59,7 @@ public class UnknownNodeFlatMapperTest {
 		} catch (ParserConfigurationException | SAXException | IOException e) {
 			fail("Problem parsing XML", e);
 		}
-		UnknownNodeFlatMapper fm = new UnknownNodeFlatMapper(Predicates.alwaysFalse());
+		UnknownNodeFlatMapper fm = new UnknownNodeFlatMapper(node1 -> false);
 		Stream<Node> actualStream = fm.apply(node);
 		assertEquals(actualStream.count(), 0l, "Stream expected to be empty");
 	}

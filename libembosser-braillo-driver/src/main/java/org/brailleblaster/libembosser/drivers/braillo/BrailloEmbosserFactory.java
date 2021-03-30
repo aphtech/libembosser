@@ -10,7 +10,7 @@ import com.google.common.collect.ImmutableList;
 public class BrailloEmbosserFactory implements EmbosserFactory {
 	private final List<Embosser> embossers;
 	public BrailloEmbosserFactory() {
-		ImmutableList.Builder<Embosser> eb = new ImmutableList.Builder<Embosser>();
+		ImmutableList.Builder<Embosser> eb = new ImmutableList.Builder<>();
 		eb.add(new Braillo200Embosser("libembosser.braillo.200", "Braillo 200", new Rectangle(BigDecimal.valueOf(330.0), BigDecimal.valueOf(356)), new Rectangle(BigDecimal.valueOf(140.0), BigDecimal.valueOf(102)), true));
 		eb.add(new Braillo200Embosser("libembosser.braillo.400s", "Braillo 400S", new Rectangle(BigDecimal.valueOf(330.0), BigDecimal.valueOf(356)), new Rectangle(BigDecimal.valueOf(140.0), BigDecimal.valueOf(102)), true));
 		eb.add(new Braillo200Embosser("libembosser.braillo.400sr", "Braillo 400SR", new Rectangle(BigDecimal.valueOf(330.0), BigDecimal.valueOf(356)), new Rectangle(BigDecimal.valueOf(140.0), BigDecimal.valueOf(102)), true));

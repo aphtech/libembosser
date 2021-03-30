@@ -127,7 +127,7 @@ public class DocumentParserTest {
 		DocumentParser parser = new DocumentParser();
 		final List<DocumentEvent> actualEvents = new ArrayList<>();
 		try {
-			parser.parseBrf(input, e -> actualEvents.add(e));
+			parser.parseBrf(input, actualEvents::add);
 		} catch (ParseException e) {
 			fail("Problem parsing the BRF", e);
 		}
@@ -174,7 +174,7 @@ public class DocumentParserTest {
 			docBuilderFactory.setNamespaceAware(true);
 			DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
 			Document inputDoc = docBuilder.parse(is);
-			parser.parsePef(inputDoc, e -> actualEvents.add(e));
+			parser.parsePef(inputDoc, actualEvents::add);
 		} catch (IOException e) {
 			fail("Problem reading the PEF", e);
 		} catch (SAXException e) {

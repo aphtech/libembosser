@@ -3,12 +3,7 @@ package org.brailleblaster.libembosser.drivers.utils.document;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.brailleblaster.libembosser.drivers.utils.ClassUtils;
 import org.brailleblaster.libembosser.drivers.utils.document.events.BrailleEvent;
@@ -293,12 +288,12 @@ public class GenericTextDocumentHandler implements ByteSourceHandlerToFunctionAd
 	public void startPage(Set<PageOption> options) {
 		optionStack.push(options);
 		// Get the linesPerPage
-		linesRemaining = Math.min(maxLinesPerPage, optionStack.stream().flatMap(o -> o.stream()).filter(o -> o instanceof LinesPerPage).findFirst().map(o -> ((LinesPerPage)o).getValue()).orElse(maxLinesPerPage) - 1);
-		cellsPerLine = Math.min(maxCellsPerLine, optionStack.stream().flatMap(o -> o.stream()).filter(o -> o instanceof CellsPerLine).findFirst().map(o -> ((CellsPerLine)o).getValue()).orElse(maxCellsPerLine));
+		linesRemaining = Math.min(maxLinesPerPage, optionStack.stream().flatMap(Collection::stream).filter(o -> o instanceof LinesPerPage).findFirst().map(o -> ((LinesPerPage)o).getValue()).orElse(maxLinesPerPage) - 1);
+		cellsPerLine = Math.min(maxCellsPerLine, optionStack.stream().flatMap(Collection::stream).filter(o -> o instanceof CellsPerLine).findFirst().map(o -> ((CellsPerLine)o).getValue()).orElse(maxCellsPerLine));
 		// Add the top margin
 		pendingLines = topMargin;
 		stateStack.push(HandlerStates.PAGE);
-		if (defaultInterpoint && (!rightPage) && optionStack.stream().flatMap(o -> o.stream()).filter(o -> o instanceof Duplex).anyMatch(o -> !((Duplex)o).getValue().booleanValue())) {
+		if (defaultInterpoint && (!rightPage) && optionStack.stream().flatMap(Collection::stream).filter(o -> o instanceof Duplex).anyMatch(o -> !((Duplex) o).getValue())) {
 			write(newPageBytes);
 			rightPage = !rightPage;
 		}
@@ -346,7 +341,7 @@ public class GenericTextDocumentHandler implements ByteSourceHandlerToFunctionAd
 	}
 
 	public void endLine() {
-		int rowGap = optionStack.stream().flatMap(o -> o.stream()).filter(o -> o instanceof RowGap).findFirst().map(o -> ((RowGap)o).getValue()).orElse(defaultRowGap) + 1;
+		int rowGap = optionStack.stream().flatMap(Collection::stream).filter(o -> o instanceof RowGap).findFirst().map(o -> ((RowGap)o).getValue()).orElse(defaultRowGap) + 1;
 		pendingLines = Math.min(linesRemaining, rowGap);
 		linesRemaining -= rowGap;
 		optionStack.pop();

@@ -33,6 +33,6 @@ public class InputReader {
 			String answer = lineReader.readLine(prompt);
 			selectedOption = Ints.tryParse(answer);
 		} while (selectedOption == null);
-		return selectedOption.intValue();
+		return selectedOption;
 	}
 }

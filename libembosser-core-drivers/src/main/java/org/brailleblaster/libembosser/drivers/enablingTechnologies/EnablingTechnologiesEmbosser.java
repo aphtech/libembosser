@@ -60,7 +60,7 @@ public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 			builder.setCell(cell);
 		}
 		Function<Iterator<DocumentEvent>, ByteSource> handler = builder.build();
-		PageRanges pages = Optional.ofNullable((PageRanges)(attributes.get(PageRanges.class))).orElseGet(() -> new PageRanges());
+		PageRanges pages = Optional.ofNullable((PageRanges)(attributes.get(PageRanges.class))).orElseGet(PageRanges::new);
 		return new PageFilter(pages).andThen(handler);
 	}
 

@@ -25,7 +25,7 @@ public class Braillo270DocumentHandlerTest {
 	}
 	@DataProvider(name="cellsPerLineProvider")
 	public Iterator<Object[]> cellsperLineProvider() {
-		List<Object[]> data = new ArrayList<Object[]>();
+		List<Object[]> data = new ArrayList<>();
 		String headerFormat = "\u001b\u001f%s";
 		data.add(new Object[] { Firmware.V1_11, 27, String.format(headerFormat, "0")});
 		data.add(new Object[] { Firmware.V1_11, 28, String.format(headerFormat, "1")});

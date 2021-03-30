@@ -47,7 +47,7 @@ public class IndexBrailleEmbosser extends BaseTextEmbosser {
 
 	@Override
 	public boolean supportsInterpoint() {
-		return supportedSides.stream().anyMatch(e -> e.isDoubleSide());
+		return supportedSides.stream().anyMatch(Layout::isDoubleSide);
 	}
 	
 	protected Function<Iterator<DocumentEvent>, ByteSource> createHandler(EmbossingAttributeSet attributes) {
@@ -98,7 +98,7 @@ public class IndexBrailleEmbosser extends BaseTextEmbosser {
 		paperOption.map(p -> paperSizes.getOrDefault(paper, null)).ifPresent(p -> builder.setPaper(OptionalInt.of(p)));
 		Optional.ofNullable(attributes.get(Copies.class)).ifPresent(v -> builder.setCopies(((Copies)v).getValue()));
 		Function<Iterator<DocumentEvent>, ByteSource> handler = builder.build();
-		PageRanges pages = Optional.ofNullable((PageRanges)(attributes.get(PageRanges.class))).orElseGet(() -> new PageRanges());
+		PageRanges pages = Optional.ofNullable((PageRanges)(attributes.get(PageRanges.class))).orElseGet(PageRanges::new);
 		return new PageFilter(pages).andThen(handler);
 	}
 	/**

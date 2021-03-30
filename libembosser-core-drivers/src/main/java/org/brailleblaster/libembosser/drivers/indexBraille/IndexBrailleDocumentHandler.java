@@ -3,6 +3,7 @@ package org.brailleblaster.libembosser.drivers.indexBraille;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.Map;
 import java.util.OptionalInt;
 
 import org.brailleblaster.libembosser.drivers.utils.document.ByteSourceHandlerToFunctionAdapter;
@@ -45,7 +46,7 @@ public class IndexBrailleDocumentHandler implements ByteSourceHandlerToFunctionA
 		}
 		public Builder setPaperMode(int mode) {
 			checkArgument(PAPER_MODE_MAPPINGS.containsValue(mode), String.format("Index embossers do not support %s paper mode", mode));
-			this.paperMode = PAPER_MODE_MAPPINGS.entrySet().stream().filter(e -> e.getValue() == mode).findFirst().map(e -> e.getKey()).get();
+			this.paperMode = PAPER_MODE_MAPPINGS.entrySet().stream().filter(e -> e.getValue() == mode).findFirst().map(Map.Entry::getKey).get();
 			return this;
 		}
 		public Builder setPaperMode(Layout sides) {

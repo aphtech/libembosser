@@ -79,7 +79,7 @@ public abstract class BaseGraphicsEmbosser implements Embosser {
 			throw new RuntimeException("Problem parsing document", e);
 		}
 		PrintRequestAttribute duplex = Optional.ofNullable((org.brailleblaster.libembosser.embossing.attribute.PaperLayout)attributes.get(PaperLayout.class)).filter(p -> supportsInterpoint()).map(p -> p.getValue().isDoubleSide() ? Sides.TWO_SIDED_LONG_EDGE : Sides.ONE_SIDED).orElse(Sides.ONE_SIDED);
-		PageRanges pages = Optional.ofNullable((PageRanges)attributes.get(PageRanges.class)).orElseGet(() -> new PageRanges());
+		PageRanges pages = Optional.ofNullable((PageRanges)attributes.get(PageRanges.class)).orElseGet(PageRanges::new);
 		Function<Iterator<DocumentEvent>, Iterator<DocumentEvent>> transform = new PageFilter(pages);
 		if (DOUBLE_SIDED_MODES.contains(duplex)) {
 			transform = transform.andThen(new InterpointGraphicTransform());
@@ -88,7 +88,7 @@ public abstract class BaseGraphicsEmbosser implements Embosser {
 		Printable printable = handler.apply(events.iterator());
 		PrinterJob printJob = PrinterJob.getPrinterJob();
 		printJob.setJobName("BrailleBlasterEmboss");
-		Optional.ofNullable(attributes.get(Copies.class)).map(v -> ((org.brailleblaster.libembosser.embossing.attribute.Copies)v).getValue()).ifPresent(v -> printJob.setCopies(v));
+		Optional.ofNullable(attributes.get(Copies.class)).map(v -> ((org.brailleblaster.libembosser.embossing.attribute.Copies)v).getValue()).ifPresent(printJob::setCopies);
 		try {
 			printJob.setPrintService(ps);
 			PageFormat pf = printJob.defaultPage();
