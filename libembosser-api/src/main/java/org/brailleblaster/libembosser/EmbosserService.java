@@ -13,7 +13,7 @@ import com.google.common.collect.Streams;
 
 public class EmbosserService {
 	private static EmbosserService service;
-	private ServiceLoader<EmbosserFactory> serviceLoader;
+	private final ServiceLoader<EmbosserFactory> serviceLoader;
 	private EmbosserService() {
 		serviceLoader = ServiceLoader.load(EmbosserFactory.class);
 	}

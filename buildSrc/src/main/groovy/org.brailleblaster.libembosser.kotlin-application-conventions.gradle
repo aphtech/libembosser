@@ -1,0 +1,4 @@
+plugins {
+    id 'org.brailleblaster.libembosser.kotlin-common-conventions'
+    id 'application'
+}

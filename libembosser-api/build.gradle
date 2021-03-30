@@ -1,7 +1,6 @@
 plugins {
-	id "java-library"
+	id 'org.brailleblaster.libembosser.kotlin-library-conventions'
 	id "com.github.spotbugs" version "4.4.3"
-	id 'org.jetbrains.kotlin.jvm' version '1.4.32'
 }
 
 java {
@@ -13,7 +12,6 @@ dependencies {
 	implementation 'com.google.guava:guava:29.0-jre'
 	implementation project(':libembosser-utils')
 	testImplementation 'org.testng:testng:6.13.1'
-	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 }
 
 test {
