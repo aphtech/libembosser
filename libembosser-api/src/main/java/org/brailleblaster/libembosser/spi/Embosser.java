@@ -2,6 +2,8 @@ package org.brailleblaster.libembosser.spi;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -189,5 +191,8 @@ public interface Embosser extends IEmbosser {
 	default Stream<Notification> checkEmboss(int cellsPerLine, int linesPerPage,
 											 EmbossingAttributeSet attributes) {
 		return Stream.empty();
+	}
+	default List<EmbosserOption> getOptions() {
+		return Collections.emptyList();
 	}
 }
