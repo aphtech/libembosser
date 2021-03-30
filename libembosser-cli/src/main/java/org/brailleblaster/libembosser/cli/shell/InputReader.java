@@ -3,8 +3,8 @@ package org.brailleblaster.libembosser.cli.shell;
 import java.util.List;
 
 import org.jline.reader.LineReader;
-import org.springframework.util.StringUtils;
 
+import com.google.common.base.Strings;
 import com.google.common.primitives.Ints;
 
 public class InputReader {
@@ -16,7 +16,7 @@ public class InputReader {
 	}
 	public String prompt(String prompt, String defaultValue) {
 		String answer = lineReader.readLine(prompt);
-		if (StringUtils.isEmpty(answer)) {
+		if (Strings.nullToEmpty(answer).isEmpty()) {
 			return defaultValue;
 		}
 		return answer;
