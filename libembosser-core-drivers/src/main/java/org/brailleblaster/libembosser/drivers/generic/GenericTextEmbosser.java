@@ -2,9 +2,11 @@ package org.brailleblaster.libembosser.drivers.generic;
 
 import java.math.BigDecimal;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
+import com.google.common.collect.ImmutableList;
 import org.brailleblaster.libembosser.drivers.utils.BaseTextEmbosser;
 import org.brailleblaster.libembosser.drivers.utils.document.GenericTextDocumentHandler;
 import org.brailleblaster.libembosser.drivers.utils.document.events.DocumentEvent;
@@ -15,24 +17,24 @@ import org.brailleblaster.libembosser.embossing.attribute.PageRanges;
 import org.brailleblaster.libembosser.embossing.attribute.PaperLayout;
 import org.brailleblaster.libembosser.embossing.attribute.PaperMargins;
 import org.brailleblaster.libembosser.embossing.attribute.PaperSize;
-import org.brailleblaster.libembosser.spi.BrlCell;
-import org.brailleblaster.libembosser.spi.EmbossingAttributeSet;
-import org.brailleblaster.libembosser.spi.Layout;
-import org.brailleblaster.libembosser.spi.Margins;
-import org.brailleblaster.libembosser.spi.Rectangle;
+import org.brailleblaster.libembosser.spi.*;
 
 import com.google.common.io.ByteSource;
 
 public class GenericTextEmbosser extends BaseTextEmbosser {
-	private boolean addMargins;
+	private final EmbosserOption.BooleanOption addMargins = new EmbosserOption.BooleanOption("Add margins", false);
 	public GenericTextEmbosser(String manufacturer, String model, Rectangle maxPaper, Rectangle minPaper) {
 		this(manufacturer, model, maxPaper, minPaper, false);
 	}
 	public GenericTextEmbosser(String id, String model, Rectangle maxPaper, Rectangle minPaper, boolean addMargins) {
 		super(id, "Generic", model, maxPaper, minPaper);
-		this.addMargins = addMargins;
+		this.addMargins.setValue(addMargins);
 	}
-	
+
+	@Override
+	public List<EmbosserOption> getOptions() {
+		return ImmutableList.of(addMargins);
+	}
 	protected Function<Iterator<DocumentEvent>, ByteSource> createHandler(EmbossingAttributeSet attributes) {
 		BrlCell cell = Optional.ofNullable(attributes.get(BrailleCellType.class)).map(v -> ((BrailleCellType)v).getValue()).orElse(BrlCell.NLS);
 		Rectangle paper = Optional.ofNullable(attributes.get(PaperSize.class)).map(v -> ((PaperSize)v).getValue()).orElse(getMaximumPaper());
@@ -46,7 +48,7 @@ public class GenericTextEmbosser extends BaseTextEmbosser {
 		int topMarginCells = 0;
 		int leftMarginCells = 0;
 		// Only set margins if addMargins is true.
-		if (addMargins) {
+		if (addMargins.getValue()) {
 			topMarginCells = cell.getLinesForHeight(topMargin);
 			leftMarginCells = cell.getCellsForWidth(leftMargin);
 		}
