@@ -17,7 +17,7 @@ public interface Notification {
 	 * @author Michael Whapples
 	 *
 	 */
-	public static enum NotificationType {
+	enum NotificationType {
 		/**
 		 * An error notification.
 		 * 
@@ -42,7 +42,7 @@ public interface Notification {
 	 * 
 	 * @return The notification type.
 	 */
-	public NotificationType getNotificationType();
+	NotificationType getNotificationType();
 	/**
 	 * Get the message in the system default locale.
 	 * 
@@ -50,12 +50,12 @@ public interface Notification {
 	 * 
 	 * @return The notification message.
 	 */
-	public String getMessage();
+	String getMessage();
 	/**
 	 * Get the message in the specified locale.
 	 * 
 	 * @param locale The locale to be used for the message.
 	 * @return The localised message.
 	 */
-	public String getMessage(Locale locale);
+	String getMessage(Locale locale);
 }

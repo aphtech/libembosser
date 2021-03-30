@@ -53,7 +53,7 @@ public final class PageRanges extends SetOfIntegerSyntax implements EmbossingAtt
 	}
 	@Override
 	public boolean equals(Object object) {
-		return object instanceof PageRanges ? super.equals(object) : false;
+		return object instanceof PageRanges && super.equals(object);
 	}
 
 }

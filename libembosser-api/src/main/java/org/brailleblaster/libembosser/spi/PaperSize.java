@@ -44,13 +44,13 @@ public enum PaperSize {
 	private String displayName;
 	private Rectangle size;
 	private PaperSize replacementSize;
-	private PaperSize(String name, String width, String height) {
+	PaperSize(String name, String width, String height) {
 		this.displayName = name;
 		size = new Rectangle(new BigDecimal(width), new BigDecimal(height));
 		// Not replaced as not deprecated so use null
 		replacementSize = null;
 	}
-	private PaperSize(PaperSize replacement) {
+	PaperSize(PaperSize replacement) {
 		this.replacementSize = checkNotNull(replacement);
 		displayName = replacementSize.getDisplayName();
 		size = replacementSize.getSize();

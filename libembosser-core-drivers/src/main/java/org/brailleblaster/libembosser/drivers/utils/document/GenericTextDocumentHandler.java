@@ -38,7 +38,7 @@ public class GenericTextDocumentHandler implements ByteSourceHandlerToFunctionAd
 	private static void throwInvalidStateException(DocumentEvent event, String state) {
 		throw new IllegalStateException(String.format("Invalid event %s for state %s", event.getClass().getName(), state));
 	}
-	private static enum HandlerStates {
+	private enum HandlerStates {
 		READY{
 			@Override
 			public void accept(GenericTextDocumentHandler h, DocumentEvent e) {
@@ -241,7 +241,7 @@ public class GenericTextDocumentHandler implements ByteSourceHandlerToFunctionAd
 		// Reset the option stack, in case of previous failure.
 		optionStack.clear();
 		// Push the options to the stack
-		optionStack.push(options);;
+		optionStack.push(options);
 		stateStack.push(HandlerStates.DOCUMENT);
 		// Documents always start with a right page
 		rightPage = true;

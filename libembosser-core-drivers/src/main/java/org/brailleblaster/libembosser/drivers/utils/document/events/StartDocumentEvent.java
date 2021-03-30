@@ -18,10 +18,7 @@ public class StartDocumentEvent extends BaseOptionEvent<DocumentOption> {
 			return false;
 		}
 		StartDocumentEvent other = (StartDocumentEvent)obj;
-		if (optionsEquals(other)) {
-			return false;
-		}
-		return true;
+		return !optionsEquals(other);
 	}
 	@Override
 	public int hashCode() {

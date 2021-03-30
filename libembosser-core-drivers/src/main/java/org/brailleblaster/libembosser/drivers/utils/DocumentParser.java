@@ -92,10 +92,10 @@ public class DocumentParser {
 		int newLines = 0;
 		int newPages = 0;
 		int prevByte = -1;
-		handler.onEvent(new StartDocumentEvent());;
-		handler.onEvent(new StartVolumeEvent());;
-		handler.onEvent(new StartSectionEvent());;
-		handler.onEvent(new StartPageEvent());;
+		handler.onEvent(new StartDocumentEvent());
+		handler.onEvent(new StartVolumeEvent());
+		handler.onEvent(new StartSectionEvent());
+		handler.onEvent(new StartPageEvent());
 		int readByte;
 		try {
 			while ((readByte = bufferedInput.read()) >= 0) {
@@ -135,10 +135,10 @@ public class DocumentParser {
 		} catch (IOException e) {
 			throw new ParseException(e);
 		}
-		handler.onEvent(new EndPageEvent());;
-		handler.onEvent(new EndSectionEvent());;
-		handler.onEvent(new EndVolumeEvent());;
-		handler.onEvent(new EndDocumentEvent());;
+		handler.onEvent(new EndPageEvent());
+		handler.onEvent(new EndSectionEvent());
+		handler.onEvent(new EndVolumeEvent());
+		handler.onEvent(new EndDocumentEvent());
 	}
 
 	private void createLineEvents(DocumentHandler handler, ByteArrayOutputStream lineBuffer)
@@ -154,7 +154,7 @@ public class DocumentParser {
 	public void parsePef(Document inputDoc, DocumentHandler handler) {
 		Element root = inputDoc.getDocumentElement();
 		if (root != null && Optional.ofNullable(PEFElementType.PEF).equals(PEFElementType.findElementType(root))) {
-			processPefElement((Element)root, handler);
+			processPefElement(root, handler);
 		}
 	}
 
@@ -214,14 +214,14 @@ public class DocumentParser {
 					rowGap = Optional.ofNullable(((Element) node).getAttribute("rowgap")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(RowGap::new);
 					rows = Optional.ofNullable(((Element) node).getAttribute("rows")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(LinesPerPage::new);
 					Set<SectionOption> sectionOptions = Streams.concat(Streams.stream(cols), Streams.stream(duplex), Streams.stream(rowGap),  Streams.stream(rows)).collect(Collectors.toSet());
-					handler.onEvent(new StartSectionEvent(sectionOptions));;
+					handler.onEvent(new StartSectionEvent(sectionOptions));
 					break;
 				case PAGE:
 					cols = Optional.ofNullable(((Element) node).getAttribute("cols")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(CellsPerLine::new);
 					rowGap = Optional.ofNullable(((Element) node).getAttribute("rowgap")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(RowGap::new);
 					rows = Optional.ofNullable(((Element) node).getAttribute("rows")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(LinesPerPage::new);
 					Set<PageOption> pageOptions = Streams.concat(Streams.stream(cols), Streams.stream(rowGap),  Streams.stream(rows)).collect(Collectors.toSet());
-					handler.onEvent(new StartPageEvent(pageOptions));;
+					handler.onEvent(new StartPageEvent(pageOptions));
 					break;
 				case ROW:
 					rowGap = Optional.ofNullable(((Element) node).getAttribute("rowgap")).flatMap(v -> Optional.ofNullable(Ints.tryParse(v))).map(RowGap::new);
@@ -265,16 +265,16 @@ public class DocumentParser {
 					handler.onEvent(new EndDocumentEvent());
 					break;
 				case VOLUME:
-					handler.onEvent(new EndVolumeEvent());;
+					handler.onEvent(new EndVolumeEvent());
 					break;
 				case SECTION:
-					handler.onEvent(new EndSectionEvent());;
+					handler.onEvent(new EndSectionEvent());
 					break;
 				case PAGE:
-					handler.onEvent(new EndPageEvent());;
+					handler.onEvent(new EndPageEvent());
 					break;
 				case ROW:
-					handler.onEvent(new EndLineEvent());;
+					handler.onEvent(new EndLineEvent());
 					break;
 				case GRAPHIC:
 					handler.onEvent(new EndGraphicEvent());

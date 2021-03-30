@@ -28,7 +28,7 @@ public enum Model implements TextEmbosserModel {
 	private final int maxCellsPerLine;
 	private final String id;
 	private final String name;
-	private Model(String id, String name, ImmutableList<Byte> lineEnd, ImmutableList<Byte> pageEnd, ImmutableList<Byte> docEnd, int maxCellsPerLine) {
+	Model(String id, String name, ImmutableList<Byte> lineEnd, ImmutableList<Byte> pageEnd, ImmutableList<Byte> docEnd, int maxCellsPerLine) {
 		this.lineEnd = lineEnd;
 		this.pageEnd = pageEnd;
 		this.docEnd = docEnd;

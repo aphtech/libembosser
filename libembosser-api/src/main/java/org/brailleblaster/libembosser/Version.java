@@ -96,9 +96,7 @@ public final class Version {
 		Version other = (Version) obj;
 		if (major != other.major)
 			return false;
-		if (minor != other.minor)
-			return false;
-		return true;
+		return minor == other.minor;
 	}
 
 }

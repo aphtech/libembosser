@@ -4,5 +4,5 @@ import org.brailleblaster.libembosser.drivers.utils.document.events.DocumentEven
 
 @FunctionalInterface	
 public interface DocumentHandler {
-	public void onEvent(DocumentEvent event);
+	void onEvent(DocumentEvent event);
 }

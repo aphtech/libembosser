@@ -12,5 +12,5 @@ public interface IGraphicsEmbosser extends Embosser {
 	 * 
 	 * @return The resolution in DPI.
 	 */
-	public int getResolution();
+    int getResolution();
 }

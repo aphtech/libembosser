@@ -6,7 +6,7 @@ public enum Layout {
 	Z_FOLDING_SINGLE_HORIZONTAL(false), Z_FOLDING_DOUBLE_HORIZONTAL(true),
 	Z_FOLDING_SINGLE_VERTICAL(false), Z_FOLDING_DOUBLE_VERTICAL(true);
 	private boolean doubleSide;
-	private Layout(boolean doubleSide) {
+	Layout(boolean doubleSide) {
 		this.doubleSide = doubleSide;
 	}
 	public boolean isDoubleSide() {

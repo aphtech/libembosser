@@ -18,10 +18,7 @@ public class StartPageEvent extends BaseOptionEvent<PageOption> {
 			return false;
 		}
 		StartPageEvent other = (StartPageEvent)obj;
-		if (optionsEquals(other)) {
-			return false;
-		}
-		return true;
+		return !optionsEquals(other);
 	}
 	@Override
 	public int hashCode() {

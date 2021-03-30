@@ -25,10 +25,7 @@ public class BrailleEvent implements DocumentEvent {
 			return false;
 		BrailleEvent other = (BrailleEvent) obj;
 		if (braille == null) {
-			if (other.braille != null)
-				return false;
-		} else if (!braille.equals(other.braille))
-			return false;
-		return true;
+			return other.braille == null;
+		} else return braille.equals(other.braille);
 	}
 }

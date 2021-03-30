@@ -25,6 +25,6 @@ public final class PaperSize extends ObjectSyntax<Rectangle> implements Embossin
 	}
 	@Override
 	public boolean equals(Object object) {
-		return object instanceof PaperSize ? super.equals(object) : false;
+		return object instanceof PaperSize && super.equals(object);
 	}
 }

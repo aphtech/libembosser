@@ -24,10 +24,10 @@ public enum PEFElementType {
 	private String ns;
 	private String elemName;
 	private List<Predicate<Element>> additionalChecks;
-	private PEFElementType(String ns, String elemName) {
+	PEFElementType(String ns, String elemName) {
 		this(ns, elemName, ImmutableList.of());
 	}
-	private PEFElementType(String ns, String elemName, List<Predicate<Element>> additionalChecks) {
+	PEFElementType(String ns, String elemName, List<Predicate<Element>> additionalChecks) {
 		this.ns = ns;
 		this.elemName = elemName;
 		this.additionalChecks = additionalChecks;

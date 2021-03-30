@@ -30,7 +30,7 @@ public interface IEmbosser {
 	 * @return An enum set of the document formats this embosser driver can emboss.
 	 */
 	@Deprecated
-	public default EnumSet<DocumentFormat> getSupportedDocumentFormats() {
+    default EnumSet<DocumentFormat> getSupportedDocumentFormats() {
 		return EnumSet.of(DocumentFormat.BRF, DocumentFormat.PEF);
 	}
 	/**
@@ -43,7 +43,7 @@ public interface IEmbosser {
 	 * @throws EmbossException When there is a problem embossing.
 	 */
 	@Deprecated
-	public default boolean embossPef(PrintService embosserDevice, Document pef, EmbossProperties embossProperties) throws EmbossException {
+	default boolean embossPef(PrintService embosserDevice, Document pef, EmbossProperties embossProperties) throws EmbossException {
 		EmbossingAttributeSet attributes = embossProperties.toAttributeSet();
 		embossPef(embosserDevice, pef, attributes);
 		// If here then successful.
@@ -60,7 +60,7 @@ public interface IEmbosser {
 	 * @throws EmbossException When there is a problem embossing.
 	 */
 	@Deprecated
-	public default boolean embossPef(PrintService embosserDevice, InputStream pef, EmbossProperties embossProperties) throws EmbossException {
+	default boolean embossPef(PrintService embosserDevice, InputStream pef, EmbossProperties embossProperties) throws EmbossException {
 		EmbossingAttributeSet attributes = embossProperties.toAttributeSet();
 		embossPef(embosserDevice, pef, attributes);
 		// If here then successful.
@@ -77,7 +77,7 @@ public interface IEmbosser {
 	 * @throws EmbossException When there is a problem embossing the document.
 	 */
 	@Deprecated
-	public default boolean embossBrf(PrintService embosserDevice, InputStream brf, EmbossProperties embossProperties) throws EmbossException {
+	default boolean embossBrf(PrintService embosserDevice, InputStream brf, EmbossProperties embossProperties) throws EmbossException {
 		EmbossingAttributeSet attributes = embossProperties.toAttributeSet();
 		embossBrf(embosserDevice, brf, attributes);
 		// If we get here then must be successful.
@@ -101,7 +101,7 @@ public interface IEmbosser {
 	 * @throws EmbossException when there is a problem embossing.
 	 */
 	@Deprecated
-	public default boolean emboss(PrintService embosserDevice, InputStream is, DocumentFormat format, EmbossProperties embossProperties) throws EmbossException {
+	default boolean emboss(PrintService embosserDevice, InputStream is, DocumentFormat format, EmbossProperties embossProperties) throws EmbossException {
 		boolean result = false;
 		switch(format) {
 		case BRF:
@@ -123,7 +123,7 @@ public interface IEmbosser {
 	 * 
 	 * @return The ID of the embosser.
 	 */
-	public String getId();
+	String getId();
 	/**
 	 * Get the name of the embosser manufacturer.
 	 * 
@@ -135,14 +135,14 @@ public interface IEmbosser {
 	 * 
 	 * @return The manufacturer of the embosser.
 	 */
-	public String getManufacturer();
+	String getManufacturer();
 
 	/**
 	 * Get the model name of the embosser.
 	 * 
 	 * @return The embosser model name.
 	 */
-	public String getModel();
+	String getModel();
 	
 	/**
 	 * Emboss a PEF document.
@@ -152,7 +152,7 @@ public interface IEmbosser {
 	 * @param attributes Additional information about how to emboss the document.
 	 * @throws EmbossException When there is a problem embossing the document.
 	 */
-	public void embossPef(PrintService embosserDevice, Document pef, EmbossingAttributeSet attributes) throws EmbossException;
+	void embossPef(PrintService embosserDevice, Document pef, EmbossingAttributeSet attributes) throws EmbossException;
 	
 	/**
 	 * Emboss a PEF document.
@@ -162,7 +162,7 @@ public interface IEmbosser {
 	 * @param attributes Additional information about how to emboss the document.
 	 * @throws EmbossException When there is a problem embossing the document.
 	 */
-	public void embossPef(PrintService embosserDevice, InputStream pef, EmbossingAttributeSet attributes) throws EmbossException;
+	void embossPef(PrintService embosserDevice, InputStream pef, EmbossingAttributeSet attributes) throws EmbossException;
 	
 	/**
 	 * Emboss a BRF document.
@@ -172,31 +172,31 @@ public interface IEmbosser {
 	 * @param attributes Additional information about how to emboss the document.
 	 * @throws EmbossException When there is a problem embossing the document.
 	 */
-	public void embossBrf(PrintService embosserDevice, InputStream brf, EmbossingAttributeSet attributes) throws EmbossException;
+	void embossBrf(PrintService embosserDevice, InputStream brf, EmbossingAttributeSet attributes) throws EmbossException;
 	
 	/**
 	 * Get the maximum paper which can be handled by the embosser.
 	 * 
 	 * @return The maximum paper which can be handled by the embosser.
 	 */
-	public Rectangle getMaximumPaper();
+	Rectangle getMaximumPaper();
 	/**
 	 * The minimum paper size which can be handled by the embosser.
 	 * 
 	 * @return The minimum paper size.
 	 */
-	public Rectangle getMinimumPaper();
+	Rectangle getMinimumPaper();
 	/**
 	 * Whether the embosser supports interpoint embossing.
 	 * 
 	 * @return If the embosser can emboss interpoint then true, otherwise false.
 	 */
-	public boolean supportsInterpoint();
+	boolean supportsInterpoint();
 	/**
 	 * Get a suitable StreamPrintServiceFactory to emboss to a OutputStream.
 	 * 
 	 * @return An optional of a suitable StreamPrintServiceFactory for embossing to a stream, empty if no suitable StreamPrintServiceFactory can be located.
 	 */
-	public Optional<StreamPrintServiceFactory> getStreamPrintServiceFactory();
+	Optional<StreamPrintServiceFactory> getStreamPrintServiceFactory();
 
 }

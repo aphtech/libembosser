@@ -24,11 +24,11 @@ public class RectangleTest {
 		assertEquals(a.equals(b), expectedAB);
 		assertEquals(b.equals(a), expectedAB);
 		if (expectedAB)
-			assertTrue(a.hashCode() == b.hashCode());
+            assertEquals(b.hashCode(), a.hashCode());
 		assertEquals(b.equals(c), expectedBC);
 		assertEquals(c.equals(b), expectedBC);
-		if (expectedBC) 
-			assertTrue(b.hashCode() == c.hashCode());
+		if (expectedBC)
+			assertEquals(c.hashCode(), b.hashCode());
 		assertEquals(a.equals(c), expectedAB && expectedBC);
 		assertEquals(c.equals(a), expectedAB && expectedBC);
 	}

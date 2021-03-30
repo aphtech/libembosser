@@ -5,7 +5,7 @@ import com.google.common.base.Charsets;
 import com.google.common.io.ByteSource;
 
 public class Braillo270DocumentHandler extends AbstractBrailloDocumentHandler {
-	public static enum Firmware {
+	public enum Firmware {
 		V1_11(9.5, 14.0) {
 			@Override
 			public ByteSource getHeader(int cellsPerLine, double sheetLength, boolean interpoint, boolean zfolding) {
@@ -25,7 +25,7 @@ public class Braillo270DocumentHandler extends AbstractBrailloDocumentHandler {
 		};
 		final private double minSheetLength;
 		final private double maxSheetLength;
-		private Firmware(double minSheet, double maxSheet) {
+		Firmware(double minSheet, double maxSheet) {
 			this.minSheetLength = minSheet;
 			this.maxSheetLength = maxSheet;
 		}

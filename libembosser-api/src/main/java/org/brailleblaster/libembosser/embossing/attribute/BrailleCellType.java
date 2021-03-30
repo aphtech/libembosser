@@ -25,6 +25,6 @@ public final class BrailleCellType extends ObjectSyntax<BrlCell> implements Embo
 	}
 	@Override
 	public boolean equals(Object object) {
-		return object instanceof BrailleCellType ? super.equals(object) : false;
+		return object instanceof BrailleCellType && super.equals(object);
 	}
 }

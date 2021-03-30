@@ -19,7 +19,7 @@ public enum BrlCell {
 	AUSTRALIAN(new BigDecimal("6.00"), new BigDecimal("10.00"), 6);
 	private BigDecimal width, height;
 	private int dots;
-	private BrlCell(BigDecimal width, BigDecimal height, int dots) {
+	BrlCell(BigDecimal width, BigDecimal height, int dots) {
 		this.width = width;
 		this.height = height;
 		this.dots = dots;

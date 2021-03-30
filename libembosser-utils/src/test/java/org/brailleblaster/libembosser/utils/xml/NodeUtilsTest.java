@@ -27,8 +27,8 @@ public class NodeUtilsTest {
 	public Object[][] findMatchingDescendantsProvider() {
 		return new Object[][] {
 			{"<p/>", new String[] {}, (Predicate<Node>) o -> true},
-			{"<p><i/><b/></p>", new String[] {}, (Predicate<Node>)n -> n instanceof Element && ((Element)n).getLocalName().equals("body")},
-			{"<p>some text <b>More text</b></p>", new String[] {"<b>More text</b>"}, (Predicate<Node>)n -> n instanceof Element && ((Element)n).getLocalName().equals("b")},
+			{"<p><i/><b/></p>", new String[] {}, (Predicate<Node>)n -> n instanceof Element && n.getLocalName().equals("body")},
+			{"<p>some text <b>More text</b></p>", new String[] {"<b>More text</b>"}, (Predicate<Node>)n -> n instanceof Element && n.getLocalName().equals("b")},
 		};
 	}
 	@Test(dataProvider="findMatchingDescendantsProvider")

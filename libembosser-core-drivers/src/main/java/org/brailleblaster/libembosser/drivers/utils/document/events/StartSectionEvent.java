@@ -18,10 +18,7 @@ public class StartSectionEvent extends BaseOptionEvent<SectionOption> {
 			return false;
 		}
 		StartSectionEvent other = (StartSectionEvent)obj;
-		if (optionsEquals(other)) {
-			return false;
-		}
-		return true;
+		return !optionsEquals(other);
 	}
 	@Override
 	public int hashCode() {

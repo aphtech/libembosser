@@ -3,5 +3,5 @@ package org.brailleblaster.libembosser.drivers.utils;
 import com.google.common.io.ByteSource;
 
 public interface DocumentToByteSourceHandler extends DocumentHandler {
-	public ByteSource asByteSource();
+	ByteSource asByteSource();
 }

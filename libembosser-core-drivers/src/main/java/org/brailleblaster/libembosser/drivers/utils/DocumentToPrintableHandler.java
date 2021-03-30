@@ -74,14 +74,14 @@ public class DocumentToPrintableHandler implements DocumentHandler, Function<Ite
 		 * 
 		 * @return A map of the text attributes to be applied to Braille strings.
 		 */
-		public Map<TextAttribute, Object> getBrailleAttributes(BrlCell brailleCell);
+		Map<TextAttribute, Object> getBrailleAttributes(BrlCell brailleCell);
 		/**
 		 * Get the padding which should be inserted between lines.
 		 * 
 		 * Whilst fonts should provide the leading or line spacing, some seem not to. In the cases where the line spacing is not accounted for in the font this will give the line spacing which should be inserted.
 		 * @return The line spacing in points.
 		 */
-		public int getLineSpacing();
+		int getLineSpacing();
 		/**
 		 * Calculate the left margin for the specific embosser.
 		 * 
@@ -90,7 +90,7 @@ public class DocumentToPrintableHandler implements DocumentHandler, Function<Ite
 		 * @param desiredWidth The desired margin.
 		 * @return The margin optimised for the embosser.
 		 */
-		public double calculateMargin(double desiredWidth);
+		double calculateMargin(double desiredWidth);
 	}
 	/**
 	 * Layout helper for interpoint Braille embossers.
@@ -98,7 +98,7 @@ public class DocumentToPrintableHandler implements DocumentHandler, Function<Ite
 	 * @author Michael Whapples
 	 *
 	 */
-	public static interface InterpointLayoutHelper extends LayoutHelper {
+	public interface InterpointLayoutHelper extends LayoutHelper {
 		/**
 		 * Calculate embosser specific margin for back side of the page.
 		 * 
@@ -109,7 +109,7 @@ public class DocumentToPrintableHandler implements DocumentHandler, Function<Ite
 		 * @param pageWidth The width of the page.
 		 * @return The optimised margin which should be used on the back of a page.
 		 */
-		public double calculateBackMargin(double desiredWidth, double frontMargin, double pageWidth);
+		double calculateBackMargin(double desiredWidth, double frontMargin, double pageWidth);
 	}
 	final static class Page {
 		private ImmutableList<PageElement> elements;
@@ -152,7 +152,7 @@ public class DocumentToPrintableHandler implements DocumentHandler, Function<Ite
 		}
 		
 	}
-	static interface PageElement {
+	interface PageElement {
 		
 	}
 	final static class Row implements PageElement {
@@ -296,7 +296,7 @@ public class DocumentToPrintableHandler implements DocumentHandler, Function<Ite
 	private static void throwInvalidStateException(DocumentEvent event, String state) {
 		throw new IllegalStateException(String.format("Invalid event %s for state %s", event.getClass().getName(), state));
 	}
-	private static enum HandlerStates {
+	private enum HandlerStates {
 		READY{
 			@Override
 			void accept(DocumentToPrintableHandler h, DocumentEvent e) {

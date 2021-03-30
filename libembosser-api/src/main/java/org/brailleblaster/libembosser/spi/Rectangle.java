@@ -50,10 +50,7 @@ public final class Rectangle {
 		} else if (height.compareTo(other.height) != 0)
 			return false;
 		if (width == null) {
-			if (other.width != null)
-				return false;
-		} else if (width.compareTo(other.width) != 0)
-			return false;
-		return true;
+			return other.width == null;
+		} else return width.compareTo(other.width) == 0;
 	}
 }

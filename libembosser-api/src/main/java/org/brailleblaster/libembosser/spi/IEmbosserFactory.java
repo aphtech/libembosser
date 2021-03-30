@@ -18,7 +18,7 @@ public interface IEmbosserFactory {
 	 * 
 	 * @return A list of supported embosser models.
 	 */
-	public List<? extends IEmbosser> getEmbossers();
+    List<? extends IEmbosser> getEmbossers();
 	/**
 	 * Get embosser drivers localised to the locale.
 	 * 
@@ -29,5 +29,5 @@ public interface IEmbosserFactory {
 	 * @param locale The locale to be used by driver instances returned.
 	 * @return A list of embossers.
 	 */
-	public List<? extends IEmbosser> getEmbossers(Locale locale);
+	List<? extends IEmbosser> getEmbossers(Locale locale);
 }

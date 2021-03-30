@@ -25,6 +25,6 @@ public final class PaperLayout extends ObjectSyntax<Layout> implements Embossing
 	}
 	@Override
 	public boolean equals(Object object) {
-		return object instanceof PaperLayout ? super.equals(object) : false;
+		return object instanceof PaperLayout && super.equals(object);
 	}
 }

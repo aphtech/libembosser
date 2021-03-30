@@ -18,10 +18,7 @@ public class StartGraphicEvent extends BaseOptionEvent<GraphicOption> {
 			return false;
 		}
 		StartGraphicEvent other = (StartGraphicEvent)obj;
-		if (optionsEquals(other)) {
-			return false;
-		}
-		return true;
+		return !optionsEquals(other);
 	}
 	@Override
 	public int hashCode() {

@@ -76,8 +76,8 @@ public class GenericTextDocumentHandlerTest {
 		final String[] multiPageDocumentOutputStrings = new String[] {"F/ PAGE", "SECOND PAGE"};
 		data.add(new Object[] {createHandlerBuilder().build(), multiPageDocumentInput, String.join("\f", multiPageDocumentOutputStrings).concat("\f").getBytes(Charsets.US_ASCII)});
 		data.add(new Object[] {createHandlerBuilder().setLinesPerPage(30).build(), multiPageDocumentInput, String.join("\f", multiPageDocumentOutputStrings).concat("\f").getBytes(Charsets.US_ASCII)});
-		data.add(new Object[] {createHandlerBuilder().padWithBlankLines(true).build(), multiPageDocumentInput, String.join("\f", Arrays.stream(multiPageDocumentOutputStrings).map(s -> s.concat(Strings.repeat("\r\n", 24))).collect(Collectors.toList())).concat("\f").getBytes(Charsets.US_ASCII)});
-		data.add(new Object[] {createHandlerBuilder().padWithBlankLines(true).setLinesPerPage(30).build(), multiPageDocumentInput, String.join("\f", Arrays.stream(multiPageDocumentOutputStrings).map(s -> s.concat(Strings.repeat("\r\n", 29))).collect(Collectors.toList())).concat("\f").getBytes(Charsets.US_ASCII)});
+		data.add(new Object[] {createHandlerBuilder().padWithBlankLines(true).build(), multiPageDocumentInput, Arrays.stream(multiPageDocumentOutputStrings).map(s -> s.concat(Strings.repeat("\r\n", 24))).collect(Collectors.joining("\f")).concat("\f").getBytes(Charsets.US_ASCII)});
+		data.add(new Object[] {createHandlerBuilder().padWithBlankLines(true).setLinesPerPage(30).build(), multiPageDocumentInput, Arrays.stream(multiPageDocumentOutputStrings).map(s -> s.concat(Strings.repeat("\r\n", 29))).collect(Collectors.joining("\f")).concat("\f").getBytes(Charsets.US_ASCII)});
 		// Tests for adding/padding margins
 		data.add(new Object[] {createHandlerBuilder().setLeftMargin(3).setTopMargin(2).build(), multiPageDocumentInput, Arrays.stream(multiPageDocumentOutputStrings).map(s -> String.format("%s%s%s", "\r\n\r\n   ", s, "\f")).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString().getBytes(Charsets.US_ASCII)});
 		// Multiple copy tests

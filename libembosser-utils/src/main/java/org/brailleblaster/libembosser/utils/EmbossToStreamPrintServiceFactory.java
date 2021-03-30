@@ -118,7 +118,7 @@ public class EmbossToStreamPrintServiceFactory extends StreamPrintServiceFactory
 
 		@Override
 		public boolean isDocFlavorSupported(DocFlavor flavor) {
-			return Arrays.stream(DOC_FLAVORS).anyMatch(f -> f.equals(flavor));
+			return Arrays.asList(DOC_FLAVORS).contains(flavor);
 		}
 
 		@Override

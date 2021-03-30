@@ -61,7 +61,7 @@ public class UnknownNodeFlatMapperTest {
 		}
 		UnknownNodeFlatMapper fm = new UnknownNodeFlatMapper(node1 -> false);
 		Stream<Node> actualStream = fm.apply(node);
-		assertEquals(actualStream.count(), 0l, "Stream expected to be empty");
+		assertEquals(actualStream.count(), 0L, "Stream expected to be empty");
 	}
 	@Test(dataProvider="inputXmlProvider")
 	public void testUnrecognisedParentInToUnknownNodeFlatMapper(String inputXml) {

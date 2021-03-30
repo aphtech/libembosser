@@ -25,6 +25,6 @@ public final class Copies extends IntegerSyntax implements EmbossingAttribute {
 	}
 	@Override
 	public boolean equals(Object obj) {
-		return obj instanceof Copies ? super.equals(obj) : false;
+		return obj instanceof Copies && super.equals(obj);
 	}
 }

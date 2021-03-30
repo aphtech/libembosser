@@ -58,10 +58,7 @@ public final class Margins {
 		} else if (!right.equals(other.right))
 			return false;
 		if (top == null) {
-			if (other.top != null)
-				return false;
-		} else if (!top.equals(other.top))
-			return false;
-		return true;
+			return other.top == null;
+		} else return top.equals(other.top);
 	}
 }
