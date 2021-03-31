@@ -42,7 +42,7 @@ abstract class BaseTextEmbosser(private val id: String, private val manufacturer
         return minimumPaper
     }
 
-    protected abstract fun createHandler(attributes: EmbossingAttributeSet): Function<Iterator<DocumentEvent?>?, ByteSource>
+    protected abstract fun createHandler(attributes: EmbossingAttributeSet): Function<Iterator<DocumentEvent>, ByteSource>
     @Throws(EmbossException::class)
     override fun embossPef(embosserDevice: PrintService, pef: Document, attributes: EmbossingAttributeSet) {
         val parser = DocumentParser()
@@ -56,7 +56,7 @@ abstract class BaseTextEmbosser(private val id: String, private val manufacturer
     }
 
     @Throws(EmbossException::class)
-    protected fun <T> emboss(embosserDevice: PrintService, input: T, parseMethod: ThrowingBiConsumer<T, DocumentHandler, DocumentParser.ParseException?>, handler: Function<Iterator<DocumentEvent?>?, ByteSource>): Boolean {
+    protected fun <T> emboss(embosserDevice: PrintService, input: T, parseMethod: ThrowingBiConsumer<T, DocumentHandler, DocumentParser.ParseException>, handler: Function<Iterator<DocumentEvent>, ByteSource>): Boolean {
         val events: MutableList<DocumentEvent> = LinkedList()
         try {
             parseMethod.accept(input, DocumentHandler { e: DocumentEvent -> events.add(e) })
