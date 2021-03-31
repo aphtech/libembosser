@@ -25,6 +25,7 @@ import org.brailleblaster.libembosser.spi.Embosser;
 import org.brailleblaster.libembosser.spi.EmbossingAttributeSet;
 import org.brailleblaster.libembosser.spi.Rectangle;
 import org.brailleblaster.libembosser.utils.EmbossToStreamPrintServiceFactory;
+import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Document;
 
 import com.google.common.io.ByteSource;
@@ -70,16 +71,16 @@ public abstract class BaseTextEmbosser implements Embosser {
 	public Rectangle getMinimumPaper() {
 		return minimumPaper;
 	}
-	abstract protected Function<Iterator<DocumentEvent>, ByteSource> createHandler(EmbossingAttributeSet attributes);
+	abstract protected @NotNull Function<Iterator<DocumentEvent>, ByteSource> createHandler(@NotNull EmbossingAttributeSet attributes);
 	@Override
-	public void embossPef(PrintService embosserDevice, Document pef, EmbossingAttributeSet attributes)
+	public void embossPef(@NotNull PrintService embosserDevice, @NotNull Document pef, EmbossingAttributeSet attributes)
 			throws EmbossException {
 		DocumentParser parser = new DocumentParser();
 		emboss(embosserDevice, pef, parser::parsePef, createHandler(attributes));
 	}
 
 	@Override
-	public void embossBrf(PrintService embosserDevice, InputStream brf, EmbossingAttributeSet attributes)
+	public void embossBrf(@NotNull PrintService embosserDevice, @NotNull InputStream brf, EmbossingAttributeSet attributes)
 			throws EmbossException {
 		DocumentParser parser = new DocumentParser();
 		emboss(embosserDevice, brf, parser::parseBrf, createHandler(attributes));
