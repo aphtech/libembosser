@@ -64,7 +64,7 @@ public class GenericTextEmbosser extends BaseTextEmbosser {
 		GenericTextDocumentHandler.Builder builder = new GenericTextDocumentHandler.Builder();
 		builder.setTopMargin(topMarginCells).setLeftMargin(leftMarginCells).setCellsPerLine(cellsPerLine).setLinesPerPage(linesPerPage);
 		Optional.ofNullable(attributes.get(Copies.class)).ifPresent(v -> builder.setCopies(((Copies)v).getValue()));
-		builder.setInterpoint(Optional.ofNullable(attributes.get(PaperLayout.class)).filter(p -> ((PaperLayout)p).getValue().equals(Layout.INTERPOINT)).isPresent()).setEopOnFullPage(eopOnFullPage.getValue()).setEndOfPage(TextConventionsKt.getPageEndingBytes(eop.getValue(), eol.getValue())).setEndOfLine(TextConventionsKt.getLineEndingBytes(eol.getValue()));
+		builder.setInterpoint(Optional.ofNullable(attributes.get(PaperLayout.class)).filter(p -> ((PaperLayout)p).getValue().equals(Layout.INTERPOINT)).isPresent()).setEopOnFullPage(eopOnFullPage.getValue()).setEndOfPage(TextConventionsKt.getPageEndingBytes(eop.getValue(), eol.getValue())).setEndOfLine(TextConventionsKt.getLineEndingBytes(eol.getValue())).padWithBlankLines(padWithBlanks.getValue());
 		GenericTextDocumentHandler handler = builder.build();
 		PageRanges pages = Optional.ofNullable((PageRanges)(attributes.get(PageRanges.class))).orElseGet(PageRanges::new);
 		return new PageFilter(pages).andThen(handler);
