@@ -14,6 +14,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.brailleblaster.libembosser.utils.PefUtils;
+import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -78,7 +79,7 @@ public interface Embosser extends IEmbosser {
 	 *                       document.
 	 * @throws EmbossException When there is a problem embossing the document.
 	 */
-	void embossPef(PrintService embosserDevice, Document pef, EmbossingAttributeSet attributes)
+	void embossPef(@NotNull PrintService embosserDevice, @NotNull Document pef, EmbossingAttributeSet attributes)
 			throws EmbossException;
 
 	/**
@@ -90,7 +91,7 @@ public interface Embosser extends IEmbosser {
 	 *                       document.
 	 * @throws EmbossException When there is a problem embossing the document.
 	 */
-	default void embossPef(PrintService embosserDevice, InputStream pef, EmbossingAttributeSet attributes)
+	default void embossPef(@NotNull PrintService embosserDevice, @NotNull InputStream pef, EmbossingAttributeSet attributes)
 			throws EmbossException {
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware(true);
@@ -113,9 +114,9 @@ public interface Embosser extends IEmbosser {
 	 *                       document.
 	 * @throws EmbossException When there is a problem embossing the document.
 	 */
-	default void embossBrf(PrintService embosserDevice, InputStream brf, EmbossingAttributeSet attributes)
+	default void embossBrf(@NotNull PrintService embosserDevice, @NotNull InputStream brf, EmbossingAttributeSet attributes)
 			throws EmbossException {
-		Document doc = null;
+		Document doc;
 		try {
 			doc = PefUtils.fromBrf(brf, "BrfEmboss", 40, 25, false);
 		} catch (ParserConfigurationException | IOException e) {
