@@ -31,6 +31,7 @@ import org.brailleblaster.libembosser.spi.BrlCell;
 import org.brailleblaster.libembosser.spi.EmbossException;
 import org.brailleblaster.libembosser.spi.Embosser;
 import org.brailleblaster.libembosser.spi.EmbossingAttributeSet;
+import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Document;
 
 /**
@@ -40,10 +41,10 @@ import org.w3c.dom.Document;
  *
  */
 public abstract class BaseGraphicsEmbosser implements Embosser {
-	private StreamPrintServiceFactory[] streamPrintServiceFactories = PrinterJob.lookupStreamPrintServices(DocFlavor.BYTE_ARRAY.POSTSCRIPT.getMimeType());
-	private String id;
-	private String manufacturer;
-	private String model;
+	private final StreamPrintServiceFactory[] streamPrintServiceFactories = PrinterJob.lookupStreamPrintServices(DocFlavor.BYTE_ARRAY.POSTSCRIPT.getMimeType());
+	private final String id;
+	private final String manufacturer;
+	private final String model;
 	public static final Set<Sides> DOUBLE_SIDED_MODES = ImmutableSet.of(Sides.DUPLEX, Sides.TWO_SIDED_LONG_EDGE, Sides.TUMBLE, Sides.TWO_SIDED_SHORT_EDGE);
 
 	protected BaseGraphicsEmbosser(String id, String manufacturer, String model) {
@@ -61,13 +62,13 @@ public abstract class BaseGraphicsEmbosser implements Embosser {
 	public abstract LayoutHelper getLayoutHelper(BrlCell cell);
 
 	@Override
-	public void embossPef(PrintService embosserDevice, Document pef, EmbossingAttributeSet attributes)
+	public void embossPef(@NotNull PrintService embosserDevice, @NotNull Document pef, EmbossingAttributeSet attributes)
 			throws EmbossException {
 		emboss(embosserDevice, pef, attributes, new DocumentParser()::parsePef);
 	}
 
 	@Override
-	public void embossBrf(PrintService embosserDevice, InputStream brf, EmbossingAttributeSet attributes)
+	public void embossBrf(@NotNull PrintService embosserDevice, @NotNull InputStream brf, EmbossingAttributeSet attributes)
 			throws EmbossException {
 		emboss(embosserDevice, brf, attributes, new DocumentParser()::parseBrf);
 	}
@@ -78,7 +79,7 @@ public abstract class BaseGraphicsEmbosser implements Embosser {
 		} catch (ParseException e) {
 			throw new RuntimeException("Problem parsing document", e);
 		}
-		PrintRequestAttribute duplex = Optional.ofNullable((org.brailleblaster.libembosser.embossing.attribute.PaperLayout)attributes.get(PaperLayout.class)).filter(p -> supportsInterpoint()).map(p -> p.getValue().isDoubleSide() ? Sides.TWO_SIDED_LONG_EDGE : Sides.ONE_SIDED).orElse(Sides.ONE_SIDED);
+		PrintRequestAttribute duplex = Optional.ofNullable((PaperLayout) attributes.get(PaperLayout.class)).filter(p -> supportsInterpoint()).filter(p -> p.getValue().isDoubleSide()).map(p -> Sides.TWO_SIDED_LONG_EDGE).orElse(Sides.ONE_SIDED);
 		PageRanges pages = Optional.ofNullable((PageRanges)attributes.get(PageRanges.class)).orElseGet(PageRanges::new);
 		Function<Iterator<DocumentEvent>, Iterator<DocumentEvent>> transform = new PageFilter(pages);
 		if (DOUBLE_SIDED_MODES.contains(duplex)) {
