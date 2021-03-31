@@ -30,12 +30,12 @@ import org.w3c.dom.Document;
 import com.google.common.io.ByteSource;
 
 public abstract class BaseTextEmbosser implements Embosser {
-	private StreamPrintServiceFactory streamPrintServiceFactory = new EmbossToStreamPrintServiceFactory();
+	private final StreamPrintServiceFactory streamPrintServiceFactory = new EmbossToStreamPrintServiceFactory();
 	private final String id;
-	private String manufacturer;
-	private String model;
-	private Rectangle maximumPaper;
-	private Rectangle minimumPaper;
+	private final String manufacturer;
+	private final String model;
+	private final Rectangle maximumPaper;
+	private final Rectangle minimumPaper;
 	// Not really sure whether this is the best way to monitor for print job finishing.
 	// Doing it as this for now as this is how it worked previously in BrailleBlaster and so want too not break things.
 	private boolean jobFinished;
