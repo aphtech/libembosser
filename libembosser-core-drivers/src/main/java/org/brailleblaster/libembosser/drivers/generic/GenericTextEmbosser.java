@@ -8,6 +8,9 @@ import java.util.function.Function;
 
 import com.google.common.collect.ImmutableList;
 import org.brailleblaster.libembosser.drivers.utils.BaseTextEmbosser;
+import org.brailleblaster.libembosser.drivers.utils.PageEnding;
+import org.brailleblaster.libembosser.drivers.utils.LineEnding;
+import org.brailleblaster.libembosser.drivers.utils.TextConventionsKt;
 import org.brailleblaster.libembosser.drivers.utils.document.GenericTextDocumentHandler;
 import org.brailleblaster.libembosser.drivers.utils.document.events.DocumentEvent;
 import org.brailleblaster.libembosser.drivers.utils.document.filters.PageFilter;
@@ -23,6 +26,12 @@ import com.google.common.io.ByteSource;
 
 public class GenericTextEmbosser extends BaseTextEmbosser {
 	private final EmbosserOption.BooleanOption addMargins = new EmbosserOption.BooleanOption("Add margins", false);
+	private final EmbosserOption.BooleanOption padWithBlanks = new EmbosserOption.BooleanOption("Pad page", false);
+	private final EmbosserOption.BooleanOption eopOnFullPage = new EmbosserOption.BooleanOption("Form feed on full page", false);
+	private final EmbosserOption.MultipleChoiceOption<LineEnding> eol = new EmbosserOption.MultipleChoiceOption<>("End of line", LineEnding.CR_LF, ImmutableList.copyOf(LineEnding.values()));
+	private final EmbosserOption.MultipleChoiceOption<PageEnding> eop = new EmbosserOption.MultipleChoiceOption<>("Form feed", PageEnding.FF, ImmutableList.copyOf(PageEnding.values()));
+	private final ImmutableList<EmbosserOption> options  = ImmutableList.of(addMargins, eol, eop, padWithBlanks, eopOnFullPage);
+
 	public GenericTextEmbosser(String manufacturer, String model, Rectangle maxPaper, Rectangle minPaper) {
 		this(manufacturer, model, maxPaper, minPaper, false);
 	}
@@ -33,7 +42,7 @@ public class GenericTextEmbosser extends BaseTextEmbosser {
 
 	@Override
 	public List<EmbosserOption> getOptions() {
-		return ImmutableList.of(addMargins);
+		return options;
 	}
 	protected Function<Iterator<DocumentEvent>, ByteSource> createHandler(EmbossingAttributeSet attributes) {
 		BrlCell cell = Optional.ofNullable(attributes.get(BrailleCellType.class)).map(v -> ((BrailleCellType)v).getValue()).orElse(BrlCell.NLS);
@@ -55,7 +64,7 @@ public class GenericTextEmbosser extends BaseTextEmbosser {
 		GenericTextDocumentHandler.Builder builder = new GenericTextDocumentHandler.Builder();
 		builder.setTopMargin(topMarginCells).setLeftMargin(leftMarginCells).setCellsPerLine(cellsPerLine).setLinesPerPage(linesPerPage);
 		Optional.ofNullable(attributes.get(Copies.class)).ifPresent(v -> builder.setCopies(((Copies)v).getValue()));
-		builder.setInterpoint(Optional.ofNullable(attributes.get(PaperLayout.class)).filter(p -> ((PaperLayout)p).getValue().equals(Layout.INTERPOINT)).isPresent());
+		builder.setInterpoint(Optional.ofNullable(attributes.get(PaperLayout.class)).filter(p -> ((PaperLayout)p).getValue().equals(Layout.INTERPOINT)).isPresent()).setEopOnFullPage(eopOnFullPage.getValue()).setEndOfPage(TextConventionsKt.getPageEndingBytes(eop.getValue(), eol.getValue())).setEndOfLine(TextConventionsKt.getLineEndingBytes(eol.getValue()));
 		GenericTextDocumentHandler handler = builder.build();
 		PageRanges pages = Optional.ofNullable((PageRanges)(attributes.get(PageRanges.class))).orElseGet(PageRanges::new);
 		return new PageFilter(pages).andThen(handler);

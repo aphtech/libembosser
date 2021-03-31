@@ -1,5 +1,5 @@
 plugins {
-	id "java-library"
+	id 'org.brailleblaster.libembosser.kotlin-library-conventions'
 	id "com.github.spotbugs" version "4.4.3"
 }
 
