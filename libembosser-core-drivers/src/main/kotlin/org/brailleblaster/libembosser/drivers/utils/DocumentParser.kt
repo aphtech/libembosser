@@ -4,7 +4,6 @@ import com.google.common.base.Charsets
 import com.google.common.collect.ImmutableSet
 import com.google.common.collect.Streams
 import com.google.common.io.BaseEncoding
-import com.google.common.primitives.Ints
 import org.brailleblaster.libembosser.drivers.utils.document.events.*
 import org.brailleblaster.libembosser.drivers.utils.document.events.GraphicOption.*
 import org.brailleblaster.libembosser.utils.PEFElementType
@@ -155,30 +154,30 @@ class DocumentParser {
                 when (elementType.get()) {
                     PEFElementType.BODY -> handler.onEvent(StartDocumentEvent())
                     PEFElementType.VOLUME -> {
-                        cols = Optional.ofNullable(node.getAttribute("cols")).flatMap { v -> Optional.ofNullable(Ints.tryParse(v)) }.map { value: Int? -> CellsPerLine(value) }
+                        cols = Optional.ofNullable(node.getAttribute("cols")).flatMap { v -> Optional.ofNullable(v.toIntOrNull()) }.map { value: Int? -> CellsPerLine(value) }
                         duplex = Optional.ofNullable(node.getAttribute("duplex")).map { obj: String -> obj.toLowerCase() }.flatMap { v: String -> if (v == "true") Optional.of(Duplex(true)) else if (v == "false") Optional.of(Duplex(false)) else Optional.empty() }
-                        rowGap = Optional.ofNullable(node.getAttribute("rowgap")).flatMap { v -> Optional.ofNullable(Ints.tryParse(v)) }.map { value: Int? -> RowGap(value) }
-                        rows = Optional.ofNullable(node.getAttribute("rows")).flatMap { v -> Optional.ofNullable(Ints.tryParse(v)) }.map { value: Int? -> LinesPerPage(value) }
+                        rowGap = Optional.ofNullable(node.getAttribute("rowgap")).flatMap { v -> Optional.ofNullable(v.toIntOrNull()) }.map { value: Int? -> RowGap(value) }
+                        rows = Optional.ofNullable(node.getAttribute("rows")).flatMap { v -> Optional.ofNullable(v.toIntOrNull()) }.map { value: Int? -> LinesPerPage(value) }
                         val volOptions: Set<VolumeOption> = Streams.concat(Streams.stream(cols), Streams.stream(duplex), Streams.stream(rowGap), Streams.stream(rows)).collect(Collectors.toSet())
                         handler.onEvent(StartVolumeEvent(volOptions))
                     }
                     PEFElementType.SECTION -> {
-                        cols = Optional.ofNullable(node.getAttribute("cols")).flatMap { v -> Optional.ofNullable(Ints.tryParse(v)) }.map { value: Int? -> CellsPerLine(value) }
+                        cols = Optional.ofNullable(node.getAttribute("cols")).flatMap { v -> Optional.ofNullable(v.toIntOrNull()) }.map { value: Int? -> CellsPerLine(value) }
                         duplex = Optional.ofNullable(node.getAttribute("duplex")).map { obj: String -> obj.toLowerCase() }.flatMap { v: String -> if (v == "true") Optional.of(Duplex(true)) else if (v == "false") Optional.of(Duplex(false)) else Optional.empty() }
-                        rowGap = Optional.ofNullable(node.getAttribute("rowgap")).flatMap { v -> Optional.ofNullable(Ints.tryParse(v)) }.map { value: Int? -> RowGap(value) }
-                        rows = Optional.ofNullable(node.getAttribute("rows")).flatMap { v -> Optional.ofNullable(Ints.tryParse(v)) }.map { value: Int? -> LinesPerPage(value) }
+                        rowGap = Optional.ofNullable(node.getAttribute("rowgap")).flatMap { v -> Optional.ofNullable(v.toIntOrNull()) }.map { value: Int? -> RowGap(value) }
+                        rows = Optional.ofNullable(node.getAttribute("rows")).flatMap { v -> Optional.ofNullable(v.toIntOrNull()) }.map { value: Int? -> LinesPerPage(value) }
                         val sectionOptions: Set<SectionOption> = Streams.concat(Streams.stream(cols), Streams.stream(duplex), Streams.stream(rowGap), Streams.stream(rows)).collect(Collectors.toSet())
                         handler.onEvent(StartSectionEvent(sectionOptions))
                     }
                     PEFElementType.PAGE -> {
-                        cols = Optional.ofNullable(node.getAttribute("cols")).flatMap { v -> Optional.ofNullable(Ints.tryParse(v)) }.map { value: Int? -> CellsPerLine(value) }
-                        rowGap = Optional.ofNullable(node.getAttribute("rowgap")).flatMap { v -> Optional.ofNullable(Ints.tryParse(v)) }.map { value: Int? -> RowGap(value) }
-                        rows = Optional.ofNullable(node.getAttribute("rows")).flatMap { v -> Optional.ofNullable(Ints.tryParse(v)) }.map { value: Int? -> LinesPerPage(value) }
+                        cols = Optional.ofNullable(node.getAttribute("cols")).flatMap { v -> Optional.ofNullable(v.toIntOrNull()) }.map { value: Int? -> CellsPerLine(value) }
+                        rowGap = Optional.ofNullable(node.getAttribute("rowgap")).flatMap { v -> Optional.ofNullable(v.toIntOrNull()) }.map { value: Int? -> RowGap(value) }
+                        rows = Optional.ofNullable(node.getAttribute("rows")).flatMap { v -> Optional.ofNullable(v.toIntOrNull()) }.map { value: Int? -> LinesPerPage(value) }
                         val pageOptions: Set<PageOption> = Streams.concat(Streams.stream(cols), Streams.stream(rowGap), Streams.stream(rows)).collect(Collectors.toSet())
                         handler.onEvent(StartPageEvent(pageOptions))
                     }
                     PEFElementType.ROW -> {
-                        rowGap = Optional.ofNullable(node.getAttribute("rowgap")).flatMap { v -> Optional.ofNullable(Ints.tryParse(v)) }.map { value: Int? -> RowGap(value) }
+                        rowGap = Optional.ofNullable(node.getAttribute("rowgap")).flatMap { v -> Optional.ofNullable(v.toIntOrNull()) }.map { value: Int? -> RowGap(value) }
                         val rowOptions: Set<RowOption> = Streams.stream(rowGap).collect(Collectors.toSet())
                         handler.onEvent(StartLineEvent(rowOptions))
                         val children = node.getChildNodes()
@@ -196,9 +195,9 @@ class DocumentParser {
                     }
                     PEFElementType.GRAPHIC -> {
                         val img = Optional.ofNullable(node.getAttribute("idref")).flatMap { a: String -> findResourceById(resourceNodes, a) }.flatMap { e: Element -> loadImageFromElement(e) }.map { image: Image? -> ImageData(image) }
-                        val height = Optional.ofNullable(node.getAttribute("height")).flatMap { v -> Optional.ofNullable(Ints.tryParse(v)) }.map { height: Int? -> Height(height) }
-                        val indent = Optional.ofNullable(node.getAttribute("indent")).flatMap { v -> Optional.ofNullable(Ints.tryParse(v)) }.map { indent: Int? -> Indent(indent) }
-                        val width = Optional.ofNullable(node.getAttribute("width")).flatMap { v -> Optional.ofNullable(Ints.tryParse(v)) }.map { width: Int? -> Width(width) }
+                        val height = Optional.ofNullable(node.getAttribute("height")).flatMap { v -> Optional.ofNullable(v.toIntOrNull()) }.map { height: Int? -> Height(height) }
+                        val indent = Optional.ofNullable(node.getAttribute("indent")).flatMap { v -> Optional.ofNullable(v.toIntOrNull()) }.map { indent: Int? -> Indent(indent) }
+                        val width = Optional.ofNullable(node.getAttribute("width")).flatMap { v -> Optional.ofNullable(v.toIntOrNull()) }.map { width: Int? -> Width(width) }
                         val graphicOptions: Set<GraphicOption> = Streams.concat(Streams.stream(img), Streams.stream(height), Streams.stream(indent), Streams.stream(width)).collect(ImmutableSet.toImmutableSet<GraphicOption>())
                         handler.onEvent(StartGraphicEvent(graphicOptions))
                         result = true
