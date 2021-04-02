@@ -10,11 +10,11 @@ variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
 before_script:
   - export GRADLE_USER_HOME=`pwd`/.gradle
+  - echo "$maven_settings_file" > $HOME/.m2/settings.xml
 build:
   stage: build
   script:
     - gradle --build-cache assemble
-    - echo "Maven settings at $maven_settings_file"
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: push
@@ -30,3 +30,8 @@ test:
     paths:
       - build
       - .gradle
+deploy:
+  stage: deploy
+  script: gradle publish
+  only:
+    - master
