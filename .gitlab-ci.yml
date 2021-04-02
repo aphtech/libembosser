@@ -14,7 +14,7 @@ build:
   stage: build
   script:
     - gradle --build-cache assemble
-    - ls -l $maven_settings_file
+    - echo "Maven settings at $maven_settings_file"
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: push
