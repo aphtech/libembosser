@@ -10,6 +10,7 @@ variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
 before_script:
   - export GRADLE_USER_HOME=`pwd`/.gradle
+  - mkdir -p $HOME/.m2
   - echo "$maven_settings_file" > $HOME/.m2/settings.xml
 build:
   stage: build
