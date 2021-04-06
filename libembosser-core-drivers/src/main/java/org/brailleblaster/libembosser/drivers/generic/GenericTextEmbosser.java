@@ -23,27 +23,30 @@ import org.brailleblaster.libembosser.embossing.attribute.PaperSize;
 import org.brailleblaster.libembosser.spi.*;
 
 import com.google.common.io.ByteSource;
+import org.jetbrains.annotations.NotNull;
 
 public class GenericTextEmbosser extends BaseTextEmbosser {
-	private final EmbosserOption.BooleanOption addMargins = new EmbosserOption.BooleanOption("Add margins", false);
+	private final EmbosserOption.BooleanOption addMargins;
 	private final EmbosserOption.BooleanOption padWithBlanks = new EmbosserOption.BooleanOption("Pad page", false);
 	private final EmbosserOption.BooleanOption eopOnFullPage = new EmbosserOption.BooleanOption("Form feed on full page", false);
 	private final EmbosserOption.MultipleChoiceOption<LineEnding> eol = new EmbosserOption.MultipleChoiceOption<>("End of line", LineEnding.CR_LF, ImmutableList.copyOf(LineEnding.values()));
 	private final EmbosserOption.MultipleChoiceOption<PageEnding> eop = new EmbosserOption.MultipleChoiceOption<>("Form feed", PageEnding.FF, ImmutableList.copyOf(PageEnding.values()));
-	private final ImmutableList<EmbosserOption> options  = ImmutableList.of(addMargins, eol, eop, padWithBlanks, eopOnFullPage);
+	private final ImmutableList<EmbosserOption> options;
 
 	public GenericTextEmbosser(String manufacturer, String model, Rectangle maxPaper, Rectangle minPaper) {
 		this(manufacturer, model, maxPaper, minPaper, false);
 	}
 	public GenericTextEmbosser(String id, String model, Rectangle maxPaper, Rectangle minPaper, boolean addMargins) {
 		super(id, "Generic", model, maxPaper, minPaper);
-		this.addMargins.setValue(addMargins);
+		this.addMargins = new EmbosserOption.BooleanOption("Add margins", addMargins);
+		this.options = ImmutableList.of(this.addMargins, eol, eop, padWithBlanks, eopOnFullPage);
 	}
 
 	@Override
 	public List<EmbosserOption> getOptions() {
 		return options;
 	}
+	@NotNull
 	protected Function<Iterator<DocumentEvent>, ByteSource> createHandler(EmbossingAttributeSet attributes) {
 		BrlCell cell = Optional.ofNullable(attributes.get(BrailleCellType.class)).map(v -> ((BrailleCellType)v).getValue()).orElse(BrlCell.NLS);
 		Rectangle paper = Optional.ofNullable(attributes.get(PaperSize.class)).map(v -> ((PaperSize)v).getValue()).orElse(getMaximumPaper());

@@ -193,6 +193,12 @@ public interface Embosser extends IEmbosser {
 											 EmbossingAttributeSet attributes) {
 		return Stream.empty();
 	}
+
+	/**
+	 * Get a list of optional customisations of the embosser.
+	 *
+	 * @return The options which can be customised.
+	 */
 	default List<EmbosserOption> getOptions() {
 		return Collections.emptyList();
 	}
