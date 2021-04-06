@@ -1,50 +1,52 @@
 package org.brailleblaster.libembosser.drivers.generic;
 
-import java.math.BigDecimal;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
-
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.io.ByteSource;
 import org.brailleblaster.libembosser.drivers.utils.BaseTextEmbosser;
-import org.brailleblaster.libembosser.drivers.utils.PageEnding;
 import org.brailleblaster.libembosser.drivers.utils.LineEnding;
+import org.brailleblaster.libembosser.drivers.utils.PageEnding;
 import org.brailleblaster.libembosser.drivers.utils.TextConventionsKt;
 import org.brailleblaster.libembosser.drivers.utils.document.GenericTextDocumentHandler;
 import org.brailleblaster.libembosser.drivers.utils.document.events.DocumentEvent;
 import org.brailleblaster.libembosser.drivers.utils.document.filters.PageFilter;
-import org.brailleblaster.libembosser.embossing.attribute.BrailleCellType;
-import org.brailleblaster.libembosser.embossing.attribute.Copies;
-import org.brailleblaster.libembosser.embossing.attribute.PageRanges;
-import org.brailleblaster.libembosser.embossing.attribute.PaperLayout;
-import org.brailleblaster.libembosser.embossing.attribute.PaperMargins;
 import org.brailleblaster.libembosser.embossing.attribute.PaperSize;
+import org.brailleblaster.libembosser.embossing.attribute.*;
 import org.brailleblaster.libembosser.spi.*;
-
-import com.google.common.io.ByteSource;
 import org.jetbrains.annotations.NotNull;
+
+import java.math.BigDecimal;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
 
 public class GenericTextEmbosser extends BaseTextEmbosser {
 	private final EmbosserOption.BooleanOption addMargins;
-	private final EmbosserOption.BooleanOption padWithBlanks = new EmbosserOption.BooleanOption("Pad page", false);
-	private final EmbosserOption.BooleanOption eopOnFullPage = new EmbosserOption.BooleanOption("Form feed on full page", false);
-	private final EmbosserOption.MultipleChoiceOption<LineEnding> eol = new EmbosserOption.MultipleChoiceOption<>("End of line", LineEnding.CR_LF, ImmutableList.copyOf(LineEnding.values()));
-	private final EmbosserOption.MultipleChoiceOption<PageEnding> eop = new EmbosserOption.MultipleChoiceOption<>("Form feed", PageEnding.FF, ImmutableList.copyOf(PageEnding.values()));
-	private final ImmutableList<EmbosserOption> options;
+	private final EmbosserOption.BooleanOption padWithBlanks = new EmbosserOption.BooleanOption(false);
+	private final EmbosserOption.BooleanOption eopOnFullPage = new EmbosserOption.BooleanOption(false);
+	private final EmbosserOption.MultipleChoiceOption<LineEnding> eol = new EmbosserOption.MultipleChoiceOption<>(LineEnding.CR_LF, ImmutableList.copyOf(LineEnding.values()));
+	private final EmbosserOption.MultipleChoiceOption<PageEnding> eop = new EmbosserOption.MultipleChoiceOption<>(PageEnding.FF, ImmutableList.copyOf(PageEnding.values()));
+	private final ImmutableMap<String, EmbosserOption> options;
 
 	public GenericTextEmbosser(String manufacturer, String model, Rectangle maxPaper, Rectangle minPaper) {
 		this(manufacturer, model, maxPaper, minPaper, false);
 	}
 	public GenericTextEmbosser(String id, String model, Rectangle maxPaper, Rectangle minPaper, boolean addMargins) {
 		super(id, "Generic", model, maxPaper, minPaper);
-		this.addMargins = new EmbosserOption.BooleanOption("Add margins", addMargins);
-		this.options = ImmutableList.of(this.addMargins, eol, eop, padWithBlanks, eopOnFullPage);
+		this.addMargins = new EmbosserOption.BooleanOption(addMargins);
+		this.options = ImmutableMap.<String, EmbosserOption>builder().put("Add margins", this.addMargins).put("Pad page", padWithBlanks).put("Form feed on full page", eopOnFullPage).put("End of line", eol).put("Form feed", eop).build();
 	}
 
+	@NotNull
 	@Override
-	public List<EmbosserOption> getOptions() {
+	public Map<String, EmbosserOption> getOptions() {
 		return options;
+	}
+	@NotNull
+	@Override
+	public GenericTextEmbosser customize(@NotNull Map<String, Object> options) {
+		return new GenericTextEmbosser(getId(), getModel(), getMaximumPaper(), getMinimumPaper());
 	}
 	@NotNull
 	protected Function<Iterator<DocumentEvent>, ByteSource> createHandler(EmbossingAttributeSet attributes) {

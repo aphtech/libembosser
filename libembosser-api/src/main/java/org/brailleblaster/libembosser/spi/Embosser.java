@@ -13,7 +13,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
-import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -93,7 +93,7 @@ public interface Embosser extends IEmbosser {
             throws EmbossException {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
-        Document doc = null;
+        Document doc;
         try {
             DocumentBuilder db = dbf.newDocumentBuilder();
             doc = db.parse(pef);
@@ -199,8 +199,8 @@ public interface Embosser extends IEmbosser {
      *
      * @return The options which can be customised.
      */
-    default List<EmbosserOption> getOptions() {
-        return Collections.emptyList();
+    default @NotNull Map<String, EmbosserOption> getOptions() {
+        return Collections.emptyMap();
     }
 
     /**
@@ -211,7 +211,7 @@ public interface Embosser extends IEmbosser {
      * @param options The options to customise the embosser.
      * @return A new customised embosser instance.
      */
-    default Embosser customize(List<EmbosserOption> options) {
+    default @NotNull Embosser customize(@NotNull Map<String, Object> options) {
         return this;
     }
 }
