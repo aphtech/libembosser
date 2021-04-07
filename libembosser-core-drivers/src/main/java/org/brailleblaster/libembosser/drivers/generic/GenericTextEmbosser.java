@@ -23,19 +23,26 @@ import java.util.function.Function;
 
 public class GenericTextEmbosser extends BaseTextEmbosser {
 	private final EmbosserOption.BooleanOption addMargins;
-	private final EmbosserOption.BooleanOption padWithBlanks = new EmbosserOption.BooleanOption(false);
-	private final EmbosserOption.BooleanOption eopOnFullPage = new EmbosserOption.BooleanOption(false);
-	private final EmbosserOption.MultipleChoiceOption<LineEnding> eol = new EmbosserOption.MultipleChoiceOption<>(LineEnding.CR_LF, ImmutableList.copyOf(LineEnding.values()));
-	private final EmbosserOption.MultipleChoiceOption<PageEnding> eop = new EmbosserOption.MultipleChoiceOption<>(PageEnding.FF, ImmutableList.copyOf(PageEnding.values()));
+	private final EmbosserOption.BooleanOption padWithBlanks;
+	private final EmbosserOption.BooleanOption eopOnFullPage;
+	private final EmbosserOption.MultipleChoiceOption<LineEnding> eol;
+	private final EmbosserOption.MultipleChoiceOption<PageEnding> eop;
 	private final ImmutableMap<String, EmbosserOption> options;
 
 	public GenericTextEmbosser(String manufacturer, String model, Rectangle maxPaper, Rectangle minPaper) {
 		this(manufacturer, model, maxPaper, minPaper, false);
 	}
 	public GenericTextEmbosser(String id, String model, Rectangle maxPaper, Rectangle minPaper, boolean addMargins) {
+		this(id, model, maxPaper, minPaper, new EmbosserOption.BooleanOption(addMargins), new EmbosserOption.MultipleChoiceOption<>(LineEnding.CR_LF, ImmutableList.copyOf(LineEnding.values())), new EmbosserOption.MultipleChoiceOption<>(PageEnding.FF, ImmutableList.copyOf(PageEnding.values())), new EmbosserOption.BooleanOption(false), new EmbosserOption.BooleanOption(false));
+	}
+		private GenericTextEmbosser(String id, String model, Rectangle maxPaper, Rectangle minPaper, EmbosserOption.BooleanOption addMargins, EmbosserOption.MultipleChoiceOption<LineEnding> eol, EmbosserOption.MultipleChoiceOption<PageEnding> eop, EmbosserOption.BooleanOption padWithBlanks, EmbosserOption.BooleanOption eopOnFullPage) {
 		super(id, "Generic", model, maxPaper, minPaper);
-		this.addMargins = new EmbosserOption.BooleanOption(addMargins);
-		this.options = ImmutableMap.<String, EmbosserOption>builder().put("Add margins", this.addMargins).put("Pad page", padWithBlanks).put("Form feed on full page", eopOnFullPage).put("End of line", eol).put("Form feed", eop).build();
+		this.addMargins = addMargins;
+		this.eol = eol;
+				this.eop = eop;
+		this.padWithBlanks = padWithBlanks;
+		this.eopOnFullPage = eopOnFullPage;
+		this.options = ImmutableMap.<String, EmbosserOption>builder().put("Add margins", this.addMargins).put("Pad page", this.padWithBlanks).put("Form feed on full page", this.eopOnFullPage).put("End of line", this.eol).put("Form feed", this.eop).build();
 	}
 
 	@NotNull
@@ -46,7 +53,12 @@ public class GenericTextEmbosser extends BaseTextEmbosser {
 	@NotNull
 	@Override
 	public GenericTextEmbosser customize(@NotNull Map<String, Object> options) {
-		return new GenericTextEmbosser(getId(), getModel(), getMaximumPaper(), getMinimumPaper());
+		EmbosserOption.BooleanOption addMargins = Optional.ofNullable(options.get("Add margins")).filter(o -> o instanceof Boolean).map(o -> new EmbosserOption.BooleanOption((Boolean)o)).orElse(this.addMargins);
+		EmbosserOption.BooleanOption padWithBlanks = Optional.ofNullable(options.get("Pad page")).filter(o -> o instanceof Boolean).map(o -> new EmbosserOption.BooleanOption((Boolean)o)).orElse(this.padWithBlanks);
+		EmbosserOption.BooleanOption eopOnFullPage = Optional.ofNullable(options.get("Form feed on full page")).filter(o -> o instanceof Boolean).map(o -> new EmbosserOption.BooleanOption((Boolean)o)).orElse(this.eopOnFullPage);
+		EmbosserOption.MultipleChoiceOption<LineEnding> eol = Optional.ofNullable(options.get("End of line")).filter(o -> o instanceof LineEnding).map(o -> new EmbosserOption.MultipleChoiceOption<>((LineEnding) o, this.eol.getChoices())).orElse(this.eol);
+		EmbosserOption.MultipleChoiceOption<PageEnding> eop = Optional.ofNullable(options.get("Form feed")).filter(o -> o instanceof PageEnding).map(o -> new EmbosserOption.MultipleChoiceOption<>((PageEnding)o, this.eop.getChoices())).orElse(this.eop);
+		return new GenericTextEmbosser(getId(), getModel(), getMaximumPaper(), getMinimumPaper(), addMargins, eol, eop, padWithBlanks, eopOnFullPage);
 	}
 	@NotNull
 	protected Function<Iterator<DocumentEvent>, ByteSource> createHandler(EmbossingAttributeSet attributes) {
