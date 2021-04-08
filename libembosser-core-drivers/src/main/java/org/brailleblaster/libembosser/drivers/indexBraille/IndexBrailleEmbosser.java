@@ -27,6 +27,7 @@ import org.brailleblaster.libembosser.spi.Rectangle;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.ByteSource;
+import org.jetbrains.annotations.NotNull;
 
 public class IndexBrailleEmbosser extends BaseTextEmbosser {
 	private final int maxCellsPerLine;
@@ -50,6 +51,7 @@ public class IndexBrailleEmbosser extends BaseTextEmbosser {
 		return supportedSides.stream().anyMatch(Layout::isDoubleSide);
 	}
 	
+	@NotNull
 	protected Function<Iterator<DocumentEvent>, ByteSource> createHandler(EmbossingAttributeSet attributes) {
 		// For now assume NLS Braille cell type.
 		BrlCell cell = BrlCell.NLS;

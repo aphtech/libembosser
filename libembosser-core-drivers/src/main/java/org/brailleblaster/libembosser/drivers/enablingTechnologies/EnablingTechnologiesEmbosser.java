@@ -21,6 +21,7 @@ import org.brailleblaster.libembosser.spi.Margins;
 import org.brailleblaster.libembosser.spi.Rectangle;
 
 import com.google.common.io.ByteSource;
+import org.jetbrains.annotations.NotNull;
 
 public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 	private boolean interpoint;
@@ -33,6 +34,7 @@ public class EnablingTechnologiesEmbosser extends BaseTextEmbosser {
 	}
 
 
+	@NotNull
 	protected Function<Iterator<DocumentEvent>, ByteSource> createHandler(EmbossingAttributeSet attributes) {
 		BrlCell cell = Optional.ofNullable(attributes.get(BrailleCellType.class)).map(v -> ((BrailleCellType)v).getValue()).orElse(BrlCell.NLS);
 		Rectangle paper = Optional.ofNullable(attributes.get(PaperSize.class)).map(v -> ((PaperSize)v).getValue()).orElse(getMaximumPaper());

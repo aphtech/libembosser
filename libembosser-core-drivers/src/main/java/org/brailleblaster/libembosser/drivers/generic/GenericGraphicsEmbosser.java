@@ -6,6 +6,7 @@ import org.brailleblaster.libembosser.drivers.utils.DocumentToPrintableHandler.L
 import org.brailleblaster.libembosser.spi.BrlCell;
 import org.brailleblaster.libembosser.spi.PaperSize;
 import org.brailleblaster.libembosser.spi.Rectangle;
+import org.jetbrains.annotations.NotNull;
 
 public class GenericGraphicsEmbosser extends BaseGraphicsEmbosser {
 	
@@ -13,11 +14,13 @@ public class GenericGraphicsEmbosser extends BaseGraphicsEmbosser {
 		super("libembosser.generic.graphics", "Generic", "Graphics embosser");
 	}
 
-	@Override
+	@NotNull
+    @Override
 	public Rectangle getMaximumPaper() {
 		return PaperSize.B0.getSize();
 	}
 
+	@NotNull
 	@Override
 	public Rectangle getMinimumPaper() {
 		return PaperSize.A10.getSize();
@@ -28,6 +31,7 @@ public class GenericGraphicsEmbosser extends BaseGraphicsEmbosser {
 		return true;
 	}
 
+	@NotNull
 	@Override
 	public LayoutHelper getLayoutHelper(BrlCell cell) {
 		return new DefaultLayoutHelper();

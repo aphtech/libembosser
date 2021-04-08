@@ -46,7 +46,7 @@ public interface Embosser extends IEmbosser {
      *
      * @return The ID of the embosser.
      */
-    String getId();
+    @NotNull String getId();
 
     /**
      * Get the name of the embosser manufacturer.
@@ -59,14 +59,14 @@ public interface Embosser extends IEmbosser {
      *
      * @return The manufacturer of the embosser.
      */
-    String getManufacturer();
+    @NotNull String getManufacturer();
 
     /**
      * Get the model name of the embosser.
      *
      * @return The embosser model name.
      */
-    String getModel();
+    @NotNull String getModel();
 
     /**
      * Emboss a PEF document.
@@ -77,7 +77,7 @@ public interface Embosser extends IEmbosser {
      *                       document.
      * @throws EmbossException When there is a problem embossing the document.
      */
-    void embossPef(@NotNull PrintService embosserDevice, @NotNull Document pef, EmbossingAttributeSet attributes)
+    void embossPef(@NotNull PrintService embosserDevice, @NotNull Document pef, @NotNull EmbossingAttributeSet attributes)
             throws EmbossException;
 
     /**
@@ -89,7 +89,7 @@ public interface Embosser extends IEmbosser {
      *                       document.
      * @throws EmbossException When there is a problem embossing the document.
      */
-    default void embossPef(@NotNull PrintService embosserDevice, @NotNull InputStream pef, EmbossingAttributeSet attributes)
+    default void embossPef(@NotNull PrintService embosserDevice, @NotNull InputStream pef, @NotNull EmbossingAttributeSet attributes)
             throws EmbossException {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
@@ -112,7 +112,7 @@ public interface Embosser extends IEmbosser {
      *                       document.
      * @throws EmbossException When there is a problem embossing the document.
      */
-    default void embossBrf(@NotNull PrintService embosserDevice, @NotNull InputStream brf, EmbossingAttributeSet attributes)
+    default void embossBrf(@NotNull PrintService embosserDevice, @NotNull InputStream brf, @NotNull EmbossingAttributeSet attributes)
             throws EmbossException {
         Document doc;
         try {
@@ -128,14 +128,14 @@ public interface Embosser extends IEmbosser {
      *
      * @return The maximum paper which can be handled by the embosser.
      */
-    Rectangle getMaximumPaper();
+    @NotNull Rectangle getMaximumPaper();
 
     /**
      * The minimum paper size which can be handled by the embosser.
      *
      * @return The minimum paper size.
      */
-    Rectangle getMinimumPaper();
+    @NotNull Rectangle getMinimumPaper();
 
     /**
      * Whether the embosser supports interpoint embossing.
@@ -151,7 +151,7 @@ public interface Embosser extends IEmbosser {
      * a stream, empty if no suitable StreamPrintServiceFactory can be
      * located.
      */
-    Optional<StreamPrintServiceFactory> getStreamPrintServiceFactory();
+    @NotNull Optional<StreamPrintServiceFactory> getStreamPrintServiceFactory();
 
     /**
      * Check that all prerequisites are met for using this embosser.
@@ -187,7 +187,7 @@ public interface Embosser extends IEmbosser {
      * @return A stream of notifications containing information about any
      * approximations which will be made for embossing.
      */
-    default Stream<Notification> checkEmboss(int cellsPerLine, int linesPerPage,
+    default @NotNull Stream<Notification> checkEmboss(int cellsPerLine, int linesPerPage,
                                              EmbossingAttributeSet attributes) {
         return Stream.empty();
     }

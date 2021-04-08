@@ -15,23 +15,32 @@ import org.brailleblaster.libembosser.spi.Rectangle;
 import org.w3c.dom.Document;
 
 public class NipponEmbosser implements Embosser {
+	private final String id;
+	private final String manufacturer;
+	private final String model;
+	private final Rectangle minimumPaper;
+	private final Rectangle maximumPaper;
+	public NipponEmbosser(String id, String model, Rectangle maximumPaper, Rectangle minimumPaper) {
+		this.id = id;
+		this.manufacturer = "Nippon";
+		this.model = model;
+		this.maximumPaper = maximumPaper;
+		this.minimumPaper = minimumPaper;
+	}
 
 	@Override
 	public String getId() {
-		// TODO Auto-generated method stub
-		return null;
+		return id;
 	}
 
 	@Override
 	public String getManufacturer() {
-		// TODO Auto-generated method stub
-		return null;
+		return manufacturer;
 	}
 
 	@Override
 	public String getModel() {
-		// TODO Auto-generated method stub
-		return null;
+		return model;
 	}
 
 	@Override
@@ -50,14 +59,12 @@ public class NipponEmbosser implements Embosser {
 
 	@Override
 	public Rectangle getMaximumPaper() {
-		// TODO Auto-generated method stub
-		return null;
+		return maximumPaper;
 	}
 
 	@Override
 	public Rectangle getMinimumPaper() {
-		// TODO Auto-generated method stub
-		return null;
+		return minimumPaper;
 	}
 
 	@Override
@@ -75,7 +82,7 @@ public class NipponEmbosser implements Embosser {
 	@Override
 	public Stream<Notification> checkPrerequisites() {
 		// TODO Auto-generated method stub
-		return null;
+		return Stream.empty();
 	}
 
 }

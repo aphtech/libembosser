@@ -177,7 +177,7 @@ class CoreDriversTest {
     }
 
     @Test(dataProvider = "simpleEmbossProvider")
-    fun testSimpleEmboss(id: String, input: String, attrs: EmbossingAttributeSet?, expected: ByteArray?) {
+    fun testSimpleEmboss(id: String, input: String, attrs: EmbossingAttributeSet, expected: ByteArray) {
         val embosserStream = EmbosserService.getInstance().embosserStream
         val embosser = embosserStream.filter { e: Embosser -> e.id == id }.findFirst().get()
         val factory: StreamPrintServiceFactory = EmbossToStreamPrintServiceFactory()
@@ -191,7 +191,8 @@ class CoreDriversTest {
             fail("Problem with input stream", e)
         }
         val outBytes = out.toByteArray()
-        assertEquals(outBytes, expected, String.format("Output did not match, output expected: %s was: %s", Arrays.toString(expected), Arrays.toString(outBytes)))
+        assertEquals(outBytes, expected, String.format("Output did not match, output expected: %s was: %s",
+            expected.contentToString(), Arrays.toString(outBytes)))
     }
 
     @Test
