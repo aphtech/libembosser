@@ -64,7 +64,7 @@ class PEF2Nippon {
     fun rowToAscii(row: Element): String {
         val brlUnicode = row.textContent
         return brlUnicode.chars().filter { c: Int -> c in 0x2800..0x28ff }
-            .map { c: Int -> BrailleMapper.UNICODE_TO_ASCII_FAST.map(c.toChar()).toInt() }.collect(
+            .map { c: Int -> BrailleMapper.UNICODE_TO_ASCII_FAST.map(c.toChar()).code }.collect(
                 { StringBuilder() }, { a: StringBuilder, c: Int ->
                     a.append(
                         c.toChar()

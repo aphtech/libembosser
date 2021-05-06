@@ -8,6 +8,8 @@ import org.brailleblaster.libembosser.drivers.utils.document.events.*
 import org.brailleblaster.libembosser.drivers.utils.document.events.GraphicOption.*
 import org.brailleblaster.libembosser.utils.PEFElementType
 import org.brailleblaster.libembosser.utils.PEFNamespaceContext
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.w3c.dom.*
 import java.awt.Image
 import java.io.*
@@ -60,7 +62,7 @@ class DocumentParser {
                         ++newPages
                         createLineEvents(handler, lineBuffer)
                     }
-                    0xa -> if (prevByte != '\r'.toInt()) {
+                    0xa -> if (prevByte != 0xd) {
                         ++newLines
                         createLineEvents(handler, lineBuffer)
                     }
@@ -155,7 +157,7 @@ class DocumentParser {
                     PEFElementType.BODY -> handler.onEvent(StartDocumentEvent())
                     PEFElementType.VOLUME -> {
                         cols = Optional.ofNullable(node.getAttribute("cols")).flatMap { v -> Optional.ofNullable(v.toIntOrNull()) }.map { value: Int? -> CellsPerLine(value) }
-                        duplex = Optional.ofNullable(node.getAttribute("duplex")).map { obj: String -> obj.toLowerCase() }.flatMap { v: String -> if (v == "true") Optional.of(Duplex(true)) else if (v == "false") Optional.of(Duplex(false)) else Optional.empty() }
+                        duplex = Optional.ofNullable(node.getAttribute("duplex")).map { obj: String -> obj.lowercase() }.flatMap { v: String -> if (v == "true") Optional.of(Duplex(true)) else if (v == "false") Optional.of(Duplex(false)) else Optional.empty() }
                         rowGap = Optional.ofNullable(node.getAttribute("rowgap")).flatMap { v -> Optional.ofNullable(v.toIntOrNull()) }.map { value: Int? -> RowGap(value) }
                         rows = Optional.ofNullable(node.getAttribute("rows")).flatMap { v -> Optional.ofNullable(v.toIntOrNull()) }.map { value: Int? -> LinesPerPage(value) }
                         val volOptions: Set<VolumeOption> = Streams.concat(Streams.stream(cols), Streams.stream(duplex), Streams.stream(rowGap), Streams.stream(rows)).collect(Collectors.toSet())
@@ -163,7 +165,7 @@ class DocumentParser {
                     }
                     PEFElementType.SECTION -> {
                         cols = Optional.ofNullable(node.getAttribute("cols")).flatMap { v -> Optional.ofNullable(v.toIntOrNull()) }.map { value: Int? -> CellsPerLine(value) }
-                        duplex = Optional.ofNullable(node.getAttribute("duplex")).map { obj: String -> obj.toLowerCase() }.flatMap { v: String -> if (v == "true") Optional.of(Duplex(true)) else if (v == "false") Optional.of(Duplex(false)) else Optional.empty() }
+                        duplex = Optional.ofNullable(node.getAttribute("duplex")).map { obj: String -> obj.lowercase() }.flatMap { v: String -> if (v == "true") Optional.of(Duplex(true)) else if (v == "false") Optional.of(Duplex(false)) else Optional.empty() }
                         rowGap = Optional.ofNullable(node.getAttribute("rowgap")).flatMap { v -> Optional.ofNullable(v.toIntOrNull()) }.map { value: Int? -> RowGap(value) }
                         rows = Optional.ofNullable(node.getAttribute("rows")).flatMap { v -> Optional.ofNullable(v.toIntOrNull()) }.map { value: Int? -> LinesPerPage(value) }
                         val sectionOptions: Set<SectionOption> = Streams.concat(Streams.stream(cols), Streams.stream(duplex), Streams.stream(rowGap), Streams.stream(rows)).collect(Collectors.toSet())
@@ -203,8 +205,7 @@ class DocumentParser {
                         result = true
                     }
                     PEFElementType.HEAD -> result = false
-                    else -> {
-                    }
+                    else -> Unit
                 }
             }
         }
@@ -221,8 +222,7 @@ class DocumentParser {
                     PEFElementType.PAGE -> handler.onEvent(EndPageEvent())
                     PEFElementType.ROW -> handler.onEvent(EndLineEvent())
                     PEFElementType.GRAPHIC -> handler.onEvent(EndGraphicEvent())
-                    else -> {
-                    }
+                    else -> Unit
                 }
             }
         }
@@ -274,5 +274,8 @@ class DocumentParser {
             }
         }
         return result
+    }
+    companion object {
+        val log: Logger = LoggerFactory.getLogger(DocumentParser::class.java)
     }
 }
