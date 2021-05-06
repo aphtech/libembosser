@@ -1,17 +1,13 @@
 package org.brailleblaster.libembosser.spi
 
 sealed class EmbosserOption {
-    data class BooleanOption(val value: Boolean) : EmbosserOption()
-    data class MultipleChoiceOption<T : MultipleChoiceValue>(val value: T, val choices: List<T>) : EmbosserOption() {
-        init {
-            require(choices.isNotEmpty())
-            require(choices.contains(value))
-        }
+    abstract val value: Any
+    class BooleanOption(override val value: Boolean) : EmbosserOption()
+    class ByteArrayOption(vararg value: Byte) : EmbosserOption() {
+        override val value: ByteArray = value.copyOf()
+        get() = field.copyOf()
     }
 
-    data class StringOption(val value: String) : EmbosserOption()
-
-    interface MultipleChoiceValue {
-        val displayString: String
-    }
+    class StringOption(override val value: String) : EmbosserOption()
+    class IntOption(override val value: Int) : EmbosserOption()
 }

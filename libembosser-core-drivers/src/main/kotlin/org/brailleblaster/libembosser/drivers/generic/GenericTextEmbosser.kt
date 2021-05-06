@@ -1,8 +1,7 @@
 package org.brailleblaster.libembosser.drivers.generic
 
-import com.google.common.collect.ImmutableList
 import com.google.common.io.ByteSource
-import org.brailleblaster.libembosser.drivers.utils.*
+import org.brailleblaster.libembosser.drivers.utils.BaseTextEmbosser
 import org.brailleblaster.libembosser.drivers.utils.document.GenericTextDocumentHandler
 import org.brailleblaster.libembosser.drivers.utils.document.events.DocumentEvent
 import org.brailleblaster.libembosser.drivers.utils.document.filters.PageFilter
@@ -10,17 +9,17 @@ import org.brailleblaster.libembosser.embossing.attribute.*
 import org.brailleblaster.libembosser.embossing.attribute.PaperSize
 import org.brailleblaster.libembosser.spi.*
 import org.brailleblaster.libembosser.spi.EmbosserOption.BooleanOption
-import org.brailleblaster.libembosser.spi.EmbosserOption.MultipleChoiceOption
 import java.math.BigDecimal
 import java.util.*
 import java.util.function.Function
 import javax.print.attribute.Attribute
 
-class GenericTextEmbosser private constructor(id: String, model: String, maxPaper: Rectangle, minPaper: Rectangle, private val addMargins: BooleanOption, private val eol: MultipleChoiceOption<LineEnding>, private val eop: MultipleChoiceOption<PageEnding>, private val padWithBlanks: BooleanOption, private val eopOnFullPage: BooleanOption) : BaseTextEmbosser(id, "Generic", model, maxPaper, minPaper) {
+class GenericTextEmbosser private constructor(id: String, model: String, maxPaper: Rectangle, minPaper: Rectangle, private val addMargins: BooleanOption, private val eol: EmbosserOption.ByteArrayOption, private val eop: EmbosserOption.ByteArrayOption, private val padWithBlanks: BooleanOption, private val eopOnFullPage: BooleanOption) : BaseTextEmbosser(id, "Generic", model, maxPaper, minPaper) {
     private val options: Map<String, EmbosserOption> = mapOf("Add margins" to addMargins, "Pad page" to padWithBlanks, "Form feed on full page" to eopOnFullPage, "End of line" to eol, "Form feed" to eop)
 
     constructor(manufacturer: String, model: String, maxPaper: Rectangle, minPaper: Rectangle) : this(manufacturer, model, maxPaper, minPaper, false)
-    constructor(id: String, model: String, maxPaper: Rectangle, minPaper: Rectangle, addMargins: Boolean) : this(id, model, maxPaper, minPaper, BooleanOption(addMargins), MultipleChoiceOption<LineEnding>(LineEnding.CR_LF, ImmutableList.copyOf<LineEnding>(LineEnding.values())), MultipleChoiceOption<PageEnding>(PageEnding.FF, ImmutableList.copyOf<PageEnding>(PageEnding.values())), BooleanOption(false), BooleanOption(false))
+    constructor(id: String, model: String, maxPaper: Rectangle, minPaper: Rectangle, addMargins: Boolean) : this(id, model, maxPaper, minPaper, BooleanOption(addMargins), EmbosserOption.ByteArrayOption(
+        0xd, 0xa), EmbosserOption.ByteArrayOption(0xc), BooleanOption(false), BooleanOption(false))
 
     override fun getOptions(): Map<String, EmbosserOption> {
         return options
@@ -30,8 +29,8 @@ class GenericTextEmbosser private constructor(id: String, model: String, maxPape
         val addMargins = Optional.ofNullable(options["Add margins"]).filter { it is Boolean }.map { BooleanOption((it as Boolean)) }.orElse(addMargins)
         val padWithBlanks = Optional.ofNullable(options["Pad page"]).filter { it is Boolean }.map { BooleanOption((it as Boolean)) }.orElse(padWithBlanks)
         val eopOnFullPage = Optional.ofNullable(options["Form feed on full page"]).filter { it is Boolean }.map { BooleanOption((it as Boolean)) }.orElse(eopOnFullPage)
-        val eol = Optional.ofNullable(options["End of line"]).filter { it is LineEnding }.map { MultipleChoiceOption(it as LineEnding, eol.choices) }.orElse(eol)
-        val eop = Optional.ofNullable(options["Form feed"]).filter { it is PageEnding }.map { MultipleChoiceOption(it as PageEnding, eop.choices) }.orElse(eop)
+        val eol = Optional.ofNullable(options["End of line"]).filter { it is ByteArray }.map { EmbosserOption.ByteArrayOption(*(it as ByteArray)) }.orElse(eol)
+        val eop = Optional.ofNullable(options["Form feed"]).filter { it is ByteArray }.map { EmbosserOption.ByteArrayOption(*(it as ByteArray)) }.orElse(eop)
         return GenericTextEmbosser(id, model, maximumPaper, minimumPaper, addMargins, eol, eop, padWithBlanks, eopOnFullPage)
     }
 
@@ -55,7 +54,7 @@ class GenericTextEmbosser private constructor(id: String, model: String, maxPape
         val builder = GenericTextDocumentHandler.Builder()
         builder.setTopMargin(topMarginCells).setLeftMargin(leftMarginCells).setCellsPerLine(cellsPerLine).setLinesPerPage(linesPerPage)
         Optional.ofNullable(attributes[Copies::class.java]).ifPresent { v: Attribute -> builder.setCopies((v as Copies).value) }
-        builder.setInterpoint(Optional.ofNullable(attributes[PaperLayout::class.java]).filter { p -> (p as PaperLayout).value == Layout.INTERPOINT }.isPresent).setEopOnFullPage(eopOnFullPage.value).setEndOfPage(getPageEndingBytes(eop.value, eol.value)).setEndOfLine(getLineEndingBytes(eol.value)).padWithBlankLines(padWithBlanks.value)
+        builder.setInterpoint(Optional.ofNullable(attributes[PaperLayout::class.java]).filter { p -> (p as PaperLayout).value == Layout.INTERPOINT }.isPresent).setEopOnFullPage(eopOnFullPage.value).setEndOfPage(eop.value).setEndOfLine(eol.value).padWithBlankLines(padWithBlanks.value)
         val handler = builder.build()
         val pages = Optional.ofNullable(attributes[PageRanges::class.java] as PageRanges?).orElseGet { PageRanges() }
         return PageFilter(pages).andThen(handler)
