@@ -1,6 +1,6 @@
 plugins {
 	id 'org.brailleblaster.libembosser.kotlin-library-conventions'
-	id "com.github.spotbugs" version "4.4.3"
+	id "com.github.spotbugs" version "4.7.1"
 }
 
 java {
