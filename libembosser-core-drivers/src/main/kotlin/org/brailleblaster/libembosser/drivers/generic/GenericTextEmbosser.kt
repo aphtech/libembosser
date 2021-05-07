@@ -15,7 +15,7 @@ import java.util.function.Function
 import javax.print.attribute.Attribute
 
 class GenericTextEmbosser private constructor(id: String, model: String, maxPaper: Rectangle, minPaper: Rectangle, private val addMargins: BooleanOption, private val eol: EmbosserOption.ByteArrayOption, private val eop: EmbosserOption.ByteArrayOption, private val padWithBlanks: BooleanOption, private val eopOnFullPage: BooleanOption) : BaseTextEmbosser(id, "Generic", model, maxPaper, minPaper) {
-    private val options: Map<String, EmbosserOption> = mapOf("Add margins" to addMargins, "Pad page" to padWithBlanks, "Form feed on full page" to eopOnFullPage, "End of line" to eol, "Form feed" to eop)
+    private val options: Map<String, EmbosserOption> = mapOf("addMargins" to addMargins, "padWithBlanks" to padWithBlanks, "eopOnFullPage" to eopOnFullPage, "eol" to eol, "eop" to eop)
 
     constructor(manufacturer: String, model: String, maxPaper: Rectangle, minPaper: Rectangle) : this(manufacturer, model, maxPaper, minPaper, false)
     constructor(id: String, model: String, maxPaper: Rectangle, minPaper: Rectangle, addMargins: Boolean) : this(id, model, maxPaper, minPaper, BooleanOption(addMargins), EmbosserOption.ByteArrayOption(
@@ -25,12 +25,17 @@ class GenericTextEmbosser private constructor(id: String, model: String, maxPape
         return options
     }
 
+    override fun getOptionName(optionId: String, locale: Locale): String {
+        require(options.contains(optionId)) { "No option $optionId" }
+        return ResourceBundle.getBundle("org.brailleblaster.libembosser.drivers.generic.GenericTextOptions", locale).getString(optionId)
+    }
+
     override fun customize(options: Map<String, EmbosserOption>): GenericTextEmbosser {
-        val addMargins = options["Add margins"] as? BooleanOption ?: this.addMargins
-        val padWithBlanks = options["Pad page"] as? BooleanOption ?: this.padWithBlanks
-        val eopOnFullPage = options["Form feed on full page"] as? BooleanOption ?: this.eopOnFullPage
-        val eol = options["End of line"] as? EmbosserOption.ByteArrayOption ?: this.eol
-        val eop = options["Form feed"] as? EmbosserOption.ByteArrayOption ?: this.eop
+        val addMargins = options["addMargins"] as? BooleanOption ?: this.addMargins
+        val padWithBlanks = options["padWithBlanks"] as? BooleanOption ?: this.padWithBlanks
+        val eopOnFullPage = options["eopOnFullPage"] as? BooleanOption ?: this.eopOnFullPage
+        val eol = options["eol"] as? EmbosserOption.ByteArrayOption ?: this.eol
+        val eop = options["eop"] as? EmbosserOption.ByteArrayOption ?: this.eop
         return GenericTextEmbosser(id, model, maximumPaper, minimumPaper, addMargins, eol, eop, padWithBlanks, eopOnFullPage)
     }
 

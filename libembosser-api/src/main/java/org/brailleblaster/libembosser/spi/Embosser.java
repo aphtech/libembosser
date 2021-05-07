@@ -12,9 +12,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 
 /**
@@ -195,12 +193,15 @@ public interface Embosser extends IEmbosser {
     /**
      * Get a list of optional customisations of the embosser.
      * <p>
-     * Use this to allow clients to identify what aspects of the embosser can be customised. The default implementation provides an empty list, IE. no customisations. If implementing this method and returning options, then the customize method should also be implemented.
+     * Use this to allow clients to identify what aspects of the embosser can be customised. The default implementation provides an empty list, IE. no customisations. If implementing this method and returning options, then the getOptionName and customize methods should also be implemented.
      *
      * @return The options which can be customised.
      */
     default @NotNull Map<String, EmbosserOption> getOptions() {
         return Collections.emptyMap();
+    }
+    default @NotNull String getOptionName(String optionId, Locale locale) {
+        throw new IllegalArgumentException(String.format("No option %s", optionId));
     }
 
     /**
