@@ -211,7 +211,7 @@ public interface Embosser extends IEmbosser {
      * @param options The options to customise the embosser.
      * @return A new customised embosser instance.
      */
-    default @NotNull Embosser customize(@NotNull Map<String, Object> options) {
+    default @NotNull Embosser customize(@NotNull Map<String, EmbosserOption> options) {
         return this;
     }
 }

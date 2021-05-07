@@ -25,12 +25,12 @@ class GenericTextEmbosser private constructor(id: String, model: String, maxPape
         return options
     }
 
-    override fun customize(options: Map<String, Any>): GenericTextEmbosser {
-        val addMargins = Optional.ofNullable(options["Add margins"]).filter { it is Boolean }.map { BooleanOption((it as Boolean)) }.orElse(addMargins)
-        val padWithBlanks = Optional.ofNullable(options["Pad page"]).filter { it is Boolean }.map { BooleanOption((it as Boolean)) }.orElse(padWithBlanks)
-        val eopOnFullPage = Optional.ofNullable(options["Form feed on full page"]).filter { it is Boolean }.map { BooleanOption((it as Boolean)) }.orElse(eopOnFullPage)
-        val eol = Optional.ofNullable(options["End of line"]).filter { it is ByteArray }.map { EmbosserOption.ByteArrayOption(*(it as ByteArray)) }.orElse(eol)
-        val eop = Optional.ofNullable(options["Form feed"]).filter { it is ByteArray }.map { EmbosserOption.ByteArrayOption(*(it as ByteArray)) }.orElse(eop)
+    override fun customize(options: Map<String, EmbosserOption>): GenericTextEmbosser {
+        val addMargins = options["Add margins"] as? BooleanOption ?: this.addMargins
+        val padWithBlanks = options["Pad page"] as? BooleanOption ?: this.padWithBlanks
+        val eopOnFullPage = options["Form feed on full page"] as? BooleanOption ?: this.eopOnFullPage
+        val eol = options["End of line"] as? EmbosserOption.ByteArrayOption ?: this.eol
+        val eop = options["Form feed"] as? EmbosserOption.ByteArrayOption ?: this.eop
         return GenericTextEmbosser(id, model, maximumPaper, minimumPaper, addMargins, eol, eop, padWithBlanks, eopOnFullPage)
     }
 
