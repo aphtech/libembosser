@@ -10,7 +10,7 @@ subprojects {
 	version = '1.4.0-beta1'
 	repositories {
 		// No need for maven central as jcenter is a superset.
-		jcenter()
+		mavenCentral()
 		mavenLocal()
 		maven { url 'https://nexus.aphtech.org/repository/aphtech-mrepo' }
 	}
