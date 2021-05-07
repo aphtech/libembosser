@@ -47,14 +47,14 @@ class GenericTextEmbosser private constructor(id: String, model: String, maxPape
         var topMarginCells = 0
         var leftMarginCells = 0
         // Only set margins if addMargins is true.
-        if (addMargins.value) {
+        if (addMargins.boolean) {
             topMarginCells = cell.getLinesForHeight(topMargin)
             leftMarginCells = cell.getCellsForWidth(leftMargin)
         }
         val builder = GenericTextDocumentHandler.Builder()
         builder.setTopMargin(topMarginCells).setLeftMargin(leftMarginCells).setCellsPerLine(cellsPerLine).setLinesPerPage(linesPerPage)
         Optional.ofNullable(attributes[Copies::class.java]).ifPresent { v: Attribute -> builder.setCopies((v as Copies).value) }
-        builder.setInterpoint(Optional.ofNullable(attributes[PaperLayout::class.java]).filter { p -> (p as PaperLayout).value == Layout.INTERPOINT }.isPresent).setEopOnFullPage(eopOnFullPage.value).setEndOfPage(eop.value).setEndOfLine(eol.value).padWithBlankLines(padWithBlanks.value)
+        builder.setInterpoint(Optional.ofNullable(attributes[PaperLayout::class.java]).filter { p -> (p as PaperLayout).value == Layout.INTERPOINT }.isPresent).setEopOnFullPage(eopOnFullPage.boolean).setEndOfPage(eop.bytes).setEndOfLine(eol.bytes).padWithBlankLines(padWithBlanks.boolean)
         val handler = builder.build()
         val pages = Optional.ofNullable(attributes[PageRanges::class.java] as PageRanges?).orElseGet { PageRanges() }
         return PageFilter(pages).andThen(handler)
