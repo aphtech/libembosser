@@ -15,27 +15,23 @@ import java.util.function.Function
 import javax.print.attribute.Attribute
 
 class GenericTextEmbosser private constructor(id: String, model: String, maxPaper: Rectangle, minPaper: Rectangle, private val addMargins: BooleanOption, private val eol: EmbosserOption.ByteArrayOption, private val eop: EmbosserOption.ByteArrayOption, private val padWithBlanks: BooleanOption, private val eopOnFullPage: BooleanOption) : BaseTextEmbosser(id, "Generic", model, maxPaper, minPaper) {
-    private val options: Map<String, EmbosserOption> = mapOf("addMargins" to addMargins, "padWithBlanks" to padWithBlanks, "eopOnFullPage" to eopOnFullPage, "eol" to eol, "eop" to eop)
+    private val options: Map<OptionIdentifier, EmbosserOption> = mapOf(GenericTextOptionIdentifier.ADD_MARGINS to addMargins, GenericTextOptionIdentifier.PAD_WITH_BLANKS to padWithBlanks, GenericTextOptionIdentifier.EOP_ON_FULL_PAGE to eopOnFullPage, GenericTextOptionIdentifier.EOL to eol, GenericTextOptionIdentifier.EOP to eop)
 
     constructor(manufacturer: String, model: String, maxPaper: Rectangle, minPaper: Rectangle) : this(manufacturer, model, maxPaper, minPaper, false)
     constructor(id: String, model: String, maxPaper: Rectangle, minPaper: Rectangle, addMargins: Boolean) : this(id, model, maxPaper, minPaper, BooleanOption(addMargins), EmbosserOption.ByteArrayOption(
         0xd, 0xa), EmbosserOption.ByteArrayOption(0xc), BooleanOption(false), BooleanOption(false))
 
-    override fun getOptions(): Map<String, EmbosserOption> {
+    override fun getOptions(): Map<OptionIdentifier, EmbosserOption> {
         return options
     }
 
-    override fun getOptionName(optionId: String, locale: Locale): String {
-        require(options.contains(optionId)) { "No option $optionId" }
-        return ResourceBundle.getBundle("org.brailleblaster.libembosser.drivers.generic.GenericTextOptions", locale).getString(optionId)
-    }
 
-    override fun customize(options: Map<String, EmbosserOption>): GenericTextEmbosser {
-        val addMargins = options["addMargins"] as? BooleanOption ?: this.addMargins
-        val padWithBlanks = options["padWithBlanks"] as? BooleanOption ?: this.padWithBlanks
-        val eopOnFullPage = options["eopOnFullPage"] as? BooleanOption ?: this.eopOnFullPage
-        val eol = options["eol"] as? EmbosserOption.ByteArrayOption ?: this.eol
-        val eop = options["eop"] as? EmbosserOption.ByteArrayOption ?: this.eop
+    override fun customize(options: Map<OptionIdentifier, EmbosserOption>): GenericTextEmbosser {
+        val addMargins = options[GenericTextOptionIdentifier.ADD_MARGINS] as? BooleanOption ?: this.addMargins
+        val padWithBlanks = options[GenericTextOptionIdentifier.PAD_WITH_BLANKS] as? BooleanOption ?: this.padWithBlanks
+        val eopOnFullPage = options[GenericTextOptionIdentifier.EOP_ON_FULL_PAGE] as? BooleanOption ?: this.eopOnFullPage
+        val eol = options[GenericTextOptionIdentifier.EOL] as? EmbosserOption.ByteArrayOption ?: this.eol
+        val eop = options[GenericTextOptionIdentifier.EOP] as? EmbosserOption.ByteArrayOption ?: this.eop
         return GenericTextEmbosser(id, model, maximumPaper, minimumPaper, addMargins, eol, eop, padWithBlanks, eopOnFullPage)
     }
 
@@ -75,4 +71,12 @@ class GenericTextEmbosser private constructor(id: String, model: String, maxPape
         return if (BigDecimal.ZERO < margin) margin else BigDecimal.ZERO
     }
 
+}
+enum class GenericTextOptionIdentifier(override val id: String) : OptionIdentifier {
+    ADD_MARGINS("addMargins"),
+    PAD_WITH_BLANKS("padWithBlanks"),
+    EOP_ON_FULL_PAGE("eopOnFullPage"),
+    EOL("eol"),
+    EOP("eop");
+    override fun getDisplayName(locale: Locale): String = ResourceBundle.getBundle("org.brailleblaster.libembosser.drivers.generic.GenericTextOptions", locale).getString(id)
 }

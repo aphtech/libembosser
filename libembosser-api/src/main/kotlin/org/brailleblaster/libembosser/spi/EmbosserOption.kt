@@ -2,6 +2,11 @@ package org.brailleblaster.libembosser.spi
 
 import java.util.*
 
+interface OptionIdentifier {
+    val id: String
+    fun getDisplayName(locale: Locale): String
+}
+
 sealed class EmbosserOption {
     abstract val value: String
     abstract fun copy(value: String): EmbosserOption
