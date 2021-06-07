@@ -19,7 +19,7 @@ class GenericTextEmbosser private constructor(id: String, model: String, maxPape
 
     constructor(manufacturer: String, model: String, maxPaper: Rectangle, minPaper: Rectangle) : this(manufacturer, model, maxPaper, minPaper, false)
     constructor(id: String, model: String, maxPaper: Rectangle, minPaper: Rectangle, addMargins: Boolean) : this(id, model, maxPaper, minPaper, BooleanOption(addMargins), EmbosserOption.ByteArrayOption(
-        0xd, 0xa), EmbosserOption.ByteArrayOption(0xc), BooleanOption(false), BooleanOption(false))
+        0xd, 0xa), EmbosserOption.ByteArrayOption(0xc), BooleanOption(false), BooleanOption(true))
 
     override fun getOptions(): Map<OptionIdentifier, EmbosserOption> {
         return options

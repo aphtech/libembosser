@@ -15,6 +15,7 @@ sealed class EmbosserOption {
         override val value: String
         get() = boolean.toString()
         override fun copy(value: String) = BooleanOption(value)
+        fun copy(value: Boolean) = BooleanOption(value)
     }
     class ByteArrayOption(vararg bytes: Byte) : EmbosserOption() {
         constructor(value: String) : this(*Base64.getDecoder().decode(value))
@@ -23,6 +24,7 @@ sealed class EmbosserOption {
         override val value: String
         get() = Base64.getEncoder().encodeToString(bytes)
         override fun copy(value: String) = ByteArrayOption(value)
+        fun copy(value: ByteArray) = ByteArrayOption(*value)
     }
 
     class StringOption(override val value: String) : EmbosserOption() {
@@ -33,5 +35,6 @@ sealed class EmbosserOption {
         override val value: String
         get() = int.toString()
         override fun copy(value: String) = IntOption(value)
+        fun copy(value: Int) = IntOption(value)
     }
 }
