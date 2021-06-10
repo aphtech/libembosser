@@ -11,7 +11,7 @@ import kotlin.test.assertTrue
 class GenericTextEmbosserTest {
     @Test
     fun testCorrectOptionsAvailable() {
-        val expectedOptions = mapOf(GenericTextOptionIdentifier.ADD_MARGINS to EmbosserOption.BooleanOption(false), GenericTextOptionIdentifier.PAD_WITH_BLANKS to EmbosserOption.BooleanOption(false), GenericTextOptionIdentifier.EOP_ON_FULL_PAGE to EmbosserOption.BooleanOption(true), GenericTextOptionIdentifier.EOL to EmbosserOption.ByteArrayOption(0xd, 0xa), GenericTextOptionIdentifier.EOP to EmbosserOption.ByteArrayOption(0xc))
+        val expectedOptions = mapOf(GenericTextOptionIdentifier.ADD_MARGINS to EmbosserOption.BooleanOption(false), GenericTextOptionIdentifier.PAD_WITH_BLANKS to EmbosserOption.BooleanOption(false), GenericTextOptionIdentifier.EOP_ON_FULL_PAGE to EmbosserOption.BooleanOption(true), GenericTextOptionIdentifier.EOL to EmbosserOption.ByteArrayOption(0xd, 0xa), GenericTextOptionIdentifier.EOP to EmbosserOption.ByteArrayOption(0xc), GenericTextOptionIdentifier.HEADER to EmbosserOption.ByteArrayOption(), GenericTextOptionIdentifier.FOOTER to EmbosserOption.ByteArrayOption())
         val embosser = EmbosserService.getInstance().getEmbosser("libembosser.generic.text")
         val actualOptions = embosser.options
         assertEquals(expectedOptions.size, actualOptions.size)
