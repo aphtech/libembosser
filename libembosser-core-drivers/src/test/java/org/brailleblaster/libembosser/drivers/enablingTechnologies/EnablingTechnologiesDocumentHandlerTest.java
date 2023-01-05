@@ -45,6 +45,7 @@ import com.google.common.primitives.Bytes;
 
 public class EnablingTechnologiesDocumentHandlerTest {
 	private static final String EOP = new String(new char[] {'\r', '\n', '\f'});
+	private final Random r = new Random(System.currentTimeMillis());
 	private Builder createHandlerBuilder(Model model) {
 		return new EnablingTechnologiesDocumentHandler.Builder(model).setPapermode(Layout.P1ONLY);
 	}
@@ -221,13 +222,11 @@ public class EnablingTechnologiesDocumentHandlerTest {
 	@DataProvider(name="invalidLeftmarginProvider")
 	public Iterator<Object[]> invalidLeftmarginProvider() {
 		Builder b = createHandlerBuilder();
-		Random r = new Random(System.currentTimeMillis());
 		return r.ints().filter(i -> i < 0 || i > 58).mapToObj(value -> new Object[] {(IntFunction<Builder>)b::setLeftMargin, value}).limit(100).iterator();
 	}
 	@DataProvider(name="invalidNumberArgProvider")
 	public Iterator<Object[]> invalidNumberArgProvider() {
 		Builder b = createHandlerBuilder(Model.JULIET_CLASSIC);
-		Random r = new Random(System.currentTimeMillis());
 		List<IntFunction<Builder>> funcs = ImmutableList.of(b::setTopMargin, b::setLinesPerPage, b::setPageLength);
 		return Streams.mapWithIndex(r.ints().filter(i -> i < 0 || i > 59), (value, index) -> new Object[] {funcs.get((int)(index % funcs.size())), value}).limit(100).iterator();
 	}
@@ -286,7 +285,6 @@ public class EnablingTechnologiesDocumentHandlerTest {
 	@DataProvider(name="invalidTopMarginAndLinesProvider")
 	public Iterator<Object[]> invalidTopMarginAndLinesProvider() {
 		List<Object[]> data = new ArrayList<>();
-		Random r = new Random(System.currentTimeMillis());
 		for (int i = 0; i < 100; ++i) {
 			int topMargin = r.nextInt(59) + 1;
 			int linesPerPage = 59 - r.nextInt(topMargin);
@@ -302,7 +300,6 @@ public class EnablingTechnologiesDocumentHandlerTest {
 	@DataProvider(name="invalidPageLengthAndTopMarginAndLinesProvider")
 	public Iterator<Object[]> invalidPageLengthAndTopMarginAndLinesProvider() {
 		List<Object[]> data = new ArrayList<>();
-		Random r = new Random(System.currentTimeMillis());
 		BrlCell cell = BrlCell.NLS;
 		for (int i = 0; i < 100; ++i) {
 			int pageLength = r.nextInt(59) + 1; // We don't want a page length of 0

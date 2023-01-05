@@ -18,6 +18,7 @@ import org.testng.annotations.Test;
 import com.google.common.collect.Iterators;
 
 public class ViewPlusLayoutHelperTest {
+	private final Random random = new Random(System.currentTimeMillis());
 	@Test
 	public void testGetBrailleAttributes() {
 		Map<TextAttribute, Object> actualAttrs = new ViewPlusLayoutHelper().getBrailleAttributes(BrlCell.NLS);
@@ -40,7 +41,6 @@ public class ViewPlusLayoutHelperTest {
 	}
 	@DataProvider(name="negativeNumberProvider")
 	public Iterator<Object[]> negativeNumberProvider() {
-		Random random = new Random(System.currentTimeMillis());
 		return random.doubles(100, Double.NEGATIVE_INFINITY, 0.0).mapToObj(v -> new Object[] {v}).iterator();
 	}
 	@Test(dataProvider="negativeNumberProvider")

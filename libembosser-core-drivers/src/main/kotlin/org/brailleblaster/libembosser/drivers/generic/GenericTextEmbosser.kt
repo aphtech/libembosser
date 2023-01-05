@@ -14,6 +14,8 @@ import java.math.BigDecimal
 import java.util.*
 import java.util.function.Function
 import javax.print.attribute.Attribute
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings
+
 
 class GenericTextEmbosser private constructor(id: String, model: String, maxPaper: Rectangle, minPaper: Rectangle, private val addMargins: BooleanOption, private val eol: ByteArrayOption, private val eop: ByteArrayOption, private val padWithBlanks: BooleanOption, private val eopOnFullPage: BooleanOption, private val header: ByteArrayOption = ByteArrayOption(), private val footer: ByteArrayOption = ByteArrayOption()) : BaseTextEmbosser(id, "Generic", model, maxPaper, minPaper) {
     private val options: Map<OptionIdentifier, EmbosserOption> = mapOf(GenericTextOptionIdentifier.ADD_MARGINS to addMargins, GenericTextOptionIdentifier.PAD_WITH_BLANKS to padWithBlanks, GenericTextOptionIdentifier.EOP_ON_FULL_PAGE to eopOnFullPage, GenericTextOptionIdentifier.EOL to eol, GenericTextOptionIdentifier.EOP to eop, GenericTextOptionIdentifier.HEADER to header, GenericTextOptionIdentifier.FOOTER to footer)
@@ -22,6 +24,10 @@ class GenericTextEmbosser private constructor(id: String, model: String, maxPape
     constructor(id: String, model: String, maxPaper: Rectangle, minPaper: Rectangle, addMargins: Boolean) : this(id, model, maxPaper, minPaper, BooleanOption(addMargins), ByteArrayOption(
         0xd, 0xa), ByteArrayOption(0xc), BooleanOption(false), BooleanOption(true))
 
+    @SuppressFBWarnings(
+        value = ["EI_EXPOSE_REP"],
+        justification = "Kotlin Map is immutable"
+    )
     override fun getOptions(): Map<OptionIdentifier, EmbosserOption> {
         return options
     }

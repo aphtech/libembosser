@@ -15,6 +15,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 public class DefaultLayoutHelperTest {
+	private final Random random = new Random(System.currentTimeMillis());
 	@Test
 	public void testGetBrailleAttributes() {
 		Map<TextAttribute, Object> actualAttrs = new DefaultLayoutHelper().getBrailleAttributes(BrlCell.NLS);
@@ -26,7 +27,6 @@ public class DefaultLayoutHelperTest {
 	}
 	@DataProvider(name="marginProvider")
 	public Iterator<Object[]> marginprovider() {
-		Random random = new Random(System.currentTimeMillis());
 		return random.doubles(100, 0.0, Double.POSITIVE_INFINITY).mapToObj(v -> new Object[] { v, v }).iterator();
 	}
 	@Test(dataProvider="marginProvider")
@@ -36,7 +36,6 @@ public class DefaultLayoutHelperTest {
 	}
 	@DataProvider(name="negativeNumberProvider")
 	public Iterator<Object[]> negativeNumberProvider() {
-		Random random = new Random(System.currentTimeMillis());
 		return random.doubles(100, Double.NEGATIVE_INFINITY, 0.0).mapToObj(v -> new Object[] {v}).iterator();
 	}
 	@Test(dataProvider="negativeNumberProvider")

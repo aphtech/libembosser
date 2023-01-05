@@ -14,9 +14,9 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 public class PageRangesTest {
+	private final Random r = new Random(System.currentTimeMillis());
 	@DataProvider(name="pageNumbersProvider")
 	public Iterator<Object[]> pageNumbersProvider() {
-		Random r = new Random(System.currentTimeMillis());
 		return r.ints(1, Integer.MAX_VALUE).limit(100).mapToObj(v -> new Object[] {v}).iterator();
 	}
 	@Test(dataProvider="pageNumbersProvider")
@@ -27,7 +27,6 @@ public class PageRangesTest {
 	@DataProvider(name="singlePageProvider")
 	public Iterator<Object[]> singlePageProvider() {
 		List<Object[]> data = new ArrayList<>();
-		Random r = new Random(System.currentTimeMillis());
 		for (int i = 0; i < 100; ++i) {
 			int pageRange = r.nextInt(Integer.MAX_VALUE) + 1;
 			int testVal = r.nextInt(Integer.MAX_VALUE) + 1;
@@ -43,7 +42,6 @@ public class PageRangesTest {
 	@DataProvider(name="singlePageRangeProvider")
 	public Iterator<Object[]> singlePageRangeProvider() {
 		List<Object[]> data = new ArrayList<>();
-		Random r = new Random(System.currentTimeMillis());
 		for (int i = 0; i < 100; ++i) {
 			int bound1 = r.nextInt(Integer.MAX_VALUE) + 1;
 			int bound2 = r.nextInt(Integer.MAX_VALUE) + 1;

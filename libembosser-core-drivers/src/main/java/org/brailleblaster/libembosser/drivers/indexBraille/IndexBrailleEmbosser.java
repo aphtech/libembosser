@@ -42,7 +42,7 @@ public class IndexBrailleEmbosser extends BaseTextEmbosser {
 	public IndexBrailleEmbosser(String id, String manufacturer, String model, Rectangle maxPaper, Rectangle minPaper, int maxCellsPerLine, EnumSet<Layout> sides, Map<Rectangle, Integer> paperSizes) {
 		super(id, manufacturer, model, maxPaper, minPaper);
 		this.maxCellsPerLine = maxCellsPerLine;
-		supportedSides = sides;
+		supportedSides = EnumSet.copyOf(sides);
 		this.paperSizes = ImmutableMap.copyOf(checkNotNull(paperSizes));
 	}
 

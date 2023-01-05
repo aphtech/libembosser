@@ -38,10 +38,10 @@ import com.google.common.collect.Streams;
 public class Braillo200DocumentHandlerTest {
 	private static final Range<Integer> VALID_CELLS_PER_LINE = Range.closed(10, 42);
 	private static final Range<Double> VALID_SHEET_LENGTH_RANGE = Range.openClosed(3.5, 14.0);
-	
+	private final Random r = new Random(System.currentTimeMillis());
+
 	@DataProvider(name="invalidCellsPerLineProvider")
 	public Iterator<Object[]> invalidCellsPerLineProvider() {
-		Random r = new Random(System.currentTimeMillis());
 		return Streams.concat(IntStream.of(7, 8, 9, 43, 44, 45), r.ints().filter(i -> !VALID_CELLS_PER_LINE.contains(i)))
 				.limit(100).mapToObj(i -> new Object[] { new Braillo200DocumentHandler.Builder(), i}).iterator();
 	}
@@ -86,7 +86,6 @@ public class Braillo200DocumentHandlerTest {
 	}
 	@DataProvider(name="invalidSheetLengthProvider")
 	public Iterator<Object[]> invalidSheetLengthProvider() {
-		Random r = new Random(System.currentTimeMillis());
 		return Streams.concat(DoubleStream.of(3.3, 3.4, 3.44, 14.02, 14.1, 14.5), r.doubles(0.0, 1000.0).filter(l -> !VALID_SHEET_LENGTH_RANGE.contains(l)))
 				.limit(100).mapToObj(l -> new Object[] { new Braillo200DocumentHandler.Builder(), l}).iterator();
 	}
@@ -139,8 +138,7 @@ public class Braillo200DocumentHandlerTest {
 				"' ", "'A", "'1", "'B", "''", "'K",
 				"K ", "KA", "K1", "KB", "K'", "KK"
 		};
-		Random rand = new Random(System.currentTimeMillis());
-		return rand.doubles(3.6, 14.0).limit(100).mapToObj(d -> new Object[] { d, (int)Math.floor(d * 2.54) }).map(d -> new Object[] { new Braillo200DocumentHandler.Builder(), d[0], inputEvents, Arrays.stream(outputLines).limit((int)d[1]).collect(Collectors.joining("\r\n")) + "\r\n\f"}).iterator();
+		return r.doubles(3.6, 14.0).limit(100).mapToObj(d -> new Object[] { d, (int)Math.floor(d * 2.54) }).map(d -> new Object[] { new Braillo200DocumentHandler.Builder(), d[0], inputEvents, Arrays.stream(outputLines).limit((int)d[1]).collect(Collectors.joining("\r\n")) + "\r\n\f"}).iterator();
 	}
 	@Test(dataProvider="validSheetLengthProvider")
 	public void testSetSheetLength(Builder builder, double sheetLength, List<DocumentEvent> inputEvents, String expectedBody) throws IOException {
