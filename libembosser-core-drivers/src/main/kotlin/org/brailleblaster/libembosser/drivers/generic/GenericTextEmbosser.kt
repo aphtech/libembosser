@@ -57,7 +57,7 @@ class GenericTextEmbosser private constructor(id: String, model: String, maxPape
         }
         val builder = GenericTextDocumentHandler.Builder()
         builder.setTopMargin(topMarginCells).setLeftMargin(leftMarginCells).setCellsPerLine(cellsPerLine).setLinesPerPage(linesPerPage)
-        Optional.ofNullable(attributes[Copies::class.java]).ifPresent { v: Attribute -> builder.setCopies((v as Copies).value) }
+        attributes[Copies::class.java]?.let { builder.setCopies((it as Copies).value) }
         builder.setInterpoint(Optional.ofNullable(attributes[PaperLayout::class.java]).filter { p -> (p as PaperLayout).value == Layout.INTERPOINT }.isPresent).setEopOnFullPage(eopOnFullPage.boolean).setEndOfPage(eop.bytes).setEndOfLine(eol.bytes).padWithBlankLines(padWithBlanks.boolean).setHeader(header.bytes).setFooter(footer.bytes)
         val handler = builder.build()
         val pages = Optional.ofNullable(attributes[PageRanges::class.java] as PageRanges?).orElseGet { PageRanges() }
