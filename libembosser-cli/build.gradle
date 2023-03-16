@@ -6,6 +6,8 @@
  * Copyright (c) 2023 American Printing House for the Blind
  */
 
+import com.github.spotbugs.snom.SpotBugsTask
+
 plugins {
 	id 'org.springframework.boot' version '2.7.7'
 	id "org.brailleblaster.libembosser.kotlin-application-conventions"
@@ -36,7 +38,7 @@ dependencies {
 	implementation project(":libembosser-braillo-driver")
 	implementation project(":libembosser-viewplus-driver")
 	implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
-	runtimeOnly "ch.qos.logback:logback-classic:1.2.3"
+	runtimeOnly 'ch.qos.logback:logback-classic:1.4.5'
 	compileOnly "com.github.spotbugs:spotbugs-annotations:${spotbugs.toolVersion.get()}"
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.testng:testng:7.4.0'
@@ -55,7 +57,7 @@ publishing {
 	}
 }
 
-tasks.withType(com.github.spotbugs.snom.SpotBugsTask) {
+tasks.withType(SpotBugsTask) {
 	reports {
 		xml.enabled = false
 		html.enabled = true
