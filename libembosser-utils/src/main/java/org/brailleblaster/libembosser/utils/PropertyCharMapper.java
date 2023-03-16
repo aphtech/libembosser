@@ -8,13 +8,12 @@
 
 package org.brailleblaster.libembosser.utils;
 
+import com.google.common.collect.Maps;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Properties;
-
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 
 public class PropertyCharMapper implements CharMapperFunction {
 
@@ -27,7 +26,7 @@ public class PropertyCharMapper implements CharMapperFunction {
 			tmpMap = Maps.fromProperties(properties);
 		} catch (IOException e) {
 			// Log the problem and just provide an empty map
-			tmpMap = ImmutableMap.of();
+			tmpMap = Map.of();
 		}
 		map = tmpMap;
 	}
