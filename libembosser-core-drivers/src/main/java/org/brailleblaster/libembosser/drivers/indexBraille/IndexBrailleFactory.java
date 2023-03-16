@@ -8,19 +8,14 @@
 
 package org.brailleblaster.libembosser.drivers.indexBraille;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import org.brailleblaster.libembosser.spi.*;
+import org.jetbrains.annotations.NotNull;
+
 import java.math.BigDecimal;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Locale;
-
-import org.brailleblaster.libembosser.spi.Embosser;
-import org.brailleblaster.libembosser.spi.EmbosserFactory;
-import org.brailleblaster.libembosser.spi.Layout;
-import org.brailleblaster.libembosser.spi.PaperSize;
-import org.brailleblaster.libembosser.spi.Rectangle;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
 public class IndexBrailleFactory implements EmbosserFactory {
 	public static final EnumSet<Layout> BASIC_D_SIDES = EnumSet.of(Layout.INTERPOINT, Layout.P1ONLY, Layout.P2ONLY, Layout.Z_FOLDING_DOUBLE_HORIZONTAL, Layout.Z_FOLDING_SINGLE_HORIZONTAL, Layout.Z_FOLDING_DOUBLE_VERTICAL, Layout.Z_FOLDING_SINGLE_VERTICAL);
@@ -37,7 +32,7 @@ public class IndexBrailleFactory implements EmbosserFactory {
 	private static final ImmutableMap<Rectangle, Integer> ET_PA_PAPER_SIZES = ImmutableMap.of(ELEVEN_AND_HALF_BY_ELEVEN_PAPER, 0, LETTER_PAPER, 1, TEN_BY_ELEVEN_PAPER, 2, ELEVEN_BY_ELEVEN_PAPER, 3);
 	private static final Rectangle BRAILLEBOX_MAX_PAPER = new Rectangle(new BigDecimal("300"), new BigDecimal("440"));
 	private static final Rectangle BRAILLEBOX_MIN_PAPER = new Rectangle(new BigDecimal("200"), new BigDecimal("250"));
-	private List<Embosser> embossers;
+	private final List<Embosser> embossers;
 	public IndexBrailleFactory() {
 		embossers = ImmutableList.<Embosser>builder()
 				// The Enabling Technologies Romeo60 and Juliet120 are based on Index Basic D V5
@@ -52,12 +47,9 @@ public class IndexBrailleFactory implements EmbosserFactory {
 				.add(new IndexBrailleEmbosser("libembosser.ib.FanFoldV5", "Index Braille", "FanFold V5", new Rectangle(new BigDecimal("317.5"), new BigDecimal("304.8")), new Rectangle(new BigDecimal("127"), new BigDecimal("203.2")), 48, FANFOLD_SIDES))
 				.build();
 	}
-	@Override
+	@NotNull
+    @Override
 	public List<Embosser> getEmbossers() {
-		return embossers;
-	}
-	@Override
-	public List<Embosser> getEmbossers(Locale locale) {
 		return embossers;
 	}
 }

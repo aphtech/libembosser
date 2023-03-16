@@ -15,21 +15,12 @@ subprojects {
 	apply plugin: 'net.linguica.maven-settings'
 
 	group = 'org.brailleblaster.libembosser'
-	version = '1.4.3'
+	version = '2.0.0-alpha-1'
 	repositories {
 		// No need for maven central as jcenter is a superset.
 		mavenCentral()
 		mavenLocal()
 		maven { url 'https://nexus.aphtech.org/repository/aphtech-mrepo' }
-	}
-	publishing {
-		repositories {
-			maven {
-				// Get server credentials from maven-settings
-				name = "aphtech-mrepo"
-				url "https://nexus.aphtech.org/repository/aphtech-mrepo/"
-			}
-		}
 	}
 }
 

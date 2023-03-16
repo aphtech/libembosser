@@ -44,9 +44,4 @@ public class ViewPlusEmbosserFactory implements EmbosserFactory {
 		return embossers;
 	}
 
-	@Override
-	public List<Embosser> getEmbossers(Locale locale) {
-		return embossers;
-	}
-
 }

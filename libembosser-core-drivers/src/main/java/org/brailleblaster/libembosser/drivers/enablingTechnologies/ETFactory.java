@@ -8,15 +8,14 @@
 
 package org.brailleblaster.libembosser.drivers.enablingTechnologies;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Locale;
-
+import com.google.common.collect.ImmutableList;
 import org.brailleblaster.libembosser.spi.Embosser;
 import org.brailleblaster.libembosser.spi.EmbosserFactory;
 import org.brailleblaster.libembosser.spi.Rectangle;
+import org.jetbrains.annotations.NotNull;
 
-import com.google.common.collect.ImmutableList;
+import java.math.BigDecimal;
+import java.util.List;
 
 public class ETFactory implements EmbosserFactory {
 	public static final Rectangle FIFTEEN_BY_FOURTEEN_PAPER = new Rectangle(new BigDecimal("381"), new BigDecimal("356"));
@@ -46,14 +45,10 @@ public class ETFactory implements EmbosserFactory {
 				.build();
 	}
 
-	@Override
+	@NotNull
+    @Override
 	public List<Embosser> getEmbossers() {
 		return embossers;
-	}
-	@Override
-	public List<Embosser> getEmbossers(Locale locale) {
-		// For now ignore the locale.
-		return getEmbossers();
 	}
 
 }
