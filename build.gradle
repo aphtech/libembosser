@@ -20,7 +20,6 @@ subprojects {
 		// No need for maven central as jcenter is a superset.
 		mavenCentral()
 		mavenLocal()
-		maven { url 'https://nexus.aphtech.org/repository/aphtech-mrepo' }
 	}
 }
 
