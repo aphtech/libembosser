@@ -18,7 +18,7 @@ dependencies {
 	implementation project(':libembosser-core-drivers')
 	// implementation project(':libembosser-utils')
 	implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
-	testImplementation 'org.testng:testng:7.4.0'
+	testImplementation 'org.testng:testng:7.7.0'
 	testImplementation 'org.assertj:assertj-core:3.11.1'
 }
 
