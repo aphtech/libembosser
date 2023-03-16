@@ -1,38 +1,11 @@
-/*******************************************************************************
- * BrailleBlaster Braille Transcription Application
- *   
- * Copyright (C) 2012-2017
- * American Printing House for the Blind, Inc. www.aph.org
- * 1839 Frankfort Ave.
- * Louisville, KY 40206
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * Portions copyright (C) 2010, 2012 
- * ViewPlus Technologies, Inc. www.viewplus.com
- *    and
- *    Abilitiessoft, Inc. www.abilitiessoft.com
- *
- * All rights reserved
- *   
- *    This file may contain code borrowed from files produced by various 
- *    Java development teams. These are gratefully acknowledged.
- *   
- * This file is free software; you can redistribute it and/or modify it
- *    under the terms of the Apache 2.0 License, as given at
- *    http://www.apache.org/licenses/
- *   
- *    This fi	le is distributed in the hope that it will be useful, but
- *    WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE
- *    See the Apache 2.0 License for more details.
- *   
- * You should have received a copy of the Apache 2.0 License along with 
- *    this program; see the file LICENSE.
- *    If not, see
- *    http://www.apache.org/licenses/
- *   
- *
- * 			
- *******************************************************************************/
+ * Copyright (c) 2023 American Printing House for the Blind
+ */
+ 
 package org.brailleblaster.libembosser.utils;
 
 import java.util.stream.IntStream;
