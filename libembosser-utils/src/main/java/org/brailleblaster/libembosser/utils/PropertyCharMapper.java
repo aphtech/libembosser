@@ -8,12 +8,11 @@
 
 package org.brailleblaster.libembosser.utils;
 
-import com.google.common.collect.Maps;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 public class PropertyCharMapper implements CharMapperFunction {
 
@@ -23,7 +22,7 @@ public class PropertyCharMapper implements CharMapperFunction {
 		try (InputStream in = getClass().getResourceAsStream(String.format("/org/brailleblaster/libembosser/brailleMappings/%s.properties", key))) {
 			Properties properties = new Properties();
 			properties.load(in);
-			tmpMap = Maps.fromProperties(properties);
+			tmpMap = properties.entrySet().stream().collect(Collectors.toUnmodifiableMap(e -> String.valueOf(e.getKey()), e -> String.valueOf(e.getValue())));
 		} catch (IOException e) {
 			// Log the problem and just provide an empty map
 			tmpMap = Map.of();
