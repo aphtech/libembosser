@@ -24,7 +24,7 @@ jar {
 	enabled = true
 }
 bootJar {
-	classifier = "application"
+	archiveClassifier = "application"
 }
 processResources {
 	expand(version: version)
