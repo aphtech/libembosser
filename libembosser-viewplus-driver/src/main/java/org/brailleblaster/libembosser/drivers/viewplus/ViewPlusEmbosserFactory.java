@@ -8,14 +8,13 @@
 
 package org.brailleblaster.libembosser.drivers.viewplus;
 
-import java.util.List;
-import java.util.Locale;
-
+import com.google.common.collect.ImmutableList;
 import org.brailleblaster.libembosser.spi.Embosser;
 import org.brailleblaster.libembosser.spi.EmbosserFactory;
 import org.brailleblaster.libembosser.spi.Rectangle;
+import org.jetbrains.annotations.NotNull;
 
-import com.google.common.collect.ImmutableList;
+import java.util.List;
 
 public class ViewPlusEmbosserFactory implements EmbosserFactory {
 	private ImmutableList<Embosser> embossers;
@@ -39,6 +38,7 @@ public class ViewPlusEmbosserFactory implements EmbosserFactory {
 				.build();
 	}
 
+	@NotNull
 	@Override
 	public List<Embosser> getEmbossers() {
 		return embossers;

@@ -25,6 +25,7 @@ import org.brailleblaster.libembosser.spi.Margins;
 import org.brailleblaster.libembosser.spi.Rectangle;
 
 import com.google.common.io.ByteSource;
+import org.jetbrains.annotations.NotNull;
 
 import javax.print.attribute.IntegerSyntax;
 
@@ -41,6 +42,7 @@ public class Braillo270Embosser extends BaseTextEmbosser {
 		return this.interpoint;
 	}
 
+	@NotNull
 	@Override
 	protected Function<Iterator<DocumentEvent>, ByteSource> createHandler(EmbossingAttributeSet attributes) {
 		final BrlCell cell = BrlCell.NLS;

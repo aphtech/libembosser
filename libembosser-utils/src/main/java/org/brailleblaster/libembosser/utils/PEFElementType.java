@@ -29,9 +29,9 @@ public enum PEFElementType {
 	SECTION(PEFNamespaceContext.PEF_NAMESPACE, "section"),
 	PAGE(PEFNamespaceContext.PEF_NAMESPACE, "page"),
 	ROW(PEFNamespaceContext.PEF_NAMESPACE, "row");
-	private String ns;
-	private String elemName;
-	private List<Predicate<Element>> additionalChecks;
+	private final String ns;
+	private final String elemName;
+	private final List<Predicate<Element>> additionalChecks;
 	PEFElementType(String ns, String elemName) {
 		this(ns, elemName, ImmutableList.of());
 	}

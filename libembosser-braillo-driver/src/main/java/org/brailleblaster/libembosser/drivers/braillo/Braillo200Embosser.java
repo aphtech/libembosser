@@ -26,6 +26,7 @@ import org.brailleblaster.libembosser.spi.Rectangle;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.ByteSource;
+import org.jetbrains.annotations.NotNull;
 
 import javax.print.attribute.IntegerSyntax;
 
@@ -37,6 +38,7 @@ public class Braillo200Embosser extends BaseTextEmbosser {
 		super(id, "Braillo", model, maxPaper, minPaper);
 		this.interpoint = interpoint;
 	}
+	@NotNull
 	protected Function<Iterator<DocumentEvent>, ByteSource> createHandler(EmbossingAttributeSet attributes) {
 		final Optional<PaperLayout> pageLayout = Optional.ofNullable((PaperLayout)(attributes.get(PaperLayout.class)));
 		boolean interpoint = pageLayout.map(l -> l.getValue().isDoubleSide()).orElse(false);

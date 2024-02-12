@@ -48,12 +48,22 @@ abstract class BaseGraphicsEmbosser protected constructor(private val id: String
     abstract fun getLayoutHelper(cell: BrlCell?): LayoutHelper
     @Throws(EmbossException::class)
     override fun embossPef(embosserDevice: PrintService, pef: Document, attributes: EmbossingAttributeSet) {
-        emboss(embosserDevice, pef, attributes, { inputDoc: Document, handler: DocumentHandler -> DocumentParser().parsePef(inputDoc, handler) })
+        emboss(embosserDevice, pef, attributes) { inputDoc: Document, handler: DocumentHandler ->
+            DocumentParser().parsePef(
+                inputDoc,
+                handler
+            )
+        }
     }
 
     @Throws(EmbossException::class)
     override fun embossBrf(embosserDevice: PrintService, brf: InputStream, attributes: EmbossingAttributeSet) {
-        emboss(embosserDevice, brf, attributes, { input: InputStream, handler: DocumentHandler -> DocumentParser().parseBrf(input, handler) })
+        emboss(embosserDevice, brf, attributes) { input: InputStream, handler: DocumentHandler ->
+            DocumentParser().parseBrf(
+                input,
+                handler
+            )
+        }
     }
 
     @Throws(EmbossException::class)

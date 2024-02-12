@@ -14,6 +14,7 @@ import org.brailleblaster.libembosser.spi.Embosser;
 import org.brailleblaster.libembosser.spi.EmbosserFactory;
 import org.brailleblaster.libembosser.spi.Rectangle;
 import com.google.common.collect.ImmutableList;
+import org.jetbrains.annotations.NotNull;
 
 public class BrailloEmbosserFactory implements EmbosserFactory {
 	private final List<Embosser> embossers;
@@ -28,6 +29,7 @@ public class BrailloEmbosserFactory implements EmbosserFactory {
 		embossers = eb.build();
 	}
 
+	@NotNull
 	@Override
 	public List<Embosser> getEmbossers() {
 		return embossers;

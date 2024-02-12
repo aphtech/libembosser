@@ -34,13 +34,6 @@ class DocumentParser {
         constructor(msg: String?) : super(msg)
         constructor(cause: Throwable?) : super(cause)
         constructor(msg: String?, cause: Throwable?) : super(msg, cause)
-
-        companion object {
-            /**
-             *
-             */
-            private const val serialVersionUID = -2233072119599883441L
-        }
     }
 
     /**

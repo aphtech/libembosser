@@ -23,6 +23,7 @@ import org.brailleblaster.libembosser.spi.EmbossingAttributeSet;
 import org.brailleblaster.libembosser.spi.Notification;
 import org.brailleblaster.libembosser.spi.Rectangle;
 import org.brailleblaster.libembosser.spi.Notification.NotificationType;
+import org.jetbrains.annotations.NotNull;
 
 public class ViewPlusEmbosser extends BaseGraphicsEmbosser {
 	private final Rectangle minPaper;
@@ -41,11 +42,13 @@ public class ViewPlusEmbosser extends BaseGraphicsEmbosser {
 		this.duplex = duplex;
 	}
 
-	@Override
+	@NotNull
+    @Override
 	public Rectangle getMaximumPaper() {
 		return maxPaper;
 	}
 
+	@NotNull
 	@Override
 	public Rectangle getMinimumPaper() {
 		return minPaper;
@@ -56,6 +59,7 @@ public class ViewPlusEmbosser extends BaseGraphicsEmbosser {
 		return duplex;
 	}
 
+	@NotNull
 	@Override
 	public LayoutHelper getLayoutHelper(BrlCell cell) {
 		return new ViewPlusLayoutHelper();
@@ -67,6 +71,7 @@ public class ViewPlusEmbosser extends BaseGraphicsEmbosser {
 				"org.brailleblaster.libembosser.drivers.i18n.ViewPlus", "NoFont")) : Stream.empty();
 	}
 
+	@NotNull
 	@Override
 	public Stream<Notification> checkEmboss(int cellsPerLine, int linesPerPage, EmbossingAttributeSet attributes) {
 		return checkFontInstalled() ? Stream.of(new DefaultNotificationImpl(NotificationType.WARNING,

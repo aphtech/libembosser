@@ -200,7 +200,8 @@ class CoreDriversTest {
         }
         val outBytes = out.toByteArray()
         assertEquals(outBytes, expected, String.format("Output did not match, output expected: %s was: %s",
-            expected.contentToString(), Arrays.toString(outBytes)))
+            expected.contentToString(), outBytes.contentToString()
+        ))
     }
 
     @Test

@@ -19,7 +19,7 @@ public final class ImageUtils {
 	 * @param img2 The second image to compare.
 	 * @return True if the pixels of the images are identical.
 	 */
-	public final static boolean imageEquals(Image img1, Image img2) {
+	public static boolean imageEquals(Image img1, Image img2) {
 		if (img1 == img2) {
 			return true;
 		}

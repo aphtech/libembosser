@@ -169,7 +169,7 @@ class PEF2Nippon {
         // This works as unknown elements are searched for known types where as a known element is not searched.
         return PefUtils.findMatchingDescendants(pef, PEFElementType.HEAD, PEFElementType.BODY).filter { e: Element? ->
             PEFElementType.findElementType(e)
-                .filter { other: PEFElementType? -> PEFElementType.BODY.equals(other) }.isPresent
+                .filter { other: PEFElementType? -> PEFElementType.BODY == other }.isPresent
         }
             .map { body: Element? -> bodyToString(body) }.collect(Collectors.joining())
     }

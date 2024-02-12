@@ -49,9 +49,9 @@ public enum PaperSize {
 	LEGAL("Legal", "216", "355.6"),
 	JUNIOR_LEGAL("Junior legal", "127", "203.2"),
 	LEDGER("Ledger", "279.4", "431.8");
-	private String displayName;
-	private Rectangle size;
-	private PaperSize replacementSize;
+	private final String displayName;
+	private final Rectangle size;
+	private final PaperSize replacementSize;
 	PaperSize(String name, String width, String height) {
 		this.displayName = name;
 		size = new Rectangle(new BigDecimal(width), new BigDecimal(height));

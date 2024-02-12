@@ -25,8 +25,9 @@ public enum BrlCell {
 	MARBURG_MEDIUM(new BigDecimal("6.00"), new BigDecimal("10.00"), 6),
 	UK(new BigDecimal("6.00"), new BigDecimal("10.00"), 6),
 	AUSTRALIAN(new BigDecimal("6.00"), new BigDecimal("10.00"), 6);
-	private BigDecimal width, height;
-	private int dots;
+	private final BigDecimal width;
+    private final BigDecimal height;
+	private final int dots;
 	BrlCell(BigDecimal width, BigDecimal height, int dots) {
 		this.width = width;
 		this.height = height;
