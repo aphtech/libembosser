@@ -21,15 +21,6 @@ subprojects {
 		mavenCentral()
 		mavenLocal()
 	}
-	publishing {
-		repositories {
-			maven {
-				// Get server credentials from maven-settings
-				name = "aphtech-mrepo"
-				url "https://nexus.aphtech.org/repository/aphtech-mrepo/"
-			}
-		}
-	}
 }
 
 wrapper {
