@@ -19,14 +19,24 @@ dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib'
 }
 
+compileJava {
+    options.release = 17
+}
+
+compileTestJava {
+    options.release = 17
+}
+
 compileKotlin {
     kotlinOptions {
         jvmTarget = "17"
+        freeCompilerArgs += "-Xjvm-default=all"
     }
 }
 
 compileTestKotlin {
     kotlinOptions {
         jvmTarget = "17"
+        freeCompilerArgs += "-Xjvm-default=all"
     }
 }
