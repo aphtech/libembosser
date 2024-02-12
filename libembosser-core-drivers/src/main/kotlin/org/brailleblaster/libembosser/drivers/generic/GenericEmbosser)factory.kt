@@ -8,7 +8,6 @@
 
 package org.brailleblaster.libembosser.drivers.generic
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings
 import org.brailleblaster.libembosser.spi.Embosser
 import org.brailleblaster.libembosser.spi.EmbosserFactory
 import org.brailleblaster.libembosser.spi.Rectangle
@@ -16,10 +15,6 @@ import org.slf4j.LoggerFactory
 import java.math.BigDecimal
 
 class GenericEmbosserFactory : EmbosserFactory {
-    @get:SuppressFBWarnings(
-        value = ["EI_EXPOSE_REP"],
-        justification = "Kotlin List is immutable"
-    )
     override val embossers: List<Embosser> = buildList {
         add(GenericTextEmbosser("libembosser.generic.text", "Text only", LARGE_GENERIC_PAPER, SMALL_GENERIC_PAPER))
         add(

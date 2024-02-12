@@ -6,18 +6,16 @@
  * Copyright (c) 2023 American Printing House for the Blind
  */
 
-import com.github.spotbugs.snom.SpotBugsTask
-
 plugins {
 	id "org.brailleblaster.libembosser.kotlin-library-conventions"
 }
 
 dependencies {
-	implementation 'com.google.guava:guava:30.1.1-jre'
+	implementation 'com.google.guava:guava:33.0.0-jre'
 	api project(':libembosser-api')
 	implementation project(':libembosser-utils')
-	implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
-	testImplementation 'org.testng:testng:7.7.0'
+	implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.11'
+	testImplementation 'org.testng:testng:7.9.0'
 	testImplementation 'org.assertj:assertj-core:3.11.1'
 }
 
@@ -30,12 +28,5 @@ publishing {
 		nipponDriver(MavenPublication) {
 			from components.java
 		}
-	}
-}
-
-tasks.withType(SpotBugsTask) {
-	reports {
-		xml.enabled = false
-		html.enabled = true
 	}
 }

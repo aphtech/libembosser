@@ -7,7 +7,6 @@
  */
 package org.brailleblaster.libembosser.drivers.aph
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings
 import org.brailleblaster.libembosser.drivers.indexBraille.IndexBrailleEmbosser
 import org.brailleblaster.libembosser.drivers.indexBraille.IndexBrailleFactory
 import org.brailleblaster.libembosser.drivers.viewplus.ViewPlusEmbosser
@@ -17,10 +16,6 @@ import org.brailleblaster.libembosser.spi.Rectangle
 import java.math.BigDecimal
 
 class AphEmbosserFactory : EmbosserFactory {
-    @get:SuppressFBWarnings(
-        value = ["EI_EXPOSE_REP"],
-        justification = "Kotlin List is immutable"
-    )
     override val embossers: List<Embosser> = listOf(
             ViewPlusEmbosser(
                 "libembosser.aph.PixBlaster",

@@ -8,7 +8,6 @@
 
 plugins {
     id 'org.jetbrains.kotlin.jvm'
-    id "com.github.spotbugs"
 }
 
 repositories {
@@ -20,21 +19,20 @@ dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib'
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+compileJava {
+    options.release = 17
 }
 
 compileKotlin {
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
         freeCompilerArgs += "-Xjvm-default=all"
     }
 }
 
 compileTestKotlin {
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
         freeCompilerArgs += "-Xjvm-default=all"
     }
 }

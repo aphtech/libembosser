@@ -14,15 +14,10 @@ import org.jline.reader.LineReader;
 
 import com.google.common.base.Strings;
 import com.google.common.primitives.Ints;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 public class InputReader {
 	private LineReader lineReader;
 	private ShellHelper shellHelper;
-	@SuppressFBWarnings(
-			value = "EI_EXPOSE_REP2",
-			justification = "Not able to copy LineReader instances"
-	)
 	public InputReader(LineReader lineReader, ShellHelper shellHelper) {
 		this.lineReader = lineReader;
 		this.shellHelper = shellHelper;
