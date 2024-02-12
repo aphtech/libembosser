@@ -10,17 +10,16 @@ plugins {
 	id "java-library"
 }
 
-java {
-	sourceCompatibility = JavaVersion.VERSION_1_8
-	targetCompatibility = JavaVersion.VERSION_1_8
+compileJava {
+	options.release = 17
 }
 
 dependencies {
 	implementation 'com.google.guava:guava:33.0.0-jre'
 	api project(':libembosser-api')
 	implementation project(':libembosser-core-drivers')
-	implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
-	testImplementation 'org.testng:testng:7.4.0'
+	implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.11'
+	testImplementation 'org.testng:testng:7.9.0'
 	testImplementation 'org.assertj:assertj-core:3.11.1'
 }
 
